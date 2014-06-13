@@ -1,0 +1,17 @@
+
+ @import url(http://fonts.googleapis.com/css?family=Ubuntu);
+body {
+font:1em/1.625em;
+background-color:#fff;
+font-family: 'Ubuntu', sans-serif;
+font-size-adjust:none;
+font-style:normal;
+width: 850px;
+margin: 20px auto;
+max-width: 90%;
+font-weight:100;
+}
+
+li {
+  margin-bottom: 50px;
+}

@@ -1,0 +1,23 @@
+{
+  "name": "resumes",
+  "version": "0.0.0",
+  "description": "resumes ======= http://microformats.org/wiki/hresume",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thomasdavis/resumes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thomasdavis/resumes/issues"
+  },
+  "homepage": "https://github.com/thomasdavis/resumes",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "mustache": "^0.8.1"
+  }
+}
