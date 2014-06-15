@@ -84,6 +84,7 @@ app.get('/resume/:uid.:format', function(req, res) {
 });
 app.post('/resume', function (req, res) {
 	var uid = guid();
+	console.log(req.body);
 	resumes[uid] = req.body && JSON.parse(req.body.resume) || {};
 	res.send({url:'http://resume-json.herokuapp.com/resume/'+uid});
 });
