@@ -1,0 +1,62 @@
+{
+    "name": "Roland Sharp",
+    "email": "rolandsharp@gmail.com",
+    "phoneNumber": null,
+    "bio": "I'm a Node.js and Ruby on Rails developer looking for remote work in the BitCoin industry.",
+    "location": {
+        "city": "Brisbane",
+        "countryCode": "AU"
+    },
+    "work": [{
+        "startDate":   "2014-05-01",
+        "endDate": "present",
+        "position": "Developer",
+        "name": "Payment Network International",
+        "website": "http://pni.com.au",
+        "description": "",
+        "highlights": []
+    },{
+        "startDate":   "2014-01-01",
+        "endDate": "2014-05-01",
+        "position": "Junior Developer",
+        "name": "My Work Australia",
+        "website": "http://www.mywork.com.au",
+        "description": "Primarily working with PHP, JavaScript and MySQL, I installed payment gateways including eWay and PayPal for client websites, developed and customised OpenCart shops, connected Electronic Marketing Systems including Campaign Monitor, worked closely with designers to get their creations moving, and wrote reusable code such as custom paginators.",
+        "highlights": ["Developed new tools in the contacting congress industry"]
+    },{
+        "startDate":   "in the past",
+        "endDate": "in the past",
+        "position": "Systems Admin",
+        "name": "G.James Australia",
+        "website": "http://gjames.com",
+        "description": "Most of my work at G.James was in keeping the printers up and running smoothly. Working with both Linux and windows servers, I would do a lot of remote ‘shadowing’ support work and training users on how to work with PDF’s and printing. Sometimes I was sent into a factory to work with floppy drives and Commodore 64's.",
+        "highlights": [""]
+    }],
+    "education": [{
+        "name": "The University of Queensland",
+        "studyType": "Bachelors",
+        "area": "Philosophy",
+        "startDate": "",
+        "endDate": "",
+        "courses": ["PHIL2001", "..."]
+    }],
+    "awards": [{
+        "name": "no awards",
+        "date": "2009-10-01",
+        "awarder": ""
+    }],
+    "publications": [{
+        "name": "no publication yet",
+        "publisher": ""
+    }],
+    "profiles": {
+        "github": "rolandnsharp",
+        "twitter": "rolandnsharp"
+    },
+    "skills": ["javascript", "ruby on rails"],
+    "hobbies": ["Philosophy"],
+    "references": [{
+        "name": "no reference",
+        "reference": ""
+    }]
+}

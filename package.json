@@ -18,6 +18,9 @@
   "homepage": "https://github.com/thomasdavis/resumes",
   "dependencies": {
     "lodash": "^2.4.1",
-    "mustache": "^0.8.1"
+    "mustache": "^0.8.1",
+    "express": "~4.4.3",
+    "resume-to-text": "0.0.5",
+    "resume-to-html": "0.0.1"
   }
 }
