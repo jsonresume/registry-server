@@ -3,8 +3,9 @@ var express = require("express");
 var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
 var resumeToHTML = require('resume-to-html');
-
+var bodyParser = require('body-parser');
 var app = express();
+app.use(bodyParser());
 var fs = require('fs');
 var guid = (function() {
   function s4() {
