@@ -87,7 +87,7 @@ app.post('/resume', function (req, res) {
 	var uid = guid();
 	console.log(req.body);
 	resumes[uid] = req.body && req.body.resume || {};
-	res.send({url:'http://registry.jsonresume.org/resume/'+uid+'.html'});
+	res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
 });
 var port = Number(process.env.PORT || 5000);
 app.listen(port, function() {
