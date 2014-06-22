@@ -4,6 +4,11 @@ var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
 var resumeToHTML = require('resume-to-html');
 var bodyParser = require('body-parser');
+
+var MongoClient = require('mongodb').MongoClient;
+var mongo = require('mongodb');
+
+
 var app = express();
 app.use(bodyParser());
 var fs = require('fs');
