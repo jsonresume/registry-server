@@ -8,6 +8,20 @@ var bcrypt = require('bcrypt-nodejs');
 
 var app = express();
 
+var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
+    postmark.send({
+        "From": "donotreply@jsonresume.org", 
+        "To": "thomasalwyndavis@gmail.com", 
+        "Subject": "Welcome to JsonResume.org", 
+        "TextBody": "You suck"
+    }, function(error, success) {
+        if(error) {
+            console.error("Unable to send via postmark: " + error.message);
+            return;
+        }
+        console.info("Sent to postmark for delivery")
+    });
+
 var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
 app.use(bodyParser());
@@ -102,8 +116,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   app.post('/user', function (req, res) {
 
 
-bcrypt.compareSync("bacon", hash); // true
-bcrypt.compareSync("veggies", hash); // false
     db.collection('users').findOne({'email' : req.body.email}, function(err, user) {
 
       if(!user) {
@@ -116,7 +128,7 @@ bcrypt.compareSync("veggies", hash); // false
           } else {
             var hash = bcrypt.hashSync(req.body.password);
             db.collection('users').insert({username:req.body.username, email: req.body.email, hash: hash}, {safe: true}, function(err, user){
-              res.send(user);
+              res.send({message: "success"});
             });
           }
         });
