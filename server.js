@@ -93,8 +93,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   });
 
   app.post('/resume', function (req, res) {
-    db.collection('users').insert({}, {safe: true}, function(err, records){
-      res.send({message: 'success'});
+    db.collection
+    db.collection('users').insert({user:req.body.user, email: req.body.email, password: req.body.password}, {safe: true}, function(err, records){
+      res.send({records});
     });
   	//var uid = guid();
   	//console.log(req.body);
