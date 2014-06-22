@@ -5,6 +5,9 @@ var resumeToText = require('resume-to-text');
 var resumeToHTML = require('resume-to-html');
 var bodyParser = require('body-parser');
 var app = express();
+
+var MongoClient = require('mongodb').MongoClient;
+var mongo = require('mongodb');
 app.use(bodyParser());
 var fs = require('fs');
 var guid = (function() {
