@@ -145,7 +145,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
           username: user.username
         };
         console.log('inserted');
-        db.collection('resumes').insert({resume: resume}, {safe: true}, function(err, resume){
+        db.collection('resumes').update({'jsonresume.username': user.username}, resume, {upsert: true, safe: true}, function(err, resume){
           res.send({url:'http://registry.jsonresume.org/' + user.username});
         });
       } else {
