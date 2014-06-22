@@ -110,7 +110,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   	var uid = guid();
   	console.log(req.body);
   	resumes[uid] = req.body && req.body.resume || {};
-  	res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
+  	res.send({url:'http://registry.jsonresume.org/resume/'+uid+'.html'});
   });
 
   app.post('/user', function (req, res) {
@@ -118,12 +118,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     db.collection('users').findOne({'email' : req.body.email}, function(err, user) {
 
-      if(!user) {
+      if(user) {
         res.send({error: {field: 'email', message: 'Email is already in use, maybe you forgot your password?'}});
       } else {
 
         db.collection('users').findOne({'username' : req.body.username}, function(err, user) {
-          if(!user) {
+          if(user) {
             res.send({error: {field: 'username', message: 'This username is already taken, please try another one'}});
           } else {
             var hash = bcrypt.hashSync(req.body.password);
