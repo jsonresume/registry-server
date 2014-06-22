@@ -115,7 +115,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
   app.post('/user', function (req, res) {
 
-
+    console.log(req.body);
     db.collection('users').findOne({'email' : req.body.email}, function(err, user) {
 
       if(user) {
