@@ -150,7 +150,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         });
       } else {
         console.log('deleted');
-        res.send('ERRORRRSSSS');
+        res.send({message:'ERRORRRSSSS'});
       }
     });
   });
