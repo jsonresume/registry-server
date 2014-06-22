@@ -155,7 +155,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         }
       });
     } else {
-      var guestUsername = s4()+s4();
+      var guestUsername = S4()+S4();
       var resume = req.body && req.body.resume || {};
       resume.jsonresume = {
         username: guestUsername
