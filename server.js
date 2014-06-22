@@ -99,7 +99,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         res.send({error: {field: 'email', message: 'Email is already in use, maybe you forgot your password?'}});
       } else {
         db.collection('users').insert({user:req.body.user, email: req.body.email, password: req.body.password}, {safe: true}, function(err, records){
-          res.send({records});
+          res.send(records);
         });
       }
     });
