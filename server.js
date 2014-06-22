@@ -4,6 +4,8 @@ var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
 var resumeToHTML = require('resume-to-html');
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt-nodejs');
+
 var app = express();
 
 var MongoClient = require('mongodb').MongoClient;
@@ -98,6 +100,10 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   });
 
   app.post('/user', function (req, res) {
+
+
+bcrypt.compareSync("bacon", hash); // true
+bcrypt.compareSync("veggies", hash); // false
     db.collection('users').findOne({'email' : req.body.email}, function(err, user) {
 
       if(!user) {
@@ -108,11 +114,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
           if(!user) {
             res.send({error: {field: 'username', message: 'This username is already taken, please try another one'}});
           } else {
-            db.collection('users').insert({username:req.body.username, email: req.body.email, password: req.body.password}, {safe: true}, function(err, records){
-              res.send(records);
+            var hash = bcrypt.hashSync(req.body.password);
+            db.collection('users').insert({username:req.body.username, email: req.body.email, hash: hash}, {safe: true}, function(err, user){
+              res.send(user);
             });
           }
-
         });
       }
 
