@@ -37,7 +37,11 @@ var guid = (function() {
            s4() + '-' + s4() + s4() + s4();
   };
 })();
-
+function S4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+               .toString(16)
+               .substring(1);
+  };
 
 MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   app.all('/*', function(req, res, next) {
