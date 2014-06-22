@@ -138,21 +138,33 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     var password = req.body.password;
     var email = req.body.email;
     console.log(req.body);
-    db.collection('users').findOne({'email' : email }, function(err, user) {
-      if(user && bcrypt.compareSync(password, user.hash)) {
-      	var resume = req.body && req.body.resume || {};
-        resume.jsonresume = {
-          username: user.username
-        };
-        console.log('inserted');
-        db.collection('resumes').update({'jsonresume.username': user.username}, resume, {upsert: true, safe: true}, function(err, resume){
-          res.send({url:'http://registry.jsonresume.org/' + user.username});
-        });
-      } else {
-        console.log('deleted');
-        res.send({message:'ERRORRRSSSS'});
-      }
-    });
+    if(!req.body.guest) {
+      db.collection('users').findOne({'email' : email }, function(err, user) {
+        if(user && bcrypt.compareSync(password, user.hash)) {
+        	var resume = req.body && req.body.resume || {};
+          resume.jsonresume = {
+            username: user.username
+          };
+          console.log('inserted');
+          db.collection('resumes').update({'jsonresume.username': user.username}, resume, {upsert: true, safe: true}, function(err, resume){
+            res.send({url:'http://registry.jsonresume.org/' + user.username});
+          });
+        } else {
+          console.log('deleted');
+          res.send({message:'ERRORRRSSSS'});
+        }
+      });
+    } else {
+      var guestUsername = s4()+s4();
+      var resume = req.body && req.body.resume || {};
+      resume.jsonresume = {
+        username: guestUsername
+      };
+      console.log('inserted');
+      db.collection('resumes').insert(resume, { safe: true}, function(err, resume){
+        res.send({url:'http://registry.jsonresume.org/' + guestUsername});
+      });
+    }
   });
 
   app.post('/user', function (req, res) {
