@@ -149,6 +149,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
           res.send({url:'http://registry.jsonresume.org/' + user.username});
         });
       } else {
+        console.log('deleted');
         res.send('ERRORRRSSSS');
       }
     });
