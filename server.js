@@ -18,78 +18,94 @@ var guid = (function() {
            s4() + '-' + s4() + s4() + s4();
   };
 })();
-app.all('/*', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
-});
-app.get('/resume/user/:username.:format', function(req, res) {
-	var resume = JSON.parse(fs.readFileSync(req.params.username + '.json', 'utf8'));
-	console.log(req.params.format);
-  	var format = req.params.format;
 
-  	var content = '';
-  	switch(format) {
-  		case 'json':
-  			content =  JSON.stringify(resume, undefined, 4);
-  			res.send(content);
-  			break;
-  		case 'txt':
-  			content = resumeToText.resumeToText(resume, function (plainText){
-  				res.set({'Content-Type': 'text/plain',
-  					'Content-Length': plainText.length});
 
-  				res.set('Cba', 'text/plain');
-  				res.type('text/plain')
-				res.send(200,plainText);
-  			});
-  			break
-  		default:
-  			resumeToHTML(resume, function (content){
-  				res.send(content);
-  			});
+MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
+  app.all('/*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+  });
+  app.get('/resume/user/:username.:format', function(req, res) {
+  	var resume = JSON.parse(fs.readFileSync(req.params.username + '.json', 'utf8'));
+  	console.log(req.params.format);
+    	var format = req.params.format;
 
-  	}
+    	var content = '';
+    	switch(format) {
+    		case 'json':
+    			content =  JSON.stringify(resume, undefined, 4);
+    			res.send(content);
+    			break;
+    		case 'txt':
+    			content = resumeToText.resumeToText(resume, function (plainText){
+    				res.set({'Content-Type': 'text/plain',
+    					'Content-Length': plainText.length});
 
-});
-var resumes = {};
-app.get('/resume/:uid.:format', function(req, res) {
-	console.log(resumes);
-	var resume = resumes[req.params.uid];
-	console.log(req.params.format);
-  	var format = req.params.format;
+    				res.set('Cba', 'text/plain');
+    				res.type('text/plain')
+  				res.send(200,plainText);
+    			});
+    			break
+    		default:
+    			resumeToHTML(resume, function (content){
+    				res.send(content);
+    			});
 
-  	var content = '';
-  	switch(format) {
-  		case 'json':
-  			content =  JSON.stringify(resume, undefined, 4);
-  			res.send(content);
-  			break;
-  		case 'txt':
-  			content = resumeToText.resumeToText(resume, function (plainText){
-  				res.set({'Content-Type': 'text/plain',
-  					'Content-Length': plainText.length});
+    	}
 
-  				res.set('Cba', 'text/plain');
-  				res.type('text/plain')
-				res.send(200,plainText);
-  			});
-  			break
-  		default:
-  			resumeToHTML(resume, function (content){
-  				res.send(content);
-  			});
+  });
+  var resumes = {};
+  app.get('/resume/:uid.:format', function(req, res) {
+  	console.log(resumes);
+  	var resume = resumes[req.params.uid];
+  	console.log(req.params.format);
+    	var format = req.params.format;
 
-  	}
+    	var content = '';
+    	switch(format) {
+    		case 'json':
+    			content =  JSON.stringify(resume, undefined, 4);
+    			res.send(content);
+    			break;
+    		case 'txt':
+    			content = resumeToText.resumeToText(resume, function (plainText){
+    				res.set({'Content-Type': 'text/plain',
+    					'Content-Length': plainText.length});
 
-});
-app.post('/resume', function (req, res) {
-	var uid = guid();
-	console.log(req.body);
-	resumes[uid] = req.body && req.body.resume || {};
-	res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
-});
-var port = Number(process.env.PORT || 5000);
-app.listen(port, function() {
-  console.log("Listening on " + port);
+    				res.set('Cba', 'text/plain');
+    				res.type('text/plain')
+  				res.send(200,plainText);
+    			});
+    			break
+    		default:
+    			resumeToHTML(resume, function (content){
+    				res.send(content);
+    			});
+
+    	}
+
+  });
+
+  app.post('/resume', function (req, res) {
+    db.collection('users').insert({}, {safe: true}, function(err, records){
+      res.send({message: 'success'});
+    });
+  	//var uid = guid();
+  	//console.log(req.body);
+  	//resumes[uid] = req.body && req.body.resume || {};
+  	//res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
+  });
+
+  app.post('/user', function (req, res) {
+    var uid = guid();
+    console.log(req.body);
+    resumes[uid] = req.body && req.body.resume || {};
+    res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
+  });
+
+  var port = Number(process.env.PORT || 5000);
+  app.listen(port, function() {
+    console.log("Listening on " + port);
+  });
 });
