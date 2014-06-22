@@ -101,7 +101,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
           });
 
       }
-
+    });
   });
   app.get('/resume/:uid.:format', function(req, res) {
   	console.log(resumes);
@@ -137,12 +137,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   app.post('/resume', function (req, res) {
     var hash = req.body.password;
     var email = req.body.email;
-    db.collection('users').findOne({'email' : email, }, function(err, user) {
-      if(user && user.hash === bcrypt.compareSync(password,user.hash)) {
+    db.collection('users').findOne({'email' : email }, function(err, user) {
+      if(user && user.hash === bcrypt.compareSync(password.user.hash)) {
       	var resume = req.body && req.body.resume || {};
         resume.jsonresume = {
           username: user.username
-        }
+        };
         db.collection('resumes').insert({resume: resume}, {safe: true}, function(err, user){
           res.send({url:'http://registry.jsonresume.org/' + user.username});
         });
