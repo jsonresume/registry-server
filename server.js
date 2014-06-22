@@ -93,9 +93,15 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   });
 
   app.post('/resume', function (req, res) {
-    db.collection
-    db.collection('users').insert({user:req.body.user, email: req.body.email, password: req.body.password}, {safe: true}, function(err, records){
-      res.send({records});
+    db.collection('users').findOne({'email' : req.body.email}, function(err, user) {
+
+      if(!user) {
+        res.send({error: {field: 'email', message: 'Email is already in use, maybe you forgot your password?'}});
+      } else {
+        db.collection('users').insert({user:req.body.user, email: req.body.email, password: req.body.password}, {safe: true}, function(err, records){
+          res.send({records});
+        });
+      }
     });
   	//var uid = guid();
   	//console.log(req.body);
