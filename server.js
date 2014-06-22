@@ -75,8 +75,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
   });
   app.get('/:uid', function(req, res) {
-    db.collection('resumes').findOne({'jsonresume.username' : req.body.uid, }, function(err, resume) {
-    
+    db.collection('resumes').findOne({'jsonresume.username' : req.params.uid, }, function(err, resume) {
+    console.log(resume);
       var format = 'html';//req.params.format;
 
       var content = '';
