@@ -139,7 +139,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     var email = req.body.email;
     console.log(req.body);
     db.collection('users').findOne({'email' : email }, function(err, user) {
-      if(user && user.hash === bcrypt.compareSync(password, user.hash)) {
+      if(user && bcrypt.compareSync(password, user.hash)) {
       	var resume = req.body && req.body.resume || {};
         resume.jsonresume = {
           username: user.username
