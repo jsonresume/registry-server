@@ -10,7 +10,7 @@ var app = express();
 
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
     postmark.send({
-        "From": "donotreply@jsonresume.org", 
+        "From": "admin@jsonresume.org", 
         "To": "thomasalwyndavis@gmail.com", 
         "Subject": "Welcome to JsonResume.org", 
         "TextBody": "You suck"
@@ -185,6 +185,18 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             res.send({error: {field: 'username', message: 'This username is already taken, please try another one'}});
           } else {
             var hash = bcrypt.hashSync(req.body.password);
+                postmark.send({
+                    "From": "admin@jsonresume.org", 
+                    "To": req.body.email, 
+                    "Subject": "Welcome to JsonResume.org", 
+                    "TextBody": "You suck"
+                }, function(error, success) {
+                    if(error) {
+                        console.error("Unable to send via postmark: " + error.message);
+                        return;
+                    }
+                    console.info("Sent to postmark for delivery")
+                });
             db.collection('users').insert({username:req.body.username, email: req.body.email, hash: hash}, {safe: true}, function(err, user){
               res.send({message: "success"});
             });
