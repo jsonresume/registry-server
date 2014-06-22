@@ -74,7 +74,35 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     	}
 
   });
-  var resumes = {};
+  app.get('/:uid', function(req, res) {
+    db.collection('resumes').findOne({'jsonresume.username' : req.body.uid, }, function(err, resume) {
+    
+      var format = 'html';//req.params.format;
+
+      var content = '';
+      switch(format) {
+        case 'json':
+          content =  JSON.stringify(resume, undefined, 4);
+          res.send(content);
+          break;
+        case 'txt':
+          content = resumeToText.resumeToText(resume, function (plainText){
+            res.set({'Content-Type': 'text/plain',
+              'Content-Length': plainText.length});
+
+            res.set('Cba', 'text/plain');
+            res.type('text/plain')
+          res.send(200,plainText);
+          });
+          break
+        default:
+          resumeToHTML(resume, function (content){
+            res.send(content);
+          });
+
+      }
+
+  });
   app.get('/resume/:uid.:format', function(req, res) {
   	console.log(resumes);
   	var resume = resumes[req.params.uid];
@@ -107,10 +135,21 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   });
 
   app.post('/resume', function (req, res) {
-  	var uid = guid();
-  	console.log(req.body);
-  	resumes[uid] = req.body && req.body.resume || {};
-  	res.send({url:'http://registry.jsonresume.org/resume/'+uid+'.html'});
+    var hash = req.body.password;
+    var email = req.body.email;
+    db.collection('users').findOne({'email' : email, }, function(err, user) {
+      if(user && user.hash === bcrypt.compareSync(password,user.hash)) {
+      	var resume = req.body && req.body.resume || {};
+        resume.jsonresume = {
+          username: user.username
+        }
+        db.collection('resumes').insert({resume: resume}, {safe: true}, function(err, user){
+          res.send({url:'http://registry.jsonresume.org/' + user.username});
+        });
+      } else {
+        res.send('ERRORRRSSSS');
+      }
+    });
   });
 
   app.post('/user', function (req, res) {
