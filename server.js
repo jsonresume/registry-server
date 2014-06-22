@@ -4,11 +4,6 @@ var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
 var resumeToHTML = require('resume-to-html');
 var bodyParser = require('body-parser');
-
-var MongoClient = require('mongodb').MongoClient;
-var mongo = require('mongodb');
-
-
 var app = express();
 app.use(bodyParser());
 var fs = require('fs');
@@ -93,6 +88,13 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
   });
 
   app.post('/resume', function (req, res) {
+  	var uid = guid();
+  	console.log(req.body);
+  	resumes[uid] = req.body && req.body.resume || {};
+  	res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
+  });
+
+  app.post('/user', function (req, res) {
     db.collection('users').findOne({'email' : req.body.email}, function(err, user) {
 
       if(!user) {
@@ -112,21 +114,10 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
       }
 
     });
-  	//var uid = guid();
-  	//console.log(req.body);
-  	//resumes[uid] = req.body && req.body.resume || {};
-  	//res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
-  });
-
-  app.post('/user', function (req, res) {
-    var uid = guid();
-    console.log(req.body);
-    resumes[uid] = req.body && req.body.resume || {};
-    res.send({url:'http://beta.jsonresume.org/resume/'+uid+'.html'});
   });
 
   var port = Number(process.env.PORT || 5000);
   app.listen(port, function() {
     console.log("Listening on " + port);
   });
-});
+})
