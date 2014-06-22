@@ -103,7 +103,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
           if(!user) {
             res.send({error: {field: 'username', message: 'This username is already taken, please try another one'}});
           } else {
-            db.collection('users').insert({user:req.body.user, email: req.body.email, password: req.body.password}, {safe: true}, function(err, records){
+            db.collection('users').insert({username:req.body.username, email: req.body.email, password: req.body.password}, {safe: true}, function(err, records){
               res.send(records);
             });
           }
