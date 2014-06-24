@@ -7,25 +7,8 @@
     <title>Bootstrap 101 Template</title>
 
     <!-- Bootstrap -->
-    <link href="bootstrap.css" rel="stylesheet">
-    <style>
-     @import url(http://fonts.googleapis.com/css?family=Ubuntu);
-body {
-font:1em/1.625em;
-background-color:#fff;
-font-family: 'Ubuntu', sans-serif;
-font-size-adjust:none;
-font-style:normal;
-width: 850px;
-margin: 20px auto;
-max-width: 90%;
-font-weight:100;
-}
-
-li {
-  margin-bottom: 50px;
-}
-</style>
+    <link href="http://bootswatch.com/cerulean/bootstrap.min.css" rel="stylesheet">
+  
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -35,31 +18,22 @@ li {
     <![endif]-->
   </head>
   <body>
-    <h1>{{name}}</h1>
-    <p>{{bio}}</p>
-    <h2>Work</h2>
-    <ul>
-    {{#work}}
-      <li>
-        <h3>{{position}}, {{name}}</h3>
-        <p>{{startDate}} - {{endDate}}</p>
-        <p>{{description}}</p>
-        <ul>
-          {{#highlights}}
-            <li>{{.}}</li>
-          {{/highlights}}
-        </ul>
-      </li>
-    {{/work}}
-    </ul>
-
-    <h2>References</h2>
-
-    {{#references}}
-      <blockquote>{{reference}} - <strong>{{name}}</strong></blockquote>
-    {{/references}}
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-1">
+        {{{resume}}}
+        </div>
+        <div class="col-md-2">
+        <br />
+          <a href="/{{username}}.md" style="width: 100%;" class="btn btn-primary">Markdown</a>
+          <br/>
+          <a href="/{{username}}.txt" style="width: 100%;" class="btn btn-info">Text</a>
+          <br/>
+          <a href="/{{username}}.pdf" style="width: 100%;" class="btn btn-warning">PDF</a>
+          <br/>
+          <a href="/{{username}}.json" style="width: 100%;" class="btn btn-success">JSON</a>
+        </div>
+        </div>
+    </div>
   </body>
 </html>

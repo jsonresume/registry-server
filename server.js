@@ -2,25 +2,17 @@ var express = require("express");
 
 var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
+var path = require('path');
 var resumeToHTML = require('resume-to-html');
+var resumeToPDF = require('resume-to-pdf');
+var resumeToMarkdown = require('resume-to-markdown');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
 
 var app = express();
 
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
-    postmark.send({
-        "From": "admin@jsonresume.org", 
-        "To": "thomasalwyndavis@gmail.com", 
-        "Subject": "Welcome to JsonResume.org", 
-        "TextBody": "You suck"
-    }, function(error, success) {
-        if(error) {
-            console.error("Unable to send via postmark: " + error.message);
-            return;
-        }
-        console.info("Sent to postmark for delivery")
-    });
+
 
 var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
@@ -78,65 +70,51 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     	}
 
   });
-  app.get('/:uid', function(req, res) {
-    db.collection('resumes').findOne({'jsonresume.username' : req.params.uid, }, function(err, resume) {
-    console.log(resume);
-      var format = 'html';//req.params.format;
+  var renderResume = function(req, res) {
+    var uid = req.params.uid;
+    var format = req.params.format || 'html';
+    console.log(format);
+    db.collection('resumes').findOne({'jsonresume.username' : uid, }, function(err, resume) {
 
-      var content = '';
-      switch(format) {
-        case 'json':
-          content =  JSON.stringify(resume, undefined, 4);
-          res.send(content);
-          break;
-        case 'txt':
-          content = resumeToText.resumeToText(resume, function (plainText){
-            res.set({'Content-Type': 'text/plain',
-              'Content-Length': plainText.length});
+        var content = '';
+        switch(format) {
+          case 'json':
+            content =  JSON.stringify(resume, undefined, 4);
+            res.set({'Content-Type': 'text/plain', 'Content-Length': content.length});
 
-            res.set('Cba', 'text/plain');
-            res.type('text/plain')
-          res.send(200,plainText);
-          });
-          break
-        default:
-          resumeToHTML(resume, function (content){
             res.send(content);
-          });
+            break;
+          case 'txt':
+            content = resumeToText(resume, function (plainText){
+              res.set({'Content-Type': 'text/plain', 'Content-Length': plainText.length});
+            res.send(200,plainText);
+            });
+            break
+          case 'md':
+            resumeToMarkdown(resume, function(markdown, errs){
+              res.set({'Content-Type': 'text/plain', 'Content-Length': markdown.length});
+              res.send(markdown);
+            })
+            break;
+          case 'pdf':
+            res.send('Not implemented');
+            break;
+          default:
+            console.log('def')
+            resumeToHTML(resume, function (content, errs){
+              var resumeTemplate = fs.readFileSync(path.resolve(__dirname, 'layout.template'), 'utf8');
 
-      }
+              var page = Mustache.render(resumeTemplate, {resume: content, username: uid});
+              res.send(page);
+            });
+
+        }
     });
-  });
-  app.get('/resume/:uid.:format', function(req, res) {
-  	console.log(resumes);
-  	var resume = resumes[req.params.uid];
-  	console.log(req.params.format);
-    	var format = req.params.format;
+  };
+  app.get('/:uid.:format', renderResume);
+  app.get('/:uid', renderResume);
 
-    	var content = '';
-    	switch(format) {
-    		case 'json':
-    			content =  JSON.stringify(resume, undefined, 4);
-    			res.send(content);
-    			break;
-    		case 'txt':
-    			content = resumeToText.resumeToText(resume, function (plainText){
-    				res.set({'Content-Type': 'text/plain',
-    					'Content-Length': plainText.length});
 
-    				res.set('Cba', 'text/plain');
-    				res.type('text/plain')
-  				res.send(200,plainText);
-    			});
-    			break
-    		default:
-    			resumeToHTML(resume, function (content){
-    				res.send(content);
-    			});
-
-    	}
-
-  });
 
   app.post('/resume', function (req, res) {
     var password = req.body.password;
