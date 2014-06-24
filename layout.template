@@ -7,7 +7,7 @@
     <title>Bootstrap 101 Template</title>
 
     <!-- Bootstrap -->
-    <link href="http://bootswatch.com/cerulean/bootstrap.min.css" rel="stylesheet">
+    <link href="http://bootswatch.com/lumen/bootstrap.min.css" rel="stylesheet">
   
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -21,19 +21,30 @@
     <div class="container">
       <div class="row">
         <div class="col-md-8 col-md-offset-1">
-        {{{resume}}}
+        {{{output}}}
         </div>
         <div class="col-md-2">
         <br />
-          <a href="/{{username}}.md" style="width: 100%;" class="btn btn-primary">Markdown</a>
-          <br/>
-          <a href="/{{username}}.txt" style="width: 100%;" class="btn btn-info">Text</a>
-          <br/>
-          <a href="/{{username}}.pdf" style="width: 100%;" class="btn btn-warning">PDF</a>
-          <br/>
-          <a href="/{{username}}.json" style="width: 100%;" class="btn btn-success">JSON</a>
+        <div class="btn-group" style="width: 100%;">
+                  <a href="/{{username}}.json" class="btn btn-default">Export</a>
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+
+          <li><a href="/{{username}}.md" style="width: 100%;" class="">Markdown</a></li>
+          <li><a href="/{{username}}.txt" style="width: 100%;" class="">Text</a></li>
+          <li><a href="/{{username}}.pdf" style="width: 100%;" class="">PDF</a></li>
+          <li><a href="/{{username}}.json" style="width: 100%;" class="">JSON</a></li>
+                  </ul>
+                </div>
+          <h3>Social Networks</h3>
+          <a href="http://twitter.com/{{resume.profiles.twitter}}" style="width: 100%;" class="btn btn-info">Follow @{{resume.profiles.twitter}}</a>
+          <a href="http://github.com/{{resume.profiles.github}}" style="width: 100%;" class="btn btn-default">Github @{{resume.profiles.github}}</a>
+
         </div>
         </div>
     </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
   </body>
 </html>
+b

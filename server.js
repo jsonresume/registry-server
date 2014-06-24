@@ -104,7 +104,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             resumeToHTML(resume, function (content, errs){
               var resumeTemplate = fs.readFileSync(path.resolve(__dirname, 'layout.template'), 'utf8');
 
-              var page = Mustache.render(resumeTemplate, {resume: content, username: uid});
+              var page = Mustache.render(resumeTemplate, {output: content, resume: resume, username: uid});
               res.send(page);
             });
 
