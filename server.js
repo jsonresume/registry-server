@@ -47,11 +47,21 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.get('/', function(req, res) {
         db.collection('users').find({}).toArray(function(err, docs) {
 
+            var routeTemplate = fs.readFileSync(path.resolve(__dirname, 'route.template'), 'utf8');
+
             var usernameArray = [];
             docs.forEach(function(doc) {
-                usernameArray.push(doc.username);
+                usernameArray.push({
+                    username: doc.username
+                });
             });
-            res.send(usernameArray);
+
+            var page = Mustache.render(routeTemplate, {
+
+                usernames: usernameArray
+            });
+
+            res.send(page);
         });
     });
 
