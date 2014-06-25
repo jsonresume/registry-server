@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 101 Template</title>
+    <title>{{resume.name}} - Json Resume</title>
 
     <!-- Bootstrap -->
     <link href="http://bootswatch.com/lumen/bootstrap.min.css" rel="stylesheet">
-  
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -25,21 +25,25 @@
         </div>
         <div class="col-md-2">
         <br />
-        <div class="btn-group" style="width: 100%;">
-                  <a href="/{{username}}.json" class="btn btn-default">Export</a>
-                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                  <ul class="dropdown-menu">
 
-          <li><a href="/{{username}}.md" style="width: 100%;" class="">Markdown</a></li>
-          <li><a href="/{{username}}.txt" style="width: 100%;" class="">Text</a></li>
-          <li><a href="/{{username}}.pdf" style="width: 100%;" class="">PDF</a></li>
-          <li><a href="/{{username}}.json" style="width: 100%;" class="">JSON</a></li>
-                  </ul>
-                </div>
           <h3>Social Networks</h3>
           <a href="http://twitter.com/{{resume.profiles.twitter}}" style="width: 100%;" class="btn btn-info">Follow @{{resume.profiles.twitter}}</a>
+          <br /><br />
           <a href="http://github.com/{{resume.profiles.github}}" style="width: 100%;" class="btn btn-default">Github @{{resume.profiles.github}}</a>
+          <br /><br />
+          <a href="http://github.com/{{resume.profiles.github}}" style="width: 100%;" class="btn btn-danger">Youtube @{{resume.profiles.github}}</a>
+          <h3>Export</h3>
+          <div class="btn-group" style="width: 100%;">
+                    <a href="/{{username}}.json" class="btn btn-default">Export</a>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                    <ul class="dropdown-menu">
 
+            <li><a href="/{{username}}.md" style="width: 100%;" class="">Markdown</a></li>
+            <li><a href="/{{username}}.txt" style="width: 100%;" class="">Text</a></li>
+            <li><a href="/{{username}}.pdf" style="width: 100%;" class="">PDF</a></li>
+            <li><a href="/{{username}}.json" style="width: 100%;" class="">JSON</a></li>
+                    </ul>
+                  </div>
         </div>
         </div>
     </div>
