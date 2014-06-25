@@ -43,28 +43,23 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         next();
     });
 
-
+    //// RS
     app.get('/', function(req, res) {
+        var routeTemplate = fs.readFileSync(path.resolve(__dirname, 'route.template'), 'utf8');
         db.collection('users').find({}).toArray(function(err, docs) {
-
-            var routeTemplate = fs.readFileSync(path.resolve(__dirname, 'route.template'), 'utf8');
-
             var usernameArray = [];
             docs.forEach(function(doc) {
                 usernameArray.push({
                     username: doc.username
                 });
             });
-
             var page = Mustache.render(routeTemplate, {
-
                 usernames: usernameArray
             });
-
             res.send(page);
         });
     });
-
+    ////
 
     app.get('/resume/user/:username.:format', function(req, res) {
         var resume = JSON.parse(fs.readFileSync(req.params.username + '.json', 'utf8'));
