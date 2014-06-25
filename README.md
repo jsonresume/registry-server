@@ -1,5 +1,8 @@
 resumes
 =======
+
+[![Build Status](https://api.travis-ci.org/jsonresume/registry-server.svg)](http://travis-ci.org/jsonresume/registry-server)
+
 http://microformats.org/wiki/hresume
 
 
