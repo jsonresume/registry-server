@@ -100,7 +100,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     })
                     break;
                 case 'pdf':
-                    res.send('Not implemented');
+                    resumeToPDF(resume, function(err, buffer) {
+                        res.contentType("application/pdf");
+                        if (err) return console.log(err);
+                        res.send(buffer);
+                    });
                     break;
                 default:
                     console.log('def')
