@@ -1,5 +1,4 @@
 var express = require("express");
-
 var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
 var path = require('path');
@@ -18,7 +17,7 @@ var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
 app.use(bodyParser());
 var fs = require('fs');
-var guid = (function() { //<- wtf
+var guid = (function() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
             .toString(16)
@@ -60,8 +59,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     };
 
-
-
     var renderResume = function(req, res) {
         var uid = req.params.uid;
         var format = req.params.format || 'html';
@@ -101,8 +98,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     break;
                 case 'pdf':
                     resumeToPDF(resume, function(err, buffer) {
-                        res.contentType("application/pdf");
                         if (err) return console.log(err);
+                        res.contentType("application/pdf");
                         res.send(buffer);
                     });
                     break;
@@ -118,7 +115,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         });
                         res.send(page);
                     });
-
             }
         });
     };
