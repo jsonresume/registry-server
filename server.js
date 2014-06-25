@@ -18,7 +18,7 @@ var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
 app.use(bodyParser());
 var fs = require('fs');
-var guid = (function() {
+var guid = (function() { //<- wtf
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
             .toString(16)
@@ -61,37 +61,40 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     });
     ////
 
-    app.get('/resume/user/:username.:format', function(req, res) {
-        var resume = JSON.parse(fs.readFileSync(req.params.username + '.json', 'utf8'));
-        console.log(req.params.format);
-        var format = req.params.format;
+    // app.get('/resume/user/:username.:format', function(req, res) {
+    //     var resume = JSON.parse(fs.readFileSync(req.params.username + '.json', 'utf8'));
+    //     console.log(req.params.format);
+    //     var format = req.params.format;
 
-        var content = '';
-        switch (format) {
-            case 'json':
-                content = JSON.stringify(resume, undefined, 4);
-                res.send(content);
-                break;
-            case 'txt':
-                content = resumeToText.resumeToText(resume, function(plainText) {
-                    res.set({
-                        'Content-Type': 'text/plain',
-                        'Content-Length': plainText.length
-                    });
+    //     var content = '';
+    //     switch (format) {
+    //         case 'json':
+    //             content = JSON.stringify(resume, undefined, 4);
+    //             res.send(content);
+    //             break;
+    //         case 'txt':
+    //             content = resumeToText.resumeToText(resume, function(plainText) {
+    //                 res.set({
+    //                     'Content-Type': 'text/plain',
+    //                     'Content-Length': plainText.length
+    //                 });
 
-                    res.set('Cba', 'text/plain');
-                    res.type('text/plain')
-                    res.send(200, plainText);
-                });
-                break
-            default:
-                resumeToHTML(resume, function(content) {
-                    res.send(content);
-                });
+    //                 res.set('Cba', 'text/plain');
+    //                 res.type('text/plain')
+    //                 res.send(200, plainText);
+    //             });
+    //             break
+    //             case 'pdf':
 
-        }
+    //             break;
+    //         default:
+    //             resumeToHTML(resume, function(content) {
+    //                 res.send(content);
+    //             });
 
-    });
+    //     }
+
+    // });
     var renderResume = function(req, res) {
         var uid = req.params.uid;
         var format = req.params.format || 'html';

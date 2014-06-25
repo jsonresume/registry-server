@@ -24,7 +24,7 @@
        {{#usernames}}
       <li>
        
-         <a href="/resume/user/{{username}}.html">{{username}}</a>
+         <a href="/{{username}}">{{username}}</a>
       </li>
     {{/usernames}}
      
