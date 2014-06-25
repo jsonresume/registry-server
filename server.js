@@ -7,7 +7,7 @@ var resumeToPDF = require('resume-to-pdf');
 var resumeToMarkdown = require('resume-to-markdown');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
-
+var gravatar = require('gravatar');
 var app = express();
 
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
@@ -48,7 +48,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             var usernameArray = [];
             docs.forEach(function(doc) {
                 usernameArray.push({
-                    username: doc.username
+                    username: doc.username,
+                    gravatar: gravatar.url(doc.email, {s: '80', r: 'pg', d: '404'})
                 });
             });
             var page = Mustache.render(routeTemplate, {
