@@ -43,9 +43,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         next();
     });
 
-    //// RS
-    app.get('/', function(req, res) {
-        var routeTemplate = fs.readFileSync(path.resolve(__dirname, 'route.template'), 'utf8');
+    var renderHomePage = function(req, res) {
+        var routeTemplate = fs.readFileSync(path.resolve(__dirname, 'home.template'), 'utf8');
         db.collection('users').find({}).toArray(function(err, docs) {
             var usernameArray = [];
             docs.forEach(function(doc) {
@@ -58,43 +57,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             });
             res.send(page);
         });
-    });
-    ////
 
-    // app.get('/resume/user/:username.:format', function(req, res) {
-    //     var resume = JSON.parse(fs.readFileSync(req.params.username + '.json', 'utf8'));
-    //     console.log(req.params.format);
-    //     var format = req.params.format;
+    };
 
-    //     var content = '';
-    //     switch (format) {
-    //         case 'json':
-    //             content = JSON.stringify(resume, undefined, 4);
-    //             res.send(content);
-    //             break;
-    //         case 'txt':
-    //             content = resumeToText.resumeToText(resume, function(plainText) {
-    //                 res.set({
-    //                     'Content-Type': 'text/plain',
-    //                     'Content-Length': plainText.length
-    //                 });
 
-    //                 res.set('Cba', 'text/plain');
-    //                 res.type('text/plain')
-    //                 res.send(200, plainText);
-    //             });
-    //             break
-    //             case 'pdf':
 
-    //             break;
-    //         default:
-    //             resumeToHTML(resume, function(content) {
-    //                 res.send(content);
-    //             });
-
-    //     }
-
-    // });
     var renderResume = function(req, res) {
         var uid = req.params.uid;
         var format = req.params.format || 'html';
@@ -151,10 +118,10 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             }
         });
     };
+
+    app.get('/', renderHomePage);
     app.get('/:uid.:format', renderResume);
     app.get('/:uid', renderResume);
-
-
 
     app.post('/resume', function(req, res) {
         var password = req.body.password;
