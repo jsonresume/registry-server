@@ -45,19 +45,15 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
 
     app.get('/', function(req, res) {
-        db.collection('resumes').find({}).toArray(function(err, docs) {
+        db.collection('users').find({}).toArray(function(err, docs) {
 
             var usernameArray = [];
             docs.forEach(function(doc) {
-                usernameArray.push(doc.name);
+                usernameArray.push(doc.username);
             });
-
             res.send(usernameArray);
-            // res.send(docs[0].name);
         });
     });
-
-
 
 
     app.get('/resume/user/:username.:format', function(req, res) {
