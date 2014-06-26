@@ -159,7 +159,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     });
                 }
             });
-        } else if (req.body.protected) {
+        } else if (req.body.pProtected) {
 
             res.send({
                 url: "hahahahahahahha"
