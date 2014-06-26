@@ -43,16 +43,20 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     });
 
     var renderHomePage = function(req, res) {
-        var routeTemplate = fs.readFileSync(path.resolve(__dirname, 'home.template'), 'utf8');
+        var homeTemplate = fs.readFileSync(path.resolve(__dirname, 'home.template'), 'utf8');
         db.collection('users').find({}).toArray(function(err, docs) {
             var usernameArray = [];
             docs.forEach(function(doc) {
                 usernameArray.push({
                     username: doc.username,
-                    gravatar: gravatar.url(doc.email, {s: '80', r: 'pg', d: '404'})
+                    gravatar: gravatar.url(doc.email, {
+                        s: '80',
+                        r: 'pg',
+                        d: '404'
+                    })
                 });
             });
-            var page = Mustache.render(routeTemplate, {
+            var page = Mustache.render(homeTemplate, {
                 usernames: usernameArray
             });
             res.send(page);
@@ -155,6 +159,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     });
                 }
             });
+        } else if (req.body.pProtected) {
+
+            res.send({
+                url: "hahahahahahahha";
+            });
+
         } else {
             var guestUsername = S4() + S4();
             var resume = req.body && req.body.resume || {};
