@@ -161,8 +161,32 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             });
         } else if (req.body.pProtected !== false) {
 
-            res.send({
-                url: "hahahahahahahha"
+            db.collection('users').findOne({
+                'email': email
+            }, function(err, user) {
+                if (user && bcrypt.compareSync(password, user.hash)) {
+                    var resume = req.body && req.body.resume || {};
+                    resume.jsonresume = {
+                        username: user.username,
+                        pProtected: req.body.pProtected
+                    };
+                    console.log('inserted');
+                    db.collection('resumes').update({
+                        'jsonresume.username': user.username
+                    }, resume, {
+                        upsert: true,
+                        safe: true
+                    }, function(err, resume) {
+                        res.send({
+                            url: 'http://registry.jsonresume.org/' + user.username
+                        });
+                    });
+                } else {
+                    console.log('deleted');
+                    res.send({
+                        message: 'ERRORRRSSSS'
+                    });
+                }
             });
 
         } else {
