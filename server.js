@@ -1,3 +1,4 @@
+var fs = require('fs');
 var express = require("express");
 var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
@@ -13,8 +14,10 @@ var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
 var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
 var templateHelper = require('./template-helper');
+
 app.use(bodyParser());
-var fs = require('fs');
+app.use(express.static(__dirname + '/public'));
+
 var guid = (function() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -64,6 +67,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     var renderResume = function(req, res) {
         var uid = req.params.uid;
         var format = req.params.format || 'html';
+        var theme = req.query["theme"] || 'default';
         console.log(format);
         db.collection('resumes').findOne({
             'jsonresume.username': uid,
@@ -108,11 +112,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 default:
                     console.log('def')
                     resumeToHTML(resume, function(content, errs) {
-                        console.log(content, errs);
+                        // console.log(content, errs);
                         var page = Mustache.render(templateHelper.get('layout'), {
                             output: content,
                             resume: resume,
-                            username: uid
+                            username: uid,
+                            theme: theme
                         });
                         res.send(page);
                     });
