@@ -9,12 +9,10 @@ var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
 var gravatar = require('gravatar');
 var app = express();
-
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
-
-
 var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
+var templateHelper = require('./template-helper');
 app.use(bodyParser());
 var fs = require('fs');
 var guid = (function() {
@@ -43,7 +41,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     });
 
     var renderHomePage = function(req, res) {
-        var homeTemplate = fs.readFileSync(path.resolve(__dirname, 'home.template'), 'utf8');
         db.collection('users').find({}).toArray(function(err, docs) {
             var usernameArray = [];
             docs.forEach(function(doc) {
@@ -56,7 +53,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     })
                 });
             });
-            var page = Mustache.render(homeTemplate, {
+            var page = Mustache.render(templateHelper.get('home'), {
                 usernames: usernameArray
             });
             res.send(page);
@@ -111,11 +108,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 default:
                     console.log('def')
                     resumeToHTML(resume, function(content, errs) {
-			console.log(content, errs);
-                        var resumeTemplate = fs.readFileSync(path.resolve(__dirname, 'layout.template'), 'utf8');
-
-
-                        var page = Mustache.render(resumeTemplate, {
+                        console.log(content, errs);
+                        var page = Mustache.render(templateHelper.get('layout'), {
                             output: content,
                             resume: resume,
                             username: uid
