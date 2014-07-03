@@ -62,6 +62,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
 
     var renderResume = function(req, res) {
+        var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
         var format = req.params.format || 'html';
         console.log(format);
@@ -107,14 +108,14 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     break;
                 default:
                     console.log('def')
-                    resumeToHTML(resume, function(content, errs) {
+                    resumeToHTML(resume, {theme: themeName},function(content, errs) {
                         console.log(content, errs);
                         var page = Mustache.render(templateHelper.get('layout'), {
                             output: content,
                             resume: resume,
                             username: uid
                         });
-                        res.send(page);
+                        res.send(content);
                     });
             }
         });
