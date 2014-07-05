@@ -3,7 +3,6 @@ var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
 var path = require('path');
 var resumeToHTML = require('resume-to-html');
-var resumeToPDF = require('resume-to-pdf');
 var resumeToMarkdown = require('resume-to-markdown');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
@@ -118,6 +117,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         })
                         break;
                     case 'pdf':
+                        console.log('Come on PDFCROWD');
                         resumeToHTML(resume, {theme: themeName},function(content, errs) {
                             client.convertHtml(content, pdf.sendHttpResponse(res));
                         });
