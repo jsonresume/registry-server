@@ -119,9 +119,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         break;
                     case 'pdf':
                         resumeToHTML(resume, {theme: themeName},function(content, errs) {
-                            client.convertHtml(content, pdf.sendHttpResponse(res), {width: "11in",
-        height: "8.5in",
-        vmargin: ".4in"});
+                            client.convertHtml(content, pdf.sendHttpResponse(res);
                         });
                         break;
                     default:
