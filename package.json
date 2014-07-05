@@ -26,7 +26,7 @@
     "mustache": "^0.8.1",
     "pdfcrowd": "^1.1.1",
     "postmark": "~0.2.5",
-    "resume-to-html": "0.0.14",
+    "resume-to-html": "0.0.15",
     "resume-to-markdown": "latest",
     "resume-to-text": "latest"
   },
