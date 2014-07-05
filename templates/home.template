@@ -20,7 +20,7 @@
   <body>
 
 
-
+<!--
 <div class="navbar navbar-default">
   <div class="container">
     <a class="navbar-brand" href="#">Json Resume</a>
@@ -34,14 +34,12 @@
     </ul>
   </div>
 </div>
-
+-->
 <div class="container">
   <div class="jumbotron text-center">
-    <h1>Fixed Width Layout</h1>
-    <p class="lead">The Bootstrap 3 grid is fluid only. This example shows how to use a custom container to create a fixed width layout.</p>
-    <p><a class="btn btn-large btn-success" href="http://bootply.com/tagged/bootstrap-3" target="ext">More Examples</a></p>
+    <h1>Coming soon!</h1>
   </div>
-
+<!--
   <div class="row">
 
 
@@ -58,10 +56,9 @@
     </div>
         </div>
       {{/usernames}}
-
-
   </div>
 
+-->
 
 
 </div> <!-- /container -->
