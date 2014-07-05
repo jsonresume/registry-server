@@ -136,36 +136,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 if (user && bcrypt.compareSync(password, user.hash)) {
                     var resume = req.body && req.body.resume || {};
                     resume.jsonresume = {
-                        username: user.username
-                    };
-                    console.log('inserted');
-                    db.collection('resumes').update({
-                        'jsonresume.username': user.username
-                    }, resume, {
-                        upsert: true,
-                        safe: true
-                    }, function(err, resume) {
-                        res.send({
-                            url: 'http://registry.jsonresume.org/' + user.username
-                        });
-                    });
-                } else {
-                    console.log('deleted');
-                    res.send({
-                        message: 'ERRORRRSSSS'
-                    });
-                }
-            });
-        } else if (req.body.pProtected !== false) {
-
-            db.collection('users').findOne({
-                'email': email
-            }, function(err, user) {
-                if (user && bcrypt.compareSync(password, user.hash)) {
-                    var resume = req.body && req.body.resume || {};
-                    resume.jsonresume = {
                         username: user.username,
-                        pProtected: req.body.pProtected
+                        passphrase: req.body.passphrase || null
                     };
                     console.log('inserted');
                     db.collection('resumes').update({
@@ -185,12 +157,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     });
                 }
             });
-
         } else {
             var guestUsername = S4() + S4();
             var resume = req.body && req.body.resume || {};
             resume.jsonresume = {
-                username: guestUsername
+                username: guestUsername,
+                passphrase: req.body.passphrase || null
             };
             console.log('inserted');
             db.collection('resumes').insert(resume, {
