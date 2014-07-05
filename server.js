@@ -65,65 +65,82 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
         var format = req.params.format || 'html';
-        console.log(format);
+        console.log('---------------------------------------------');
         db.collection('resumes').findOne({
             'jsonresume.username': uid,
         }, function(err, resume) {
-
-            var content = '';
-            switch (format) {
-                case 'json':
-                    content = JSON.stringify(resume, undefined, 4);
-                    res.set({
-                        'Content-Type': 'text/plain',
-                        'Content-Length': content.length
-                    });
-
-                    res.send(content);
-                    break;
-                case 'txt':
-                    content = resumeToText(resume, function(plainText) {
-                        res.set({
-                            'Content-Type': 'text/plain',
-                            'Content-Length': plainText.length
-                        });
-                        res.send(200, plainText);
-                    });
-                    break
-                case 'md':
-                    resumeToMarkdown(resume, function(markdown, errs) {
-                        res.set({
-                            'Content-Type': 'text/plain',
-                            'Content-Length': markdown.length
-                        });
-                        res.send(markdown);
-                    })
-                    break;
-                case 'pdf':
-                    resumeToPDF(resume, function(err, buffer) {
-                        if (err) return console.log(err);
-                        res.contentType("application/pdf");
-                        res.send(buffer);
-                    });
-                    break;
-                default:
-                    console.log('def')
-                    resumeToHTML(resume, {theme: themeName},function(content, errs) {
-                        console.log(content, errs);
-                        var page = Mustache.render(templateHelper.get('layout'), {
-                            output: content,
-                            resume: resume,
-                            username: uid
-                        });
-                        res.send(content);
-                    });
+            console.log(resume);
+            if(!resume) {
+                return;
             }
+            if(typeof resume.jsonresume.passphrase ==='string' && typeof req.body.passphrase === 'undefined') {
+
+                var page = Mustache.render(templateHelper.get('password'), {
+                });
+                res.send(page);
+                return;
+            } 
+            console.log(req.body.passphrase, resume.jsonresume.passphrase);
+            if(typeof req.body.passphrase !== 'undefined' && req.body.passphrase !== resume.jsonresume.passphrase) {
+                res.send('Password was wrong, go back and try again');
+                return;
+            }
+                var content = '';
+                switch (format) {
+                    case 'json':
+                        content = JSON.stringify(resume, undefined, 4);
+                        res.set({
+                            'Content-Type': 'text/plain',
+                            'Content-Length': content.length
+                        });
+
+                        res.send(content);
+                        break;
+                    case 'txt':
+                        content = resumeToText(resume, function(plainText) {
+                            res.set({
+                                'Content-Type': 'text/plain',
+                                'Content-Length': plainText.length
+                            });
+                            res.send(200, plainText);
+                        });
+                        break
+                    case 'md':
+                        resumeToMarkdown(resume, function(markdown, errs) {
+                            res.set({
+                                'Content-Type': 'text/plain',
+                                'Content-Length': markdown.length
+                            });
+                            res.send(markdown);
+                        })
+                        break;
+                    case 'pdf':
+                        resumeToPDF(resume, function(err, buffer) {
+                            if (err) return console.log(err);
+                            res.contentType("application/pdf");
+                            res.send(buffer);
+                        });
+                        break;
+                    default:
+                        console.log('def')
+                        resumeToHTML(resume, {theme: themeName},function(content, errs) {
+                            console.log(content, errs);
+                            var page = Mustache.render(templateHelper.get('layout'), {
+                                output: content,
+                                resume: resume,
+                                username: uid
+                            });
+                            res.send(content);
+                        });
+                }
+            
         });
     };
 
     app.get('/', renderHomePage);
     app.get('/:uid.:format', renderResume);
     app.get('/:uid', renderResume);
+    app.post('/:uid', renderResume);
 
     app.post('/resume', function(req, res) {
         var password = req.body.password;
