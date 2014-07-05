@@ -119,7 +119,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         break;
                     case 'pdf':
                         resumeToHTML(resume, {theme: themeName},function(content, errs) {
-                            client.convertHtml(content, pdf.sendHttpResponse(res);
+                            client.convertHtml(content, pdf.sendHttpResponse(res));
                         });
                         break;
                     default:
