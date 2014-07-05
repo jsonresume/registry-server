@@ -140,7 +140,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.get('/', renderHomePage);
     app.get('/:uid.:format', renderResume);
     app.get('/:uid', renderResume);
-    app.post('/:uid', renderResume);
 
     app.post('/resume', function(req, res) {
         var password = req.body.password;
@@ -249,6 +248,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
         });
     });
+    app.post('/:uid', renderResume);
 
     var port = Number(process.env.PORT || 5000);
     app.listen(port, function() {
