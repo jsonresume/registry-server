@@ -13,6 +13,9 @@ var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
 var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
 var templateHelper = require('./template-helper');
+var pdf = require('pdfcrowd');
+
+var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
 var fs = require('fs');
 var guid = (function() {
@@ -115,11 +118,10 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         })
                         break;
                     case 'pdf':
-                        resumeToPDF(resume, function(err, buffer) {
-                            console.log('pDF', arguments);
-                            console.log(err);
-                            res.contentType("application/pdf");
-                            res.send(buffer);
+                        resumeToHTML(resume, {theme: themeName},function(content, errs) {
+                            client.convertHtml(content, pdf.sendHttpResponse(res), {width: "11in",
+        height: "8.5in",
+        vmargin: ".4in"});
                         });
                         break;
                     default:
