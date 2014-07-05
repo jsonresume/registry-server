@@ -115,7 +115,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         })
                         break;
                     case 'pdf':
-                    console.log('pdf');
                         resumeToPDF(resume, function(err, buffer) {
                             console.log('pDF', arguments);
                             console.log(err);
