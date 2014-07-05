@@ -27,7 +27,7 @@
     "postmark": "~0.2.5",
     "resume-to-html": "latest",
     "resume-to-markdown": "latest",
-    "resume-to-pdf": "latest",
+    "resume-to-pdf": "0.1.5",
     "resume-to-text": "latest"
   },
   "devDependencies": {
