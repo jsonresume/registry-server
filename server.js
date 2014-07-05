@@ -62,6 +62,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
 
     var renderResume = function(req, res) {
+        console.log('hello')
         var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
         var format = req.params.format || 'html';
@@ -69,7 +70,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         db.collection('resumes').findOne({
             'jsonresume.username': uid,
         }, function(err, resume) {
-            console.log(resume);
             if(!resume) {
                 return;
             }
@@ -115,7 +115,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         })
                         break;
                     case 'pdf':
+                    console.log('pdf');
                         resumeToPDF(resume, function(err, buffer) {
+                            console.log('pDF', arguments);
                             if (err) return console.log(err);
                             res.contentType("application/pdf");
                             res.send(buffer);
