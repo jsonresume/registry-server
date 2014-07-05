@@ -25,9 +25,9 @@
     "mongodb": "~1.4.7",
     "mustache": "^0.8.1",
     "postmark": "~0.2.5",
-    "resume-to-html": "latest",
+    "resume-to-html": "0.0.10",
     "resume-to-markdown": "latest",
-    "resume-to-pdf": "0.1.5",
+    "resume-to-pdf": "0.1.6",
     "resume-to-text": "latest"
   },
   "devDependencies": {
