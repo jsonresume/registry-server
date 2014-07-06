@@ -225,18 +225,18 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         });
                     } else {
                         var hash = bcrypt.hashSync(req.body.password);
-                        postmark.send({
-                            "From": "admin@jsonresume.org",
-                            "To": req.body.email,
-                            "Subject": "Welcome to JsonResume.org",
-                            "TextBody": "You suck"
-                        }, function(error, success) {
-                            if (error) {
-                                console.error("Unable to send via postmark: " + error.message);
-                                return;
-                            }
-                            console.info("Sent to postmark for delivery")
-                        });
+                        // postmark.send({
+                        //     "From": "admin@jsonresume.org",
+                        //     "To": req.body.email,
+                        //     "Subject": "Welcome to JsonResume.org",
+                        //     "TextBody": "You suck"
+                        // }, function(error, success) {
+                        //     if (error) {
+                        //         console.error("Unable to send via postmark: " + error.message);
+                        //         return;
+                        //     }
+                        //     console.info("Sent to postmark for delivery")
+                        // });
                         db.collection('users').insert({
                             username: req.body.username,
                             email: req.body.email,
