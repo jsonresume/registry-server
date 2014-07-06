@@ -73,6 +73,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             'jsonresume.username': uid,
         }, function(err, resume) {
             if (!resume) {
+                res.send('no resume found');
                 return;
             }
             if (typeof resume.jsonresume.passphrase === 'string' && typeof req.body.passphrase === 'undefined') {
@@ -142,8 +143,41 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
 
     app.get('/', renderHomePage);
+
+
+      var renderMembersPage = function(req, res) {
+        console.log('a');
+        db.collection('users').find({}).toArray(function(err, docs) {
+            console.log(err);
+            var usernameArray = [];
+            docs.forEach(function(doc) {
+                usernameArray.push({
+                    username: doc.username,
+                    gravatar: gravatar.url(doc.email, {
+                        s: '80',
+                        r: 'pg',
+                        d: '404'
+                    })
+                });
+            });
+            var page = Mustache.render(templateHelper.get('members'), {
+                usernames: usernameArray
+            });
+            res.send(page);
+        });
+
+    };
+    app.get('/members', renderMembersPage);
+
+
     app.get('/:uid.:format', renderResume);
     app.get('/:uid', renderResume);
+
+
+
+
+
+
 
     app.post('/resume', function(req, res) {
         var password = req.body.password;
@@ -224,19 +258,21 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                             }
                         });
                     } else {
+                        var emailTemplate = fs.readFileSync('templates/email/welcome.html');
+                        var emailCopy = Mustache.render(emailTemplate, user);
                         var hash = bcrypt.hashSync(req.body.password);
-                        // postmark.send({
-                        //     "From": "admin@jsonresume.org",
-                        //     "To": req.body.email,
-                        //     "Subject": "Welcome to JsonResume.org",
-                        //     "TextBody": "You suck"
-                        // }, function(error, success) {
-                        //     if (error) {
-                        //         console.error("Unable to send via postmark: " + error.message);
-                        //         return;
-                        //     }
-                        //     console.info("Sent to postmark for delivery")
-                        // });
+                        postmark.send({
+                            "From": "admin@jsonresume.org",
+                            "To": req.body.email,
+                            "Subject": "Json Resume - Community driven HR",
+                            "TextBody": emailCopy
+                        }, function(error, success) {
+                        if (error) {
+                            console.error("Unable to send via postmark: " + error.message);
+                            return;
+                        }
+                            console.info("Sent to postmark for delivery")
+                        });
                         db.collection('users').insert({
                             username: req.body.username,
                             email: req.body.email,
