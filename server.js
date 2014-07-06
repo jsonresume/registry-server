@@ -68,12 +68,13 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
         var format = req.params.format || 'html';
-        console.log('---------------------------------------------');
         db.collection('resumes').findOne({
             'jsonresume.username': uid,
         }, function(err, resume) {
             if (!resume) {
-                res.send('no resume found');
+                console.log(templateHelper.get('noresume'));
+                var page = Mustache.render(templateHelper.get('noresume'), {});
+                res.send(page);
                 return;
             }
             if (typeof resume.jsonresume.passphrase === 'string' && typeof req.body.passphrase === 'undefined') {
@@ -146,7 +147,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
 
       var renderMembersPage = function(req, res) {
-        console.log('a');
+        console.log('================================');
         db.collection('users').find({}).toArray(function(err, docs) {
             console.log(err);
             var usernameArray = [];
