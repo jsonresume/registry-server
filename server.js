@@ -259,7 +259,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         });
                     } else {
                         var emailTemplate = fs.readFileSync('templates/email/welcome.html', 'utf8');
-                        var emailCopy = Mustache.render(emailTemplate, user);
+                        var emailCopy = Mustache.render(emailTemplate, {username: req.body.username});
                         var hash = bcrypt.hashSync(req.body.password);
                         postmark.send({
                             "From": "admin@jsonresume.org",
