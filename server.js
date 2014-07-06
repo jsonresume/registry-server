@@ -118,7 +118,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 case 'pdf':
                     console.log('Come on PDFCROWD');
                     resumeToHTML(resume, {
-                        theme: themeName
+                        theme: resume.jsonresume.theme || themeName
                     }, function(content, errs) {
                         client.convertHtml(content, pdf.sendHttpResponse(res));
                     });
@@ -126,7 +126,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 default:
                     console.log('def')
                     resumeToHTML(resume, {
-                        theme: themeName
+                        theme: resume.jsonresume.theme || themeName
                     }, function(content, errs) {
                         console.log(content, errs);
                         var page = Mustache.render(templateHelper.get('layout'), {
