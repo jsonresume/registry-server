@@ -258,7 +258,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                             }
                         });
                     } else {
-                        var emailTemplate = fs.readFileSync('templates/email/welcome.html');
+                        var emailTemplate = fs.readFileSync('templates/email/welcome.html', 'utf8');
                         var emailCopy = Mustache.render(emailTemplate, user);
                         var hash = bcrypt.hashSync(req.body.password);
                         postmark.send({
