@@ -72,69 +72,72 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         db.collection('resumes').findOne({
             'jsonresume.username': uid,
         }, function(err, resume) {
-            if(!resume) {
+            if (!resume) {
                 return;
             }
-            if(typeof resume.jsonresume.passphrase ==='string' && typeof req.body.passphrase === 'undefined') {
+            if (typeof resume.jsonresume.passphrase === 'string' && typeof req.body.passphrase === 'undefined') {
 
-                var page = Mustache.render(templateHelper.get('password'), {
-                });
+                var page = Mustache.render(templateHelper.get('password'), {});
                 res.send(page);
                 return;
-            } 
+            }
             console.log(req.body.passphrase, resume.jsonresume.passphrase);
-            if(typeof req.body.passphrase !== 'undefined' && req.body.passphrase !== resume.jsonresume.passphrase) {
+            if (typeof req.body.passphrase !== 'undefined' && req.body.passphrase !== resume.jsonresume.passphrase) {
                 res.send('Password was wrong, go back and try again');
                 return;
             }
-                var content = '';
-                switch (format) {
-                    case 'json':
-                        content = JSON.stringify(resume, undefined, 4);
+            var content = '';
+            switch (format) {
+                case 'json':
+                    content = JSON.stringify(resume, undefined, 4);
+                    res.set({
+                        'Content-Type': 'text/plain',
+                        'Content-Length': content.length
+                    });
+
+                    res.send(content);
+                    break;
+                case 'txt':
+                    content = resumeToText(resume, function(plainText) {
                         res.set({
                             'Content-Type': 'text/plain',
-                            'Content-Length': content.length
+                            'Content-Length': plainText.length
                         });
-
+                        res.send(200, plainText);
+                    });
+                    break
+                case 'md':
+                    resumeToMarkdown(resume, function(markdown, errs) {
+                        res.set({
+                            'Content-Type': 'text/plain',
+                            'Content-Length': markdown.length
+                        });
+                        res.send(markdown);
+                    })
+                    break;
+                case 'pdf':
+                    console.log('Come on PDFCROWD');
+                    resumeToHTML(resume, {
+                        theme: themeName
+                    }, function(content, errs) {
+                        client.convertHtml(content, pdf.sendHttpResponse(res));
+                    });
+                    break;
+                default:
+                    console.log('def')
+                    resumeToHTML(resume, {
+                        theme: themeName
+                    }, function(content, errs) {
+                        console.log(content, errs);
+                        var page = Mustache.render(templateHelper.get('layout'), {
+                            output: content,
+                            resume: resume,
+                            username: uid
+                        });
                         res.send(content);
-                        break;
-                    case 'txt':
-                        content = resumeToText(resume, function(plainText) {
-                            res.set({
-                                'Content-Type': 'text/plain',
-                                'Content-Length': plainText.length
-                            });
-                            res.send(200, plainText);
-                        });
-                        break
-                    case 'md':
-                        resumeToMarkdown(resume, function(markdown, errs) {
-                            res.set({
-                                'Content-Type': 'text/plain',
-                                'Content-Length': markdown.length
-                            });
-                            res.send(markdown);
-                        })
-                        break;
-                    case 'pdf':
-                        console.log('Come on PDFCROWD');
-                        resumeToHTML(resume, {theme: themeName},function(content, errs) {
-                            client.convertHtml(content, pdf.sendHttpResponse(res));
-                        });
-                        break;
-                    default:
-                        console.log('def')
-                        resumeToHTML(resume, {theme: themeName},function(content, errs) {
-                            console.log(content, errs);
-                            var page = Mustache.render(templateHelper.get('layout'), {
-                                output: content,
-                                resume: resume,
-                                username: uid
-                            });
-                            res.send(content);
-                        });
-                }
-            
+                    });
+            }
+
         });
     };
 
@@ -154,7 +157,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     var resume = req.body && req.body.resume || {};
                     resume.jsonresume = {
                         username: user.username,
-                        passphrase: req.body.passphrase || null
+                        passphrase: req.body.passphrase || null,
+                        theme: req.body.theme || null
                     };
                     console.log('inserted');
                     db.collection('resumes').update({
@@ -179,7 +183,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             var resume = req.body && req.body.resume || {};
             resume.jsonresume = {
                 username: guestUsername,
-                passphrase: req.body.passphrase || null
+                passphrase: req.body.passphrase || null,
+                theme: req.body.theme || null
             };
             console.log('inserted');
             db.collection('resumes').insert(resume, {
