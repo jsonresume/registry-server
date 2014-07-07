@@ -25,7 +25,7 @@
 
 <div class="col-lg-4 col-lg-offset-4" style="margin-top: 300px;">
 <p>
-You've made it thus, great!<br />
+You've made it this far, great!<br />
 But you still need to publish your resume<br /><br />
 Create a new resume.json by typing `<em>resume init</em>`<br /><br />
 Fill out a few of the fields until you are happy, then simly type `<em>resume publish</em>`
