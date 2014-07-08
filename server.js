@@ -91,10 +91,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             var content = '';
             switch (format) {
                 case 'json':
+                    delete resume.jsonresume; // This removes our registry server config vars from the resume.json
                     content = JSON.stringify(resume, undefined, 4);
                     res.set({
                         'Content-Type': 'text/plain',
-                        'Content-Length': content.length
+                        'Content-Length': content.length + 1 // TODO - This is a hack to try get the right content length
                     });
 
                     res.send(content);
