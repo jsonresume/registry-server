@@ -95,7 +95,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     content = JSON.stringify(resume, undefined, 4);
                     res.set({
                         'Content-Type': 'text/plain',
-                        'Content-Length': content.length + 1 // TODO - This is a hack to try get the right content length
+                        'Content-Length': Buffer.byteLength(content, 'utf8') // TODO - This is a hack to try get the right content length
+                        // http://stackoverflow.com/questions/17922748/what-is-the-correct-method-for-calculating-the-content-length-header-in-node-js
                     });
 
                     res.send(content);
