@@ -92,6 +92,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             switch (format) {
                 case 'json':
                     delete resume.jsonresume; // This removes our registry server config vars from the resume.json
+                    delete resume._id; // This removes the document id of mongo
                     content = JSON.stringify(resume, undefined, 4);
                     res.set({
                         'Content-Type': 'text/plain',
