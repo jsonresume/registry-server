@@ -67,7 +67,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         console.log('hello')
         var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
-        var format = req.params.format || 'html';
+        var format = req.params.format || req.headers.accept || 'html';
         db.collection('resumes').findOne({
             'jsonresume.username': uid,
         }, function(err, resume) {
@@ -89,60 +89,54 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 return;
             }
             var content = '';
-            switch (format) {
-                case 'json':
-                    delete resume.jsonresume; // This removes our registry server config vars from the resume.json
-                    delete resume._id; // This removes the document id of mongo
-                    content = JSON.stringify(resume, undefined, 4);
+            if(/json/.test(format)) {
+                delete resume.jsonresume; // This removes our registry server config vars from the resume.json
+                delete resume._id; // This removes the document id of mongo
+                content = JSON.stringify(resume, undefined, 4);
+                res.set({
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(content, 'utf8') // TODO - This is a hack to try get the right content length
+                    // http://stackoverflow.com/questions/17922748/what-is-the-correct-method-for-calculating-the-content-length-header-in-node-js
+                });
+
+                res.send(content);
+            } else if (/txt/.test(format)) {
+                content = resumeToText(resume, function(plainText) {
                     res.set({
                         'Content-Type': 'text/plain',
-                        'Content-Length': Buffer.byteLength(content, 'utf8') // TODO - This is a hack to try get the right content length
-                        // http://stackoverflow.com/questions/17922748/what-is-the-correct-method-for-calculating-the-content-length-header-in-node-js
+                        'Content-Length': plainText.length
                     });
-
+                    res.send(200, plainText);
+                });
+            } else if (/md/.test(format)) {
+                resumeToMarkdown(resume, function(markdown, errs) {
+                    res.set({
+                        'Content-Type': 'text/plain',
+                        'Content-Length': markdown.length
+                    });
+                    res.send(markdown);
+                })
+            } else if (/pdf/.test(format)) {
+                console.log('Come on PDFCROWD');
+                resumeToHTML(resume, {
+                    theme: resume.jsonresume.theme || themeName
+                }, function(content, errs) {
+                    client.convertHtml(content, pdf.sendHttpResponse(res));
+                });
+            } else {
+                console.log('def')
+                resumeToHTML(resume, {
+                    theme: resume.jsonresume.theme || themeName
+                }, function(content, errs) {
+                    console.log(content, errs);
+                    var page = Mustache.render(templateHelper.get('layout'), {
+                        output: content,
+                        resume: resume,
+                        username: uid
+                    });
                     res.send(content);
-                    break;
-                case 'txt':
-                    content = resumeToText(resume, function(plainText) {
-                        res.set({
-                            'Content-Type': 'text/plain',
-                            'Content-Length': plainText.length
-                        });
-                        res.send(200, plainText);
-                    });
-                    break
-                case 'md':
-                    resumeToMarkdown(resume, function(markdown, errs) {
-                        res.set({
-                            'Content-Type': 'text/plain',
-                            'Content-Length': markdown.length
-                        });
-                        res.send(markdown);
-                    })
-                    break;
-                case 'pdf':
-                    console.log('Come on PDFCROWD');
-                    resumeToHTML(resume, {
-                        theme: resume.jsonresume.theme || themeName
-                    }, function(content, errs) {
-                        client.convertHtml(content, pdf.sendHttpResponse(res));
-                    });
-                    break;
-                default:
-                    console.log('def')
-                    resumeToHTML(resume, {
-                        theme: resume.jsonresume.theme || themeName
-                    }, function(content, errs) {
-                        console.log(content, errs);
-                        var page = Mustache.render(templateHelper.get('layout'), {
-                            output: content,
-                            resume: resume,
-                            username: uid
-                        });
-                        res.send(content);
-                    });
+                });
             }
-
         });
     };
 
