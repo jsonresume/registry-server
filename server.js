@@ -89,7 +89,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 return;
             }
             var content = '';
-            if(/json/.test(format)) {
+            if (/json/.test(format)) {
                 delete resume.jsonresume; // This removes our registry server config vars from the resume.json
                 delete resume._id; // This removes the document id of mongo
                 content = JSON.stringify(resume, undefined, 4);
@@ -143,7 +143,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.get('/', renderHomePage);
 
 
-      var renderMembersPage = function(req, res) {
+    var renderMembersPage = function(req, res) {
         console.log('================================');
         db.collection('users').find({}).toArray(function(err, docs) {
             console.log(err);
@@ -229,6 +229,51 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         }
     });
 
+    // update theme
+    app.put('/resume', function(req, res) {
+        var password = req.body.password;
+        var email = req.body.email;
+        var theme = req.body.theme;
+        console.log(theme, "theme update!!!!!!!!!!!!1111");
+        // console.log(req.body);
+        db.collection('users').findOne({
+            'email': email
+        }, function(err, user) {
+            if (user && bcrypt.compareSync(password, user.hash)) {
+
+                db.collection('resumes').findOne({
+                    'username': user.username
+                }, function(err, resume) {
+
+                    db.collection('resumes').update({
+                        //query
+                        'jsonresume.username': user.username
+                    }, {
+                        // update set new theme
+                        $set: {
+                            'jsonresume.theme': theme
+                        }
+                    }, {
+                        //options
+                        upsert: true,
+                        safe: true
+                    }, function(err, resume) {
+                        res.send({
+                            url: 'http://registry.jsonresume.org/' + user.username
+                        });
+                    });
+                });
+
+            } else {
+                console.log('deleted');
+                res.send({
+                    message: 'authentication error'
+                });
+            }
+        });
+    });
+
+
     app.post('/user', function(req, res) {
 
         console.log(req.body);
@@ -257,7 +302,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         });
                     } else {
                         var emailTemplate = fs.readFileSync('templates/email/welcome.html', 'utf8');
-                        var emailCopy = Mustache.render(emailTemplate, {username: req.body.username});
+                        var emailCopy = Mustache.render(emailTemplate, {
+                            username: req.body.username
+                        });
                         var hash = bcrypt.hashSync(req.body.password);
                         postmark.send({
                             "From": "admin@jsonresume.org",
@@ -265,10 +312,10 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                             "Subject": "Json Resume - Community driven HR",
                             "TextBody": emailCopy
                         }, function(error, success) {
-                        if (error) {
-                            console.error("Unable to send via postmark: " + error.message);
-                            return;
-                        }
+                            if (error) {
+                                console.error("Unable to send via postmark: " + error.message);
+                                return;
+                            }
                             console.info("Sent to postmark for delivery")
                         });
                         db.collection('users').insert({
