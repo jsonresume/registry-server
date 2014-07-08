@@ -241,29 +241,23 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         }, function(err, user) {
             if (user && bcrypt.compareSync(password, user.hash)) {
 
-                db.collection('resumes').findOne({
-                    'username': user.username
+                db.collection('resumes').update({
+                    //query
+                    'jsonresume.username': user.username
+                }, {
+                    // update set new theme
+                    $set: {
+                        'jsonresume.theme': theme
+                    }
+                }, {
+                    //options
+                    upsert: true,
+                    safe: true
                 }, function(err, resume) {
-
-                    db.collection('resumes').update({
-                        //query
-                        'jsonresume.username': user.username
-                    }, {
-                        // update set new theme
-                        $set: {
-                            'jsonresume.theme': theme
-                        }
-                    }, {
-                        //options
-                        upsert: true,
-                        safe: true
-                    }, function(err, resume) {
-                        res.send({
-                            url: 'http://registry.jsonresume.org/' + user.username
-                        });
+                    res.send({
+                        url: 'http://registry.jsonresume.org/' + user.username
                     });
                 });
-
             } else {
                 console.log('deleted');
                 res.send({
@@ -335,6 +329,45 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
         });
     });
+
+
+
+    //delete user
+    app.delete('/account', function(req, res) {
+
+        var password = req.body.password;
+        var email = req.body.email;
+
+        db.collection('users').findOne({
+            'email': email
+        }, function(err, user) {
+            if (user && bcrypt.compareSync(password, user.hash)) {
+                // console.log(req.body);
+
+                //remove the users resume
+                db.collection('resumes').remove({
+                    'jsonresume.username': user.username
+                }, 1, function(err, numberRemoved) {
+                    console.log(err, numberRemoved, 'resume deleted');
+                    // then remove user
+                    db.collection('users').remove({
+                        'email': email
+                    }, 1, function(err, numberRemoved) {
+                        console.log(err, numberRemoved, 'user deleted');
+                        if (!err) {
+                            res.send({
+                                message: "account deleted"
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    });
+
+
+
+
     app.post('/:uid', renderResume);
 
     var port = Number(process.env.PORT || 5000);
