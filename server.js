@@ -123,7 +123,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     client.convertHtml(content, pdf.sendHttpResponse(res));
                 });
             } else {
-                var theme = resume.jsonresume.theme || themeName;
+                var theme = req.query.theme || resume.jsonresume.theme || themeName;
                 request
                    .post('http://themes.jsonresume.org/theme/' + theme)
                    .send({ resume: resume })
