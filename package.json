@@ -28,7 +28,8 @@
     "postmark": "~0.2.5",
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "latest",
-    "resume-to-text": "latest"
+    "resume-to-text": "latest",
+    "superagent": "^0.18.1"
   },
   "devDependencies": {
     "tap-spec": "^0.2.0",

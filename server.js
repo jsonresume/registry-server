@@ -13,6 +13,7 @@ var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
 var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
+var request = require('superagent');
 
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
@@ -72,7 +73,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             'jsonresume.username': uid,
         }, function(err, resume) {
             if (!resume) {
-                console.log(templateHelper.get('noresume'));
                 var page = Mustache.render(templateHelper.get('noresume'), {});
                 res.send(page);
                 return;
@@ -83,7 +83,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 res.send(page);
                 return;
             }
-            console.log(req.body.passphrase, resume.jsonresume.passphrase);
             if (typeof req.body.passphrase !== 'undefined' && req.body.passphrase !== resume.jsonresume.passphrase) {
                 res.send('Password was wrong, go back and try again');
                 return;
@@ -124,9 +123,18 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     client.convertHtml(content, pdf.sendHttpResponse(res));
                 });
             } else {
-                console.log('def')
+                var theme = resume.jsonresume.theme || themeName;
+                request
+                   .post('http://themes.jsonresume.org/theme/' + theme)
+                   .send({ resume: resume })
+                   .set('Content-Type', 'application/json')
+                   .end(function(response){
+                    console.log(response);
+                        res.send(response.text);
+                   });
+                /*
                 resumeToHTML(resume, {
-                    theme: resume.jsonresume.theme || themeName
+                    
                 }, function(content, errs) {
                     console.log(content, errs);
                     var page = Mustache.render(templateHelper.get('layout'), {
@@ -136,6 +144,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     });
                     res.send(content);
                 });
+                */
             }
         });
     };
