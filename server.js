@@ -129,7 +129,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                    .send({ resume: resume })
                    .set('Content-Type', 'application/json')
                    .end(function(response){
-                    console.log(response);
                         res.send(response.text);
                    });
                 /*
