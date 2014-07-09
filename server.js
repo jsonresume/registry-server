@@ -14,6 +14,7 @@ var mongo = require('mongodb');
 var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
 var request = require('superagent');
+var schema = require('resume-schema');
 
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
@@ -44,6 +45,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     });
 
     var renderHomePage = function(req, res) {
+        if(/ld\+json/.test(req.headers.accept)){
+          return renderContext(req, res);
+        }
         db.collection('users').find({}).toArray(function(err, docs) {
             var usernameArray = [];
             docs.forEach(function(doc) {
@@ -62,6 +66,19 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             res.send(page);
         });
 
+    };
+
+    var renderContext = function(req, res) {
+        var content = JSON.stringify(schema.context, null, '  ');
+
+        res.set({
+            'Content-Type': 'application/ld+json',
+            'Content-Length': Buffer.byteLength(content, 'utf8'),
+            'Cache-Control': 'public, max-age=43200',
+            'Vary': 'Accept, Accept-Encoding'
+        });
+
+        res.send(content);
     };
 
     var renderResume = function(req, res) {

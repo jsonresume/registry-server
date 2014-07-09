@@ -29,6 +29,8 @@
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "latest",
     "resume-to-text": "latest",
+    "resume-to-jsonld": "latest",
+    "resume-schema": "latest",
     "superagent": "^0.18.1"
   },
   "devDependencies": {
