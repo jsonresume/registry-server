@@ -330,8 +330,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         });
     });
 
-
-
     //delete user
     app.delete('/account', function(req, res) {
 
@@ -365,8 +363,42 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         });
     });
 
+    //change password
+    app.put('/account', function(req, res) {
 
+        var email = req.body.email;
+        var password = req.body.currentPassword;
+        var hash = bcrypt.hashSync(req.body.newPassword);
 
+        db.collection('users').findOne({
+            'email': email
+        }, function(err, user) {
+            if (user && bcrypt.compareSync(password, user.hash)) {
+                // console.log(req.body);
+
+                db.collection('users').update({
+                    //query
+                    'email': email
+                }, {
+                    // update set new theme
+                    $set: {
+                        'hash': hash
+                    }
+                }, {
+                    //options
+                    upsert: true,
+                    safe: true
+                }, function(err, user) {
+                    console.log(err, user);
+                    if (!err) {
+                        res.send({
+                            message: "password updated"
+                        });
+                    }
+                });
+            }
+        });
+    });
 
     app.post('/:uid', renderResume);
 
