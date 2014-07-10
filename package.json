@@ -29,8 +29,8 @@
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "latest",
     "resume-to-text": "latest",
-    "resume-to-jsonld": "latest",
-    "resume-schema": "latest",
+    "resume-to-jsonld": "git://github.com/bollwyvl/resumeToJSONLD",
+    "resume-schema": "git://github.com/bollwyvl/resume-schema#jsonld",
     "superagent": "^0.18.1"
   },
   "devDependencies": {
