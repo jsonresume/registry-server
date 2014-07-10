@@ -4,7 +4,10 @@ node_js:
 services:
   - mongodb
 before_script:
-  - "export MONGOHQ_URL='mongodb://:@localhost:6379/test'"
+  - "export MONGOHQ_URL='mongodb://localhost:6379/test'"
   - "export ROOT_URL='http://localhost:5000/'"
-  - "node server.js &"
+  - "node server.js > server_log &"
   - "sleep 3"
+after_script:
+  - "echo 'Server Log:'"
+  - "cat server_log"
