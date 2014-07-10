@@ -6,3 +6,5 @@ services:
 before_script:
   - "export MONGOHQ_URL='mongodb://:@localhost:6379/test'"
   - "export ROOT_URL='http://localhost:5000/'"
+  - "node server.js &"
+  - "sleep 3"
