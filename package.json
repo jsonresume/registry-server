@@ -4,7 +4,8 @@
   "description": "resumes ======= http://microformats.org/wiki/hresume",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/index.js | tap-spec"
+    "test": "node ./test/index.js | tap-spec",
+    "server": "MONGOHQ_URL='mongodb://localhost/test' ROOT_URL='http://localhost:5000/' node server.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,8 @@
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "latest",
     "resume-to-text": "latest",
+    "resume-to-jsonld": "git://github.com/bollwyvl/resumeToJSONLD",
+    "resume-schema": "git://github.com/bollwyvl/resume-schema#jsonld",
     "superagent": "^0.18.1"
   },
   "devDependencies": {

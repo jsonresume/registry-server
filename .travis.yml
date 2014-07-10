@@ -1,3 +1,11 @@
- language: node_js
- node_js:
-   - "0.10"
+language: node_js
+node_js:
+  - "0.10"
+services:
+  - mongodb
+before_script:
+  - "npm run server > server_log &"
+  - "sleep 3"
+after_script:
+  - "echo 'Server Log:'"
+  - "cat server_log"
