@@ -4,7 +4,8 @@
   "description": "resumes ======= http://microformats.org/wiki/hresume",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/index.js | tap-spec"
+    "test": "node ./test/index.js | tap-spec",
+    "server": "MONGOHQ_URL='mongodb://localhost/test' ROOT_URL='http://localhost:5000/' node server.js"
   },
   "repository": {
     "type": "git",
