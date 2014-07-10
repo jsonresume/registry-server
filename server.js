@@ -17,6 +17,8 @@ var pdf = require('pdfcrowd');
 var request = require('superagent');
 var schema = require('resume-schema');
 
+var urlRoot = process.env.URL_ROOT || 'http://registry.jsonresume.org/';
+
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
 var fs = require('fs');
@@ -123,7 +125,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
                 if(/ld\+json/.test(req.headers.accept)){
                   res.set({
-                      'Link': '<http://registry.jsonresume.org>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+                      'Link': '<'+ urlRoot +
+                          '>; rel="http://www.w3.org/ns/json-ld#context";' +
+                          'type="application/ld+json"'
                   });
                 }
 
@@ -244,7 +248,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         safe: true
                     }, function(err, resume) {
                         res.send({
-                            url: 'http://registry.jsonresume.org/' + user.username
+                            url: urlRoot + user.username
                         });
                     });
                 } else {
@@ -267,7 +271,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 safe: true
             }, function(err, resume) {
                 res.send({
-                    url: 'http://registry.jsonresume.org/' + guestUsername
+                    url: urlRoot + guestUsername
                 });
             });
         }
@@ -299,7 +303,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     safe: true
                 }, function(err, resume) {
                     res.send({
-                        url: 'http://registry.jsonresume.org/' + user.username
+                        url: urlRoot + user.username
                     });
                 });
             } else {
