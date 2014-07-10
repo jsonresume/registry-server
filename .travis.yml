@@ -4,7 +4,7 @@ node_js:
 services:
   - mongodb
 before_script:
-  - "npm run server > server_log"
+  - "npm run server > server_log &"
   - "sleep 3"
 after_script:
   - "echo 'Server Log:'"
