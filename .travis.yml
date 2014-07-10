@@ -5,7 +5,7 @@ services:
   - mongodb
 before_install:
   - "npm install git://github.com/bollwyvl/resume-schema#jsonld"
-  - "npm install git://github.com/bollwyvl/resumeToJSONLD#jsonld"
+  - "npm install git://github.com/bollwyvl/resumeToJSONLD"
 before_script:
   - "export MONGOHQ_URL='mongodb://:@localhost:6379/test'"
   - "export ROOT_URL='http://localhost:5000/'"
