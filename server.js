@@ -4,6 +4,7 @@ var resumeToText = require('resume-to-text');
 var path = require('path');
 var resumeToHTML = require('resume-to-html');
 var resumeToMarkdown = require('resume-to-markdown');
+var resumeToJSONLD = require('resume-to-jsonld');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
 var gravatar = require('gravatar');
@@ -69,7 +70,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
 
     var renderContext = function(req, res) {
-        var content = JSON.stringify(schema.context, null, '  ');
+        var content = JSON.stringify(schema.context, undefined, 4);
 
         res.set({
             'Content-Type': 'application/ld+json',
@@ -108,6 +109,24 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             if (/json/.test(format)) {
                 delete resume.jsonresume; // This removes our registry server config vars from the resume.json
                 delete resume._id; // This removes the document id of mongo
+
+                if(/jsonld/.test(format)){
+                    return resumeToJSONLD(resume, function(err, resumeLD){
+                        content = JSON.stringify(resumeLD, undefined, 4);
+                        res.set({
+                            'Content-Type': 'application/ld+json',
+                            'Content-Length': Buffer.byteLength(content, 'utf8')
+                        });
+                        res.send(content);
+                    });
+                }
+
+                if(/ld\+json/.test(req.headers.accept)){
+                  res.set({
+                      'Link': '<http://registry.jsonresume.org>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"'
+                  });
+                }
+
                 content = JSON.stringify(resume, undefined, 4);
                 res.set({
                     'Content-Type': 'application/json',
