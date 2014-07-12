@@ -14,6 +14,8 @@ var mongo = require('mongodb');
 var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
 var request = require('superagent');
+var redis = require("redis"),
+    redisClient = redis.createClient();
 
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
@@ -322,6 +324,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                             }
                             console.info("Sent to postmark for delivery")
                         });
+
+
+
                         db.collection('users').insert({
                             username: req.body.username,
                             email: req.body.email,
@@ -340,6 +345,30 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 });
             }
 
+        });
+    });
+
+    app.post('/session', function(req, res) {
+        var password = req.body.password;
+        var email = req.body.email;
+        // console.log(req.body);
+        db.collection('users').findOne({
+            'email': email
+        }, function(err, user) {
+            if (user && bcrypt.compareSync(password, user.hash)) {
+
+                redisClient.set(bcrypt.hashSync(req.body.email), 'value', redis.print);
+                res.send({
+                    message: 'loggedIn',
+                    username: user.username,
+                    email: email,
+                    session: 'value'
+                });
+            } else {
+                res.send({
+                    message: 'authentication error'
+                });
+            }
         });
     });
 
