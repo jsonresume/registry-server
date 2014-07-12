@@ -125,12 +125,14 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             } else {
                 var theme = req.query.theme || resume.jsonresume.theme || themeName;
                 request
-                   .post('http://themes.jsonresume.org/theme/' + theme)
-                   .send({ resume: resume })
-                   .set('Content-Type', 'application/json')
-                   .end(function(response){
+                    .post('http://themes.jsonresume.org/theme/' + theme)
+                    .send({
+                        resume: resume
+                    })
+                    .set('Content-Type', 'application/json')
+                    .end(function(response) {
                         res.send(response.text);
-                   });
+                    });
                 /*
                 resumeToHTML(resume, {
                     
@@ -377,9 +379,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     //change password
     app.put('/account', function(req, res) {
 
+
         var email = req.body.email;
         var password = req.body.currentPassword;
         var hash = bcrypt.hashSync(req.body.newPassword);
+        console.log(email, password, hash);
 
         db.collection('users').findOne({
             'email': email
