@@ -270,7 +270,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     app.post('/user', function(req, res) {
 
-        console.log(req.body);
+        // console.log(req.body);
         db.collection('users').findOne({
             'email': req.body.email
         }, function(err, user) {
@@ -320,6 +320,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                             safe: true
                         }, function(err, user) {
                             res.send({
+                                // username: user.username,
+                                email: user[0].email,
+                                username: user[0].username,
                                 message: "success"
                             });
                         });
