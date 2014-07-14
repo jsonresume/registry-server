@@ -15,11 +15,16 @@ var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
 var request = require('superagent');
 var sha256 = require('sha256');
-var redis = require("redis"),
-    redisClient = redis.createClient();
+if (process.env.REDISTOGO_URL) {
+    var rtg = require("url").parse(process.env.REDISTOGO_URL);
+    var redis = require("redis").createClient(rtg.port, rtg.hostname);
+    redis.auth(rtg.auth.split(":")[1]);
+} else {
+    var redis = require("redis").createClient();
+}
 
-redisClient.on("error", function(err) {
-    console.log("error event - " + redisClient.host + ":" + redisClient.port + " - " + err);
+redis.on("error", function(err) {
+    console.log("error event - " + redis.host + ":" + redis.port + " - " + err);
 });
 
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
@@ -190,7 +195,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
 
 
-    redisClient.on("error", function(err) {
+    redis.on("error", function(err) {
         console.log("Error " + err);
         res.send({
             sessionError: err
@@ -209,7 +214,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 // console.log(err, user);
 
 
-                redisClient.get(req.body.session, function(err, valueExists) {
+                redis.get(req.body.session, function(err, valueExists) {
 
                     if (user && password && bcrypt.compareSync(password, user.hash)) {
                         var resume = req.body && req.body.resume || {};
@@ -294,7 +299,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             'email': email
         }, function(err, user) {
 
-            redisClient.get(req.body.session, function(err, valueExists) {
+            redis.get(req.body.session, function(err, valueExists) {
                 console.log(err, valueExists, 'theme redis');
 
                 if (!valueExists && user && bcrypt.compareSync(password, user.hash)) {
@@ -440,7 +445,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 // console.log(email, bcrypt.hashSync(email));
                 var sessionUID = uid(32);
 
-                redisClient.set(sessionUID, true, redis.print);
+                redis.set(sessionUID, true, redis.print);
 
 
 
@@ -455,7 +460,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
 
 
-                // redisClient.quit();
+                // redis.quit();
             } else {
                 res.send({
                     message: 'authentication error'
