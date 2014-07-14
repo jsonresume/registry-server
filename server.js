@@ -478,7 +478,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         db.collection('users').findOne({
             'email': email
         }, function(err, user) {
-            if (user && bcrypt.compareSync(password, user.hash)) {
+            console.log(err, user, 'waafdkls');
+            if (!user) {
+                res.send({
+                    message: '\nemail not found'
+                });
+            } else if (user && bcrypt.compareSync(password, user.hash)) {
                 // console.log(req.body);
 
                 //remove the users resume
@@ -491,12 +496,19 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         'email': email
                     }, 1, function(err, numberRemoved) {
                         console.log(err, numberRemoved, 'user deleted');
-                        if (!err) {
+                        if (err) {
+                            res.send(err);
+                        } else {
                             res.send({
-                                message: "account deleted"
+                                message: '\nYour account has been successfully deleted.'
                             });
+
                         }
                     });
+                });
+            } else {
+                res.send({
+                    message: "\ninvalid Password"
                 });
             }
         });
