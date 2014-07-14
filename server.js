@@ -211,7 +211,25 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
                 redisClient.get(req.body.session, function(err, valueExists) {
 
-                    if (valueExists === null) {
+                    if (user && password && bcrypt.compareSync(password, user.hash)) {
+                        var resume = req.body && req.body.resume || {};
+                        resume.jsonresume = {
+                            username: user.username,
+                            passphrase: req.body.passphrase || null,
+                            theme: req.body.theme || null
+                        };
+                        console.log('inserted');
+                        db.collection('resumes').update({
+                            'jsonresume.username': user.username
+                        }, resume, {
+                            upsert: true,
+                            safe: true
+                        }, function(err, resume) {
+                            res.send({
+                                url: 'http://registry.jsonresume.org/' + user.username
+                            });
+                        });
+                    } else if (valueExists === null) {
                         res.send({
                             sessionError: 'invalid session'
                         });
@@ -236,24 +254,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                             });
                         });
 
-                    } else if (user && bcrypt.compareSync(password, user.hash)) {
-                        var resume = req.body && req.body.resume || {};
-                        resume.jsonresume = {
-                            username: user.username,
-                            passphrase: req.body.passphrase || null,
-                            theme: req.body.theme || null
-                        };
-                        console.log('inserted');
-                        db.collection('resumes').update({
-                            'jsonresume.username': user.username
-                        }, resume, {
-                            upsert: true,
-                            safe: true
-                        }, function(err, resume) {
-                            res.send({
-                                url: 'http://registry.jsonresume.org/' + user.username
-                            });
-                        });
                     } else {
                         res.send({
                             message: 'ERRORRRSSSS'
@@ -282,8 +282,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     // update theme
     app.put('/resume', function(req, res) {
-
-
 
         var password = req.body.password;
         var email = req.body.email;
@@ -425,7 +423,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
 
 
-                redisClient.quit();
+                // redisClient.quit();
             } else {
                 res.send({
                     message: 'authentication error'
@@ -483,7 +481,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     //query
                     'email': email
                 }, {
-                    // update set new theme
                     $set: {
                         'hash': hash
                     }
