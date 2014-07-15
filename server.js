@@ -189,6 +189,20 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
     app.get('/members', renderMembersPage);
 
+    // export pdf route
+    app.get('/pdf', function(req, res) {
+        console.log(req.body.resume, req.body.theme);
+        request
+            .post('http://themes.jsonresume.org/theme/' + req.body.theme)
+            .send({
+                resume: req.body.resume
+            })
+            .set('Content-Type', 'application/json')
+            .end(function(response) {
+                client.convertHtml(response.text, pdf.sendHttpResponse(res));
+            });
+    });
+
 
     app.get('/:uid.:format', renderResume);
     app.get('/:uid', renderResume);
@@ -427,12 +441,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     });
 
 
+
+
+
     function uid(len) {
         return Math.random().toString(35).substr(2, len);
     }
-
-
-
     app.post('/session', function(req, res) {
         var password = req.body.password;
         var email = req.body.email;
