@@ -27,6 +27,8 @@ redis.on("error", function(err) {
     console.log("error event - " + redis.host + ":" + redis.port + " - " + err);
 });
 
+app.use(express.static(__dirname + '/assets', {maxAge: 7200 * 1000}));
+
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
 var fs = require('fs');

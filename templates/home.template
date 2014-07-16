@@ -16,58 +16,45 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <script>
-    window.location = 'http://jsonresume.org';
-    </script>
+
   </head>
   <body>
+    <div class="app"></div>
 
-
-<!--
-<div class="navbar navbar-default">
-  <div class="container">
-    <a class="navbar-brand" href="#">Json Resume</a>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Home</a></li>
-      <li><a href="#">Link</a></li>
-      <li><a href="#">Link</a></li>
-      <li class="divider-vertical"></li>
-      <li><a href="#">More</a></li>
-      <li><a href="#">Options</a></li>
-    </ul>
-  </div>
-</div>
--->
-<div class="container">
-  <div class="jumbotron text-center">
-    <h1>Coming soon!</h1>
-  </div>
-<!--
-  <div class="row">
-
-
-       {{#usernames}}
-       <div class="col-lg-6">
-       <div class="media">
-      <a class="pull-left" href="/{{username}}">
-        <img class="media-object img-circle" data-src="holder.js/64x64" alt="64x64" src="{{gravatar}}" style="width: 64px; height: 64px;">
-      </a>
-      <div class="media-body">
-        <h4 class="media-heading">{{username}}</h4>
-        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.
-      </div>
-    </div>
-        </div>
-      {{/usernames}}
-  </div>
-
--->
-
-
-</div> <!-- /container -->
-
-
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/react.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/JSXTransformer.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/jsx">
+      /** @jsx React.DOM */
+
+      var LoginForm = React.createClass({
+          render: function () {
+              return (
+                <form>
+                  <input type="text" />
+                  <input type="button" value="Login" />
+                </form>
+              );
+              //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
+          }
+      });
+
+      var App = React.createClass({
+          render: function () {
+              return (
+                <div className="container">
+                  <h3>Hello {this.props.name}</h3>
+                  <LoginForm />
+                </div>
+              );
+              //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
+          }
+      });
+
+      React.renderComponent(<App name="Thomas" />, $('.app')[0]);
+
+      </script>
+   
   </body>
 </html>
