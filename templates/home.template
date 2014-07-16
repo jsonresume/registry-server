@@ -9,6 +9,48 @@
     <!-- Bootstrap -->
     <link href="http://bootswatch.com/lumen/bootstrap.min.css" rel="stylesheet">
 
+   <style type="text/css">
+    body {
+
+  background-color: #eee;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+   </style>
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -28,24 +70,94 @@
     <script type="text/jsx">
       /** @jsx React.DOM */
 
-      var LoginForm = React.createClass({
+      var Header = React.createClass({
           render: function () {
               return (
-                <form>
-                  <input type="text" />
-                  <input type="button" value="Login" />
-                </form>
+                <div className="navbar navbar-default">
+                <div className="container">
+                  <a className="navbar-brand" href="/">JSON Resume</a>
+                  <ul className="nav navbar-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/themes">Themes</a></li>
+                  </ul>
+                </div>
+              </div>
               );
               //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
           }
       });
 
+      // var LoginForm = React.createClass({
+      //     render: function () {
+      //         return (
+      //           <div className="container">
+      //           <form className="form-signin" role="form" callback={this.handleLogin}>
+      //           <h2 className="form-signin-heading">Please sign in</h2>
+      //           <input name="email" type="email" className="form-control" placeholder="Email address" required autofocus/>
+      //          <input name="password" type="password" className="form-control" placeholder="Password" required/>
+      //            <div className="checkbox">
+      //             <label>
+      //               <input type="checkbox" value="remember-me"/> Remember me
+      //             </label>
+      //           </div>
+      //             <button onClick={this.handleLogin} className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      //           </form>
+      //           </div>
+      //         );
+      //         //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
+      //     }
+      // });
+
       var App = React.createClass({
+
+          getInitialState: function() {
+            return {email: '', password: ''};
+          },
+          onChangeEmail: function(e) {
+            this.setState({email: e.target.value});
+          },
+          onChangePassword: function(e) {
+            this.setState({password: e.target.value});
+          },
+          handleSubmit: function(loginDetails){
+            // TODO: submit details to server
+            $.ajax({
+              url: 'http://registry.jsonresume.org/session',
+              dataType: 'json',
+              type: 'POST',
+              data: {email: this.state.email, password: this.state.password},
+              success: function(data) {
+                // this.setState({data: data});
+                console.log(data);
+              }.bind(this),
+              error: function(xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+              }.bind(this)
+            });
+            // alert(this.state.email + this.state.password);
+          },
+
           render: function () {
               return (
-                <div className="container">
+                <div >
+                 <Header />
                   <h3>Hello {this.props.name}</h3>
-                  <LoginForm />
+
+                  <div className="container">
+
+                  <form onSubmit={this.handleSubmit} className="form-signin" >
+                  <h2 className="form-signin-heading">Please sign in</h2>
+                    <input name="email" type="email" onChange={this.onChangeEmail} value={this.state.email} className="form-control" placeholder="Email address" required autofocus/>
+                    <input name="password" type="password" onChange={this.onChangePassword} value={this.state.password} className="form-control" placeholder="Password" required/>
+                    <div className="checkbox">
+                  <label>
+                    <input type="checkbox" value="remember-me"/> Remember me
+                  </label>
+                </div>
+                    <button onClick={this.handleSubmit} className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                  </form>
+                
+                </div>
                 </div>
               );
               //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
