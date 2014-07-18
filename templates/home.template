@@ -73,8 +73,8 @@ body {
       /** @jsx React.DOM */
       // Setup all request to hit the registry server
       $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-        options.url = 'http://localhost:5000' + options.url;
-        //options.url = 'http://registry.jsonresume.org' + options.url;
+        //options.url = 'http://localhost:5000' + options.url;
+        options.url = 'http://registry.jsonresume.org' + options.url;
       });
 
       var Header = React.createClass({
