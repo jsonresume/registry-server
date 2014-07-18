@@ -16,9 +16,7 @@
 }
 
 .form-signin {
-  max-width: 330px;
   padding: 15px;
-  margin: 0 auto;
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
@@ -49,6 +47,9 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+body {
+  overflow-y: scroll;
+}
    </style>
 
 
@@ -62,109 +63,334 @@
   </head>
   <body>
     <div class="app"></div>
-
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/react.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/JSXTransformer.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script type="text/jsx">
       /** @jsx React.DOM */
-
-      var Header = React.createClass({
-          render: function () {
-              return (
-                <div className="navbar navbar-default">
-                <div className="container">
-                  <a className="navbar-brand" href="/">JSON Resume</a>
-                  <ul className="nav navbar-nav">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/themes">Themes</a></li>
-                  </ul>
-                </div>
-              </div>
-              );
-              //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
-          }
+      // Setup all request to hit the registry server
+      $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        options.url = 'http://localhost:5000' + options.url;
+        //options.url = 'http://registry.jsonresume.org' + options.url;
       });
 
-      // var LoginForm = React.createClass({
-      //     render: function () {
-      //         return (
-      //           <div className="container">
-      //           <form className="form-signin" role="form" callback={this.handleLogin}>
-      //           <h2 className="form-signin-heading">Please sign in</h2>
-      //           <input name="email" type="email" className="form-control" placeholder="Email address" required autofocus/>
-      //          <input name="password" type="password" className="form-control" placeholder="Password" required/>
-      //            <div className="checkbox">
-      //             <label>
-      //               <input type="checkbox" value="remember-me"/> Remember me
-      //             </label>
-      //           </div>
-      //             <button onClick={this.handleLogin} className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-      //           </form>
-      //           </div>
-      //         );
-      //         //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
-      //     }
-      // });
+      var Header = React.createClass({
+
+        getInitialState: function() {
+          return {username: null}
+        },
+        componentDidMount: function() {
+          console.log('state',Session.get('auth')); 
+        },
+        handleLogout: function () {
+          Session.logout();
+          return false;
+        },
+        render: function () {
+          if(this.props.auth === 'true') {
+               return (
+              <div className="navbar navbar-default">
+              <div className="container">
+                <a className="navbar-brand" href="/">JSON Resume Registry</a>
+                <ul className="nav navbar-nav">
+                  <li><a href="#">Home</a></li>
+                  <li><a href="#about">About</a></li>
+                </ul>
+                <ul className="nav navbar-nav navbar-right">
+                  <li className="pull-right"><a onClick={this.handleLogout} href="#logout">Logout</a></li>
+                </ul>
+
+              </div>
+            </div>
+            );
+          } else {
+            return (
+              <div className="navbar navbar-default">
+              <div className="container">
+                <a className="navbar-brand" href="/">JSON Resume Registry</a>
+                <ul className="nav navbar-nav">
+                  <li><a href="#">Home</a></li>
+                  <li><a href="#about">About</a></li>
+                </ul>
+              </div>
+            </div>
+            );
+          }
+        }
+      });
+
+      
+
+      var SessionModel = Backbone.Model.extend({
+      
+        urlRoot: '/session',
+        initialize: function () {
+          var that = this;
+          // Hook into jquery
+
+          // Use withCredentials to send the server cookies
+          // The server must allow this through response headers
+          $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+            options.xhrFields = {
+              withCredentials: true
+            };
+            // If we have a csrf token send it through with the next request
+            if(typeof that.get('_csrf') !== 'undefined') {
+              jqXHR.setRequestHeader('X-CSRF-Token', that.get('_csrf'));
+            }
+          });
+        },
+        login: function(creds) {
+          // Do a POST to /session and send the serialized form creds
+          this.save(creds, {
+             success: function () {}
+          });
+        },
+        logout: function() {
+          // Do a DELETE to /session and clear the clientside data
+          var that = this;
+          this.destroy({
+            success: function (model, resp) {
+              model.clear()
+              model.id = null;
+              // Set auth to false to trigger a change:auth event
+              // The server also returns a new csrf token so that
+              // the user can relogin without refreshing the page
+              that.set({auth: false});//, _csrf: resp._csrf});
+              
+            }
+          });      
+        },
+        getAuth: function(callback) {
+          // getAuth is wrapped around our router
+          // before we start any routers let us see if the user is valid
+          this.fetch({
+              success: callback
+          });
+        }
+      }); 
+      var Session = new SessionModel();
+      var LoginForm = React.createClass({
+        handleSubmit: function(loginDetails){
+          var that = this;
+
+          Session.login({
+            email: this.state.email, 
+            password: this.state.password
+          })
+          return false;
+        },
+        getInitialState: function() {
+          return {email: 'thomasalwyndavis@gmail.com', password: 'ffsffs'};
+        },
+        onChangeEmail: function(e) {
+          this.setState({email: e.target.value});
+        },
+        onChangePassword: function(e) {
+          this.setState({password: e.target.value});
+        },
+        render: function () {
+          return (
+            <form onSubmit={this.handleSubmit} className="form-signin" >
+                <input name="email" type="email" onChange={this.onChangeEmail} value={this.state.email} className="form-control" placeholder="Email address" required autofocus/>
+                <input name="password" type="password" onChange={this.onChangePassword} value={this.state.password} className="form-control" placeholder="Password" required/>
+                <div className="checkbox">
+              <label>
+                <input type="checkbox" value="remember-me"/> Remember me
+              </label>
+              </div>
+              <button onClick={this.handleSubmit} className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            </form>
+          );
+        }
+      });
+
+      var RegisterForm = React.createClass({
+
+        getInitialState: function() {
+          return {email: '', password: ''};
+        },
+        onChangeEmail: function(e) {
+          this.setState({email: e.target.value});
+        },
+        onChangePassword: function(e) {
+          this.setState({password: e.target.value});
+        },
+        render: function () {
+          return (
+            <form onSubmit={this.handleSubmit} className="form-signin" >
+                <input name="email" type="email" onChange={this.onChangeEmail} value={this.state.email} className="form-control" placeholder="Email address" required autofocus/>
+                <input name="password" type="password" onChange={this.onChangePassword} value={this.state.password} className="form-control" placeholder="Password" required/>
+                <div className="checkbox">
+              <label>
+                <input type="checkbox" value="remember-me"/> Remember me
+              </label>
+              </div>
+              <button onClick={this.handleSubmit} className="btn btn-lg btn-success btn-block" type="submit">Register</button>
+            </form>
+          );
+        }
+      });
+      var HomePage = React.createClass({
+        render: function () {
+          return (
+            <div className="row">
+              <div className="col-md-8">
+                <h1>Welcome</h1>
+                <p>We are going to host resumes</p>
+              </div>
+              <div className="col-md-4">
+                <h2>Login</h2>
+                <LoginForm />
+                <h2>Register</h2>
+                <RegisterForm />
+              </div>
+            </div>
+          );
+        }
+      })
+      var AboutPage = React.createClass({
+
+        render: function () {
+          return (
+            <p>About page goes here</p>
+          );
+        }
+      });
+      var DashboardPage = React.createClass({
+        getInitialState: function() {
+          return {
+            resume: '{}'
+          };
+        },
+        componentDidMount: function() {
+          console.log('get resume');
+          var that = this;
+          $.ajax('/' + Session.get('username') + '.json', {
+            success: function(result) {
+              console.log(result);
+              if (that.isMounted()) {
+                that.setState({resume: JSON.stringify(result, undefined, 4)});
+              }
+            }
+          });
+        },
+        render: function () {
+          return (
+            <pre><code>{this.state.resume}</code></pre>
+          );
+        }
+      });
+      var DefaultPage = React.createClass({
+        render: function () {
+          return (
+            <p>Loading</p>
+          );
+        }
+      })
+      var Page = React.createClass({
+          render: function () {
+            console.log(this.props.page);
+            switch(this.props.page) {
+              case 'dashboard':
+                return (
+                  <DashboardPage />
+                );
+              case 'about':
+                return (
+                  <AboutPage />
+                );
+              case 'home':
+                return (
+                  <HomePage />
+                );
+              default: 
+                return (
+                  <DefaultPage />
+                );
+
+            }
+          }
+      });
 
       var App = React.createClass({
 
-          getInitialState: function() {
-            return {email: '', password: ''};
-          },
-          onChangeEmail: function(e) {
-            this.setState({email: e.target.value});
-          },
-          onChangePassword: function(e) {
-            this.setState({password: e.target.value});
-          },
-          handleSubmit: function(loginDetails){
-            // TODO: submit details to server
-            $.ajax({
-              url: 'http://registry.jsonresume.org/session',
-              dataType: 'json',
-              type: 'POST',
-              data: {email: this.state.email, password: this.state.password},
-              success: function(data) {
-                // this.setState({data: data});
-                console.log(data);
-              }.bind(this),
-              error: function(xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
-              }.bind(this)
-            });
-            // alert(this.state.email + this.state.password);
-          },
 
           render: function () {
+              var auth = Session.get('auth');
+              if(auth) {
+                auth = 'true';
+              } else {
+                auth = 'false';
+              }
+              console.log('auth', auth);
               return (
-                <div >
-                 <Header />
-                  <h3>Hello {this.props.name}</h3>
-
+                <div>
+                 <Header auth={auth} />
                   <div className="container">
-
-                  <form onSubmit={this.handleSubmit} className="form-signin" >
-                  <h2 className="form-signin-heading">Please sign in</h2>
-                    <input name="email" type="email" onChange={this.onChangeEmail} value={this.state.email} className="form-control" placeholder="Email address" required autofocus/>
-                    <input name="password" type="password" onChange={this.onChangePassword} value={this.state.password} className="form-control" placeholder="Password" required/>
-                    <div className="checkbox">
-                  <label>
-                    <input type="checkbox" value="remember-me"/> Remember me
-                  </label>
-                </div>
-                    <button onClick={this.handleSubmit} className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-                  </form>
-                
-                </div>
+                    <Page page={this.props.page} />
+                  </div>
                 </div>
               );
-              //React.DOM.div({className: 'container'}, 'Hello', this.props.name);
           }
       });
 
-      React.renderComponent(<App name="Thomas" />, $('.app')[0]);
+      var appNode = $('.app')[0];
+
+      React.renderComponent(<App page="none" name="Thomas" />, appNode);
+
+      var AppRouter = Backbone.Router.extend({
+
+        routes: {
+          "about": "about",
+          "dashboard": "dashboard",
+          "": "home"
+
+        }
+
+
+      });
+
+
+      var app_router = new AppRouter;
+
+      Session.on('change:auth', function (session){
+        if(session.get('auth')) {
+          app_router.navigate('dashboard', true);
+
+        } else {
+          app_router.navigate('', true);
+
+        }
+      });
+
+      app_router.on('route:home', function(actions) {
+        if(Session.get('auth')) {
+          app_router.navigate('dashboard', true);
+          return;
+        };
+        React.renderComponent(<App page="home" />, appNode);
+      });
+
+      app_router.on('route:about', function(actions) {
+        React.renderComponent(<App page="about" />, appNode);
+      });
+
+      app_router.on('route:dashboard', function(actions) {
+
+        if(!Session.get('auth')) {
+          app_router.navigate('', true);
+          return;
+        };
+
+        React.renderComponent(<App page="dashboard" />, appNode);
+      });
+      Session.getAuth(function () {
+        Backbone.history.start();
+      })
 
       </script>
    

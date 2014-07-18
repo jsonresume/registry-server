@@ -15,6 +15,8 @@ var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
 var request = require('superagent');
 var sha256 = require('sha256');
+var expressSession = require('express-session');
+var cookieParser = require('cookie-parser');
 if (process.env.REDISTOGO_URL) {
     var rtg = require("url").parse(process.env.REDISTOGO_URL);
     var redis = require("redis").createClient(rtg.port, rtg.hostname);
@@ -26,6 +28,26 @@ if (process.env.REDISTOGO_URL) {
 redis.on("error", function(err) {
     console.log("error event - " + redis.host + ":" + redis.port + " - " + err);
 });
+
+var allowCrossDomain = function(req, res, next) {
+  // Added other domains you want the server to give access to
+  // WARNING - Be careful with what origins you give access to
+  var allowedHost = [
+    'http://backbonetutorials.com',
+    'http://localhost'
+  ];
+  
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', req.headers.origin)
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+    next();
+}
+
+app.use(allowCrossDomain);
+app.use(cookieParser());
+
+app.use(expressSession({secret:'somesecrettokenhere'}));
 
 app.use(express.static(__dirname + '/assets', {maxAge: 7200 * 1000}));
 
@@ -52,8 +74,8 @@ function S4() {
 
 MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.all('/*', function(req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        //res.header("Access-Control-Allow-Origin", "*");
+        //res.header("Access-Control-Allow-Headers", "X-Requested-With");
         next();
     });
 
@@ -163,6 +185,29 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             }
         });
     };
+
+    app.get('/session', function(req, res){ 
+      // This checks the current users auth
+      // It runs before Backbones router is started
+      // we should return a csrf token for Backbone to use
+      if(typeof req.session.username !== 'undefined'){
+        res.send({auth: true, id: req.session.id, username: req.session.username, _csrf: req.session._csrf});
+      } else {
+        res.send({auth: false, _csrf: req.session._csrf});
+      }
+    });
+    app.del('/session/:id', function(req, res, next){  
+      // Logout by clearing the session
+      req.session.regenerate(function(err){
+        // Generate a new csrf token so the user can login again
+        // This is pretty hacky, connect.csrf isn't built for rest
+        // I will probably release a restful csrf module
+        //csrf.generate(req, res, function () {
+          res.send({auth: false, _csrf: req.session._csrf});    
+        //});
+      });  
+    });
+
 
     app.get('/', renderHomePage);
 
@@ -467,11 +512,14 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
                 // var session = value.toString();
 
+                req.session.username = user.username;
+                req.session.email = email;
                 res.send({
                     message: 'loggedIn',
                     username: user.username,
                     email: email,
-                    session: sessionUID
+                    session: sessionUID,
+                    auth: true
                 });
 
 
