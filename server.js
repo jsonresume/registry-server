@@ -1,4 +1,4 @@
-var controllers = require('./controllers');
+var controller = require('./controller');
 
 var express = require("express");
 var Mustache = require('mustache');
@@ -94,33 +94,33 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         next();
     });
 
-    app.get('/session', controllers.checkAuth);
+    app.get('/', controller.renderHomePage);
 
-    app.del('/session/:id', controllers.deleteSession);
+    app.post('/session', controller.session.createSession);
+    app.get('/session', controller.session.checkAuth);
+    app.del('/session/:id', controller.session.deleteSession);
 
-    app.get('/', controllers.renderHomePage);
 
-    app.get('/members', controllers.renderMembersPage);
 
-    app.get('/pdf', controllers.exportPdf);
+    app.get('/members', controller.renderMembersPage);
 
-    app.get('/:uid.:format', controllers.renderResume);
+    app.get('/pdf', controller.exportPdf);
 
-    app.get('/:uid', controllers.renderResume);
+    app.get('/:uid.:format', controller.renderResume);
+    app.get('/:uid', controller.renderResume);
+    app.post('/:uid', controller.renderResume);
 
-    app.post('/resume', controllers.postResume);
+    app.post('/resume', controller.resume.postResume);
+    app.put('/resume', controller.resume.changeTheme);
 
-    app.put('/resume', controllers.changeTheme);
 
-    app.post('/user', controllers.registerUser);
 
-    app.post('/session', controllers.createSession);
+    var userTest = require('./controller/user'); //fix this, not working form controller index for some reason
 
-    app.delete('/account', controllers.deleteUser);
+    app.post('/user', userTest.registerUser);
+    app.delete('/account', userTest.deleteUser);
+    app.put('/account', userTest.changePassword);
 
-    app.put('/account', controllers.changePassword);
-
-    app.post('/:uid', controllers.renderResume);
 
     var port = Number(process.env.PORT || 5000);
     app.listen(port, function() {
