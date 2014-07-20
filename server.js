@@ -24,7 +24,7 @@ if (process.env.REDISTOGO_URL) {
 } else {
     var redis = require("redis").createClient();
 }
-
+var RedisStore = require('connect-redis')(expressSession);
 redis.on("error", function(err) {
     console.log("error event - " + redis.host + ":" + redis.port + " - " + err);
 });
@@ -46,8 +46,8 @@ var allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 app.use(cookieParser());
-
-app.use(expressSession({secret:'somesecrettokenhere'}));
+  app.use(expressSession({ store: new RedisStore({client: redis}), secret: 'keyboard cat' }))
+//app.use(expressSession({secret:'somesecrettokenhere'}));
 
 app.use(express.static(__dirname + '/assets', {maxAge: 7200 * 1000}));
 
