@@ -268,6 +268,10 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         var password = req.body.password;
         var email = req.body.email;
         // console.log(req.body);
+
+
+
+
         if (!req.body.guest) {
             db.collection('users').findOne({
                 'email': email
@@ -277,7 +281,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
                 redis.get(req.body.session, function(err, valueExists) {
 
-                    if (user && password && bcrypt.compareSync(password, user.hash)) {
+                    if ((user && password && bcrypt.compareSync(password, user.hash)_ || req.session.username) {
                         var resume = req.body && req.body.resume || {};
                         resume.jsonresume = {
                             username: user.username,
