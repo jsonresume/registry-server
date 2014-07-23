@@ -473,6 +473,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         }, {
                             safe: true
                         }, function(err, user) {
+                            req.session.username = user[0].username;
+                            req.session.email = user[0].email;
                             res.send({
                                 // username: user.username,
                                 email: user[0].email,
