@@ -479,6 +479,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         }, function(err, user) {
                             req.session.username = user[0].username;
                             req.session.email = user[0].email;
+                            console.log('USE CREATED', req.session, req.session.username);
                             res.send({
                                 // username: user.username,
                                 email: user[0].email,
