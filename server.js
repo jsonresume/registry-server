@@ -270,7 +270,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         // console.log(req.body);
 
 
-
+        console.log('XXXXXXXXXXXXXXXX', req.session.username);
 
         if (!req.body.guest) {
             db.collection('users').findOne({
