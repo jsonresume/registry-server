@@ -266,7 +266,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     app.post('/resume', function(req, res) {
         var password = req.body.password;
-        var email = req.body.email;
+        var email = req.body.email || req.session.email;
         // console.log(req.body);
 
 
