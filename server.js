@@ -125,7 +125,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             }
             var content = '';
             if (/json/.test(format)) {
-                delete resume.jsonresume; // This removes our registry server config vars from the resume.json
+                if(typeof req.session.username === 'undefined') {
+                    delete resume.jsonresume; // This removes our registry server config vars from the resume.json
+                }
                 delete resume._id; // This removes the document id of mongo
                 content = JSON.stringify(resume, undefined, 4);
                 res.set({
