@@ -211,7 +211,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     });
 
 
-    app.get('/', renderHomePage);
+    //app.get('/', renderHomePage);
 
 
     var renderMembersPage = function(req, res) {
