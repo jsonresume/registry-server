@@ -237,7 +237,13 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     };
     app.get('/members', renderMembersPage);
-
+    app.get('/stats', function (req,res) {
+        db.collection('users').find().count(function (e, usercount) {
+        db.collection('resumes').find().count(function (e, resumecount) {
+            res.send({userCount: usercount,resumeCount: resumecount});
+        });
+        });
+    });
     // export pdf route
     app.get('/pdf', function(req, res) {
         console.log(req.body.resume, req.body.theme);
