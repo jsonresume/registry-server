@@ -17,6 +17,26 @@ var request = require('superagent');
 var sha256 = require('sha256');
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
+var Pusher = require('pusher');
+var pusher = null;
+if(process.env.PUSHER_KEY) {
+    pusher = new Pusher({
+      appId: '83846',
+      key: process.env.PUSHER_KEY,
+      secret: process.env.PUSHER_SECRET
+    });
+};
+
+var realTimeViews = 0;
+if(pusher !== null) {
+    setInterval(function() { 
+        pusher.trigger('test_channel', 'my_event', {
+          points: [{y:realTimeViews,time: new Date().getTime()}]
+        });
+        realTimeViews = 0;
+    }, 10000);
+};
+
 if (process.env.REDISTOGO_URL) {
     var rtg = require("url").parse(process.env.REDISTOGO_URL);
     var redis = require("redis").createClient(rtg.port, rtg.hostname);
@@ -101,7 +121,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
 
     var renderResume = function(req, res) {
-        console.log('hello')
+        realTimeViews++;
         var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
         var format = req.params.format || req.headers.accept || 'html';

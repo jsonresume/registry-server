@@ -30,6 +30,7 @@
     "mustache": "^0.8.1",
     "pdfcrowd": "^1.1.1",
     "postmark": "~0.2.5",
+    "pusher": "^1.0.0",
     "redis": "^0.11.0",
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "latest",
