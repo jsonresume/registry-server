@@ -34,7 +34,7 @@ if(pusher !== null) {
           points: [{y:realTimeViews,time: new Date().getTime()}]
         });
         realTimeViews = 0;
-    }, 10000);
+    }, 1000);
 };
 
 if (process.env.REDISTOGO_URL) {
