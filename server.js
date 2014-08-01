@@ -26,15 +26,20 @@ if(process.env.PUSHER_KEY) {
       secret: process.env.PUSHER_SECRET
     });
 };
-
+var points = [];
 var realTimeViews = 0;
 if(pusher !== null) {
     setInterval(function() { 
-        pusher.trigger('test_channel', 'my_event', {
-          points: [{y:realTimeViews,time: new Date().getTime()}]
-        });
+        points.push({y:realTimeViews,time: new Date().getTime()});
         realTimeViews = 0;
     }, 1000);
+        setInterval(function() { 
+
+        pusher.trigger('test_channel', 'my_event', {
+          points: points
+        });
+        points = [];
+    }, 10000);
 };
 
 if (process.env.REDISTOGO_URL) {
