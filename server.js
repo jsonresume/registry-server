@@ -112,6 +112,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         });
 
     };
+    app.get('/views', function(req, res){ 
+        redis.get('views', function(err, views) {
+            res.send({views: views*1});
+        });
+    });
 
     var renderResume = function(req, res) {
         realTimeViews++;
