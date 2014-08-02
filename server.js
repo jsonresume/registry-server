@@ -112,11 +112,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         });
 
     };
-    app.get('/views', function(req, res){ 
-        redis.get('views', function(err, views) {
-            res.send({views: views*1});
-        });
-    });
 
     var renderResume = function(req, res) {
         realTimeViews++;
@@ -273,11 +268,15 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
     app.get('/members', renderMembersPage);
     app.get('/stats', function (req,res) {
+
+        redis.get('views', function(err, views) {
         db.collection('users').find().count(function (e, usercount) {
         db.collection('resumes').find().count(function (e, resumecount) {
-            res.send({userCount: usercount,resumeCount: resumecount});
+            res.send({userCount: usercount,resumeCount: resumecount, views: views*1});
         });
         });
+        });
+
     });
     // export pdf route
     app.get('/pdf', function(req, res) {
