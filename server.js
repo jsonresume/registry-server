@@ -28,19 +28,7 @@ if(process.env.PUSHER_KEY) {
 };
 var points = [];
 var realTimeViews = 0;
-if(pusher !== null) {
-    setInterval(function() { 
-        points.push({y:realTimeViews,time: new Date().getTime()});
-        realTimeViews = 0;
-    }, 1000);
-        setInterval(function() { 
 
-        pusher.trigger('test_channel', 'my_event', {
-          points: points
-        });
-        points = [];
-    }, 10000);
-};
 
 if (process.env.REDISTOGO_URL) {
     var rtg = require("url").parse(process.env.REDISTOGO_URL);
@@ -127,6 +115,23 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     var renderResume = function(req, res) {
         realTimeViews++;
+        
+        redis.get('views', function(err, views) {
+            if(err) {
+                redis.set('views', 0);
+            } else {
+                redis.set('views', views*1+1, redis.print);
+
+            }
+            console.log(views);
+
+            if(pusher !== null) {
+            pusher.trigger('test_channel', 'my_event', {
+              views: views
+            });
+            };
+        });
+
         var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
         var format = req.params.format || req.headers.accept || 'html';
