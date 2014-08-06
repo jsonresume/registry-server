@@ -1,0 +1,3 @@
+[submodule "resume-editor"]
+	path = resume-editor
+	url = http://github.com/erming/resume-editor
