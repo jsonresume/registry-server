@@ -185,11 +185,19 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 })
             } else if (/pdf/.test(format)) {
                 console.log('Come on PDFCROWD');
-                resumeToHTML(resume, {
-                    theme: resume.jsonresume.theme || themeName
-                }, function(content, errs) {
-                    client.convertHtml(content, pdf.sendHttpResponse(res));
-                });
+                  var theme = req.query.theme || resume.jsonresume.theme || themeName;
+                request
+                    .post('http://themes.jsonresume.org/theme/' + theme)
+                    .send({
+                        resume: resume
+                    })
+                    .set('Content-Type', 'application/json')
+                    .end(function(response) {
+                    client.convertHtml(response.text, pdf.sendHttpResponse(res));
+
+                    });
+
+
             } else {
                 var theme = req.query.theme || resume.jsonresume.theme || themeName;
                 request
