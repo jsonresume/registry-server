@@ -193,7 +193,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     })
                     .set('Content-Type', 'application/json')
                     .end(function(response) {
-                    client.convertHtml(response.text, pdf.sendHttpResponse(res));
+                    client.convertHtml(response.text, pdf.sendHttpResponse(res), {
+                        hmargin: "0in",
+                        vmargin: "0in",
+                        height: "-1"
+                    });
 
                     });
 
