@@ -9,3 +9,7 @@
 3. `git submodule update --init`
 4. Setup a mongodb server on your computer
 5. `MONGOHQ_URL=<url> node server.js`
+
+## License
+
+Available under [the MIT license](http://mths.be/mit).
