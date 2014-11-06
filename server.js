@@ -279,6 +279,13 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     };
     app.get('/members', renderMembersPage);
+    app.get('/competition', function (req,res) {
+        //{vote: {$ne: null}}, {username:1, vote: 1}
+        db.collection('tweets').find({vote: {$ne: null}}, {username:1, vote: 1}).toArray(  function (e, tweets) {
+            console.log(arguments);
+            res.send(tweets);
+        });
+    });
     app.get('/stats', function (req,res) {
 
         redis.get('views', function(err, views) {
