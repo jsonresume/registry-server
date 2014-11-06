@@ -9,6 +9,49 @@
     <!-- Bootstrap -->
     <link href="http://bootswatch.com/lumen/bootstrap.min.css" rel="stylesheet">
 
+   <style type="text/css">
+    body {
+
+  background-color: #eee;
+}
+
+.form-signin {
+  padding: 15px;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+body {
+  overflow-y: scroll;
+}
+   </style>
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -16,58 +59,340 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
   </head>
   <body>
-
-
-
-<div class="navbar navbar-default">
-  <div class="container">
-    <a class="navbar-brand" href="#">Json Resume</a>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Home</a></li>
-      <li><a href="#">Link</a></li>
-      <li><a href="#">Link</a></li>
-      <li class="divider-vertical"></li>
-      <li><a href="#">More</a></li>
-      <li><a href="#">Options</a></li>
-    </ul>
-  </div>
-</div>
-
-<div class="container">
-  <div class="jumbotron text-center">
-    <h1>Fixed Width Layout</h1>
-    <p class="lead">The Bootstrap 3 grid is fluid only. This example shows how to use a custom container to create a fixed width layout.</p>
-    <p><a class="btn btn-large btn-success" href="http://bootply.com/tagged/bootstrap-3" target="ext">More Examples</a></p>
-  </div>
-
-  <div class="row">
-
-
-       {{#usernames}}
-       <div class="col-lg-6">
-       <div class="media">
-      <a class="pull-left" href="/{{username}}">
-        <img class="media-object img-circle" data-src="holder.js/64x64" alt="64x64" src="{{gravatar}}" style="width: 64px; height: 64px;">
-      </a>
-      <div class="media-body">
-        <h4 class="media-heading">{{username}}</h4>
-        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.
-      </div>
-    </div>
-        </div>
-      {{/usernames}}
-
-
-  </div>
-
-
-
-</div> <!-- /container -->
-
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <div class="app"></div>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/react.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.10.0/JSXTransformer.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/jsx">
+      /** @jsx React.DOM */
+      // Setup all request to hit the registry server
+      $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        //options.url = 'http://localhost:5000' + options.url;
+        options.url = 'http://registry.jsonresume.org' + options.url;
+      });
+
+      var Header = React.createClass({
+
+        getInitialState: function() {
+          return {username: null}
+        },
+        componentDidMount: function() {
+          console.log('state',Session.get('auth')); 
+        },
+        handleLogout: function () {
+          Session.logout();
+          return false;
+        },
+        render: function () {
+          if(this.props.auth === 'true') {
+               return (
+              <div className="navbar navbar-default">
+              <div className="container">
+                <a className="navbar-brand" href="/">JSON Resume Registry</a>
+                <ul className="nav navbar-nav">
+                  <li><a href="#">Home</a></li>
+                  <li><a href="#about">About</a></li>
+                </ul>
+                <ul className="nav navbar-nav navbar-right">
+                  <li className="pull-right"><a onClick={this.handleLogout} href="#logout">Logout</a></li>
+                </ul>
+
+              </div>
+            </div>
+            );
+          } else {
+            return (
+              <div className="navbar navbar-default">
+              <div className="container">
+                <a className="navbar-brand" href="/">JSON Resume Registry</a>
+                <ul className="nav navbar-nav">
+                  <li><a href="#">Home</a></li>
+                  <li><a href="#about">About</a></li>
+                </ul>
+              </div>
+            </div>
+            );
+          }
+        }
+      });
+
+      
+
+      var SessionModel = Backbone.Model.extend({
+      
+        urlRoot: '/session',
+        initialize: function () {
+          var that = this;
+          // Hook into jquery
+
+          // Use withCredentials to send the server cookies
+          // The server must allow this through response headers
+          $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+            options.xhrFields = {
+              withCredentials: true
+            };
+            // If we have a csrf token send it through with the next request
+            if(typeof that.get('_csrf') !== 'undefined') {
+              jqXHR.setRequestHeader('X-CSRF-Token', that.get('_csrf'));
+            }
+          });
+        },
+        login: function(creds) {
+          // Do a POST to /session and send the serialized form creds
+          this.save(creds, {
+             success: function () {}
+          });
+        },
+        logout: function() {
+          // Do a DELETE to /session and clear the clientside data
+          var that = this;
+          this.destroy({
+            success: function (model, resp) {
+              model.clear()
+              model.id = null;
+              // Set auth to false to trigger a change:auth event
+              // The server also returns a new csrf token so that
+              // the user can relogin without refreshing the page
+              that.set({auth: false});//, _csrf: resp._csrf});
+              
+            }
+          });      
+        },
+        getAuth: function(callback) {
+          // getAuth is wrapped around our router
+          // before we start any routers let us see if the user is valid
+          this.fetch({
+              success: callback
+          });
+        }
+      }); 
+      var Session = new SessionModel();
+      var LoginForm = React.createClass({
+        handleSubmit: function(loginDetails){
+          var that = this;
+
+          Session.login({
+            email: this.state.email, 
+            password: this.state.password
+          })
+          return false;
+        },
+        getInitialState: function() {
+          return {email: 'thomasalwyndavis@gmail.com', password: 'ffsffs'};
+        },
+        onChangeEmail: function(e) {
+          this.setState({email: e.target.value});
+        },
+        onChangePassword: function(e) {
+          this.setState({password: e.target.value});
+        },
+        render: function () {
+          return (
+            <form onSubmit={this.handleSubmit} className="form-signin" >
+                <input name="email" type="email" onChange={this.onChangeEmail} value={this.state.email} className="form-control" placeholder="Email address" required autofocus/>
+                <input name="password" type="password" onChange={this.onChangePassword} value={this.state.password} className="form-control" placeholder="Password" required/>
+                <div className="checkbox">
+              <label>
+                <input type="checkbox" value="remember-me"/> Remember me
+              </label>
+              </div>
+              <button onClick={this.handleSubmit} className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            </form>
+          );
+        }
+      });
+
+      var RegisterForm = React.createClass({
+
+        getInitialState: function() {
+          return {email: '', password: ''};
+        },
+        onChangeEmail: function(e) {
+          this.setState({email: e.target.value});
+        },
+        onChangePassword: function(e) {
+          this.setState({password: e.target.value});
+        },
+        render: function () {
+          return (
+            <form onSubmit={this.handleSubmit} className="form-signin" >
+                <input name="email" type="email" onChange={this.onChangeEmail} value={this.state.email} className="form-control" placeholder="Email address" required autofocus/>
+                <input name="password" type="password" onChange={this.onChangePassword} value={this.state.password} className="form-control" placeholder="Password" required/>
+                <div className="checkbox">
+              <label>
+                <input type="checkbox" value="remember-me"/> Remember me
+              </label>
+              </div>
+              <button onClick={this.handleSubmit} className="btn btn-lg btn-success btn-block" type="submit">Register</button>
+            </form>
+          );
+        }
+      });
+      var HomePage = React.createClass({
+        render: function () {
+          return (
+            <div className="row">
+              <div className="col-md-8">
+                <h1>Welcome</h1>
+                <p>We are going to host resumes</p>
+              </div>
+              <div className="col-md-4">
+                <h2>Login</h2>
+                <LoginForm />
+                <h2>Register</h2>
+                <RegisterForm />
+              </div>
+            </div>
+          );
+        }
+      })
+      var AboutPage = React.createClass({
+
+        render: function () {
+          return (
+            <p>About page goes here</p>
+          );
+        }
+      });
+      var DashboardPage = React.createClass({
+        getInitialState: function() {
+          return {
+            resume: '{}'
+          };
+        },
+        componentDidMount: function() {
+          console.log('get resume');
+          var that = this;
+          $.ajax('/' + Session.get('username') + '.json', {
+            success: function(result) {
+              console.log(result);
+              if (that.isMounted()) {
+                that.setState({resume: JSON.stringify(result, undefined, 4)});
+              }
+            }
+          });
+        },
+        render: function () {
+          return (
+            <pre><code>{this.state.resume}</code></pre>
+          );
+        }
+      });
+      var DefaultPage = React.createClass({
+        render: function () {
+          return (
+            <p>Loading</p>
+          );
+        }
+      })
+      var Page = React.createClass({
+          render: function () {
+            console.log(this.props.page);
+            switch(this.props.page) {
+              case 'dashboard':
+                return (
+                  <DashboardPage />
+                );
+              case 'about':
+                return (
+                  <AboutPage />
+                );
+              case 'home':
+                return (
+                  <HomePage />
+                );
+              default: 
+                return (
+                  <DefaultPage />
+                );
+
+            }
+          }
+      });
+
+      var App = React.createClass({
+
+
+          render: function () {
+              var auth = Session.get('auth');
+              if(auth) {
+                auth = 'true';
+              } else {
+                auth = 'false';
+              }
+              console.log('auth', auth);
+              return (
+                <div>
+                 <Header auth={auth} />
+                  <div className="container">
+                    <Page page={this.props.page} />
+                  </div>
+                </div>
+              );
+          }
+      });
+
+      var appNode = $('.app')[0];
+
+      React.renderComponent(<App page="none" name="Thomas" />, appNode);
+
+      var AppRouter = Backbone.Router.extend({
+
+        routes: {
+          "about": "about",
+          "dashboard": "dashboard",
+          "": "home"
+
+        }
+
+
+      });
+
+
+      var app_router = new AppRouter;
+
+      Session.on('change:auth', function (session){
+        if(session.get('auth')) {
+          app_router.navigate('dashboard', true);
+
+        } else {
+          app_router.navigate('', true);
+
+        }
+      });
+
+      app_router.on('route:home', function(actions) {
+        if(Session.get('auth')) {
+          app_router.navigate('dashboard', true);
+          return;
+        };
+        React.renderComponent(<App page="home" />, appNode);
+      });
+
+      app_router.on('route:about', function(actions) {
+        React.renderComponent(<App page="about" />, appNode);
+      });
+
+      app_router.on('route:dashboard', function(actions) {
+
+        if(!Session.get('auth')) {
+          app_router.navigate('', true);
+          return;
+        };
+
+        React.renderComponent(<App page="dashboard" />, appNode);
+      });
+      Session.getAuth(function () {
+        Backbone.history.start();
+      })
+
+      </script>
+   
   </body>
 </html>

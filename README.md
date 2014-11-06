@@ -1,16 +1,15 @@
-
-resumes
-=======
+# JSON Resume Registry Server
 
 [![Build Status](https://api.travis-ci.org/jsonresume/registry-server.svg)](http://travis-ci.org/jsonresume/registry-server)
 
-http://microformats.org/wiki/hresume
+## Development
 
+1. Clone the repository
+2. `npm install`
+3. `git submodule update --init`
+4. Setup a mongodb server on your computer
+5. `MONGOHQ_URL=<url> node server.js`
 
-## Getting started
+## License
 
-```
-node resume.js thomasdavis.json thomasdavis.html
-```
-
-Everyone just work on that resume and print out the html and shit and leave comments and get an idea of shit blah
+Available under [the MIT license](http://mths.be/mit).

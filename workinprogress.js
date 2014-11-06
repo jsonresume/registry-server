@@ -15,54 +15,12 @@ var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
 var request = require('superagent');
 var sha256 = require('sha256');
-var expressSession = require('express-session');
-var cookieParser = require('cookie-parser');
-var Pusher = require('pusher');
-var pusher = null;
-if(process.env.PUSHER_KEY) {
-    pusher = new Pusher({
-      appId: '83846',
-      key: process.env.PUSHER_KEY,
-      secret: process.env.PUSHER_SECRET
-    });
-};
-var points = [];
-var realTimeViews = 0;
+var redis = require("redis"),
+    redisClient = redis.createClient();
 
-
-if (process.env.REDISTOGO_URL) {
-    var rtg = require("url").parse(process.env.REDISTOGO_URL);
-    var redis = require("redis").createClient(rtg.port, rtg.hostname);
-    redis.auth(rtg.auth.split(":")[1]);
-} else {
-    var redis = require("redis").createClient();
-}
-var RedisStore = require('connect-redis')(expressSession);
-redis.on("error", function(err) {
-    console.log("error event - " + redis.host + ":" + redis.port + " - " + err);
+redisClient.on("error", function(err) {
+    console.log("error event - " + redisClient.host + ":" + redisClient.port + " - " + err);
 });
-
-var allowCrossDomain = function(req, res, next) {
-  // Added other domains you want the server to give access to
-  // WARNING - Be careful with what origins you give access to
-  var allowedHost = [
-    'http://backbonetutorials.com',
-    'http://localhost'
-  ];
-  
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', req.headers.origin)
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-    next();
-}
-
-app.use(allowCrossDomain);
-app.use(cookieParser());
-  app.use(expressSession({ store: new RedisStore({client: redis}), secret: 'keyboard cat' }))
-//app.use(expressSession({secret:'somesecrettokenhere'}));
-
-app.use(express.static(__dirname + '/resume-editor', {maxAge: 7200 * 1000}));
 
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
@@ -87,8 +45,8 @@ function S4() {
 
 MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.all('/*', function(req, res, next) {
-        //res.header("Access-Control-Allow-Origin", "*");
-        //res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
         next();
     });
 
@@ -114,24 +72,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     };
 
     var renderResume = function(req, res) {
-        realTimeViews++;
-        
-        redis.get('views', function(err, views) {
-            if(err) {
-                redis.set('views', 0);
-            } else {
-                redis.set('views', views*1+1, redis.print);
-
-            }
-            console.log(views);
-
-            if(pusher !== null) {
-            pusher.trigger('test_channel', 'my_event', {
-              views: views
-            });
-            };
-        });
-
+        console.log('hello')
         var themeName = req.query.theme || 'modern';
         var uid = req.params.uid;
         var format = req.params.format || req.headers.accept || 'html';
@@ -155,9 +96,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             }
             var content = '';
             if (/json/.test(format)) {
-                if(typeof req.session.username === 'undefined') {
-                    delete resume.jsonresume; // This removes our registry server config vars from the resume.json
-                }
+                delete resume.jsonresume; // This removes our registry server config vars from the resume.json
                 delete resume._id; // This removes the document id of mongo
                 content = JSON.stringify(resume, undefined, 4);
                 res.set({
@@ -185,23 +124,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 })
             } else if (/pdf/.test(format)) {
                 console.log('Come on PDFCROWD');
-                  var theme = req.query.theme || resume.jsonresume.theme || themeName;
-                request
-                    .post('http://themes.jsonresume.org/theme/' + theme)
-                    .send({
-                        resume: resume
-                    })
-                    .set('Content-Type', 'application/json')
-                    .end(function(response) {
-                    client.convertHtml(response.text, pdf.sendHttpResponse(res), {
-                        hmargin: "0in",
-                        vmargin: "0in",
-                        height: "-1"
-                    });
-
-                    });
-
-
+                resumeToHTML(resume, {
+                    theme: resume.jsonresume.theme || themeName
+                }, function(content, errs) {
+                    client.convertHtml(content, pdf.sendHttpResponse(res));
+                });
             } else {
                 var theme = req.query.theme || resume.jsonresume.theme || themeName;
                 request
@@ -230,30 +157,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         });
     };
 
-    app.get('/session', function(req, res){ 
-      // This checks the current users auth
-      // It runs before Backbones router is started
-      // we should return a csrf token for Backbone to use
-      if(typeof req.session.username !== 'undefined'){
-        res.send({auth: true, id: req.session.id, username: req.session.username, _csrf: req.session._csrf});
-      } else {
-        res.send({auth: false, _csrf: req.session._csrf});
-      }
-    });
-    app.del('/session/:id', function(req, res, next){  
-      // Logout by clearing the session
-      req.session.regenerate(function(err){
-        // Generate a new csrf token so the user can login again
-        // This is pretty hacky, connect.csrf isn't built for rest
-        // I will probably release a restful csrf module
-        //csrf.generate(req, res, function () {
-          res.send({auth: false, _csrf: req.session._csrf});    
-        //});
-      });  
-    });
-
-
-    //app.get('/', renderHomePage);
+    app.get('/', renderHomePage);
 
 
     var renderMembersPage = function(req, res) {
@@ -279,111 +183,71 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     };
     app.get('/members', renderMembersPage);
-    app.get('/stats', function (req,res) {
-
-        redis.get('views', function(err, views) {
-        db.collection('users').find().count(function (e, usercount) {
-        db.collection('resumes').find().count(function (e, resumecount) {
-            res.send({userCount: usercount,resumeCount: resumecount, views: views*1});
-        });
-        });
-        });
-
-    });
-    // export pdf route
-    app.get('/pdf', function(req, res) {
-        console.log(req.body.resume, req.body.theme);
-        request
-            .post('http://themes.jsonresume.org/theme/' + req.body.theme)
-            .send({
-                resume: req.body.resume
-            })
-            .set('Content-Type', 'application/json')
-            .end(function(response) {
-                client.convertHtml(response.text, pdf.sendHttpResponse(res));
-            });
-    });
 
 
     app.get('/:uid.:format', renderResume);
     app.get('/:uid', renderResume);
 
-
-
-    redis.on("error", function(err) {
-        console.log("Error " + err);
-        res.send({
-            sessionError: err
-        });
-    });
-
-
     app.post('/resume', function(req, res) {
         var password = req.body.password;
-        var email = req.body.email || req.session.email;
+        var email = req.body.email;
         // console.log(req.body);
-
-
-        console.log('XXXXXXXXXXXXXXXX', req.session.username);
-
         if (!req.body.guest) {
             db.collection('users').findOne({
                 'email': email
             }, function(err, user) {
-                // console.log(err, user);
 
+                console.log(err, user);
 
-                redis.get(req.body.session, function(err, valueExists) {
+                // redisClient.get(req.body.session, function(err, value) {
 
-                    if ((user && password && bcrypt.compareSync(password, user.hash)) || (typeof req.session.username !== 'undefined')) {
-                        var resume = req.body && req.body.resume || {};
-                        resume.jsonresume = {
-                            username: user.username,
-                            passphrase: req.body.passphrase || null,
-                            theme: req.body.theme || null
-                        };
-                        console.log('inserted');
-                        db.collection('resumes').update({
-                            'jsonresume.username': user.username
-                        }, resume, {
-                            upsert: true,
-                            safe: true
-                        }, function(err, resume) {
-                            res.send({
-                                url: 'http://registry.jsonresume.org/' + user.username
-                            });
-                        });
-                    } else if (valueExists === null) {
-                        res.send({
-                            sessionError: 'invalid session'
-                        });
-                    } else if (valueExists) {
+                //     console.log(sha256(value), sha256(user.email));
 
-                        console.log('success');
-                        var resume = req.body && req.body.resume || {};
-                        resume.jsonresume = {
-                            username: user.username,
-                            passphrase: req.body.passphrase || null,
-                            theme: req.body.theme || null
-                        };
-                        console.log('inserted');
-                        db.collection('resumes').update({
-                            'jsonresume.username': user.username
-                        }, resume, {
-                            upsert: true,
-                            safe: true
-                        }, function(err, resume) {
-                            res.send({
-                                url: 'http://registry.jsonresume.org/' + user.username
-                            });
-                        });
+                //     if (sha256(value) === sha256(user.email)) {
 
-                    } else {
-                        res.send({
-                            message: 'ERRORRRSSSS'
-                        });
-                    }
-                });
+                //         console.log('success');
+                //         var resume = req.body && req.body.resume || {};
+                //         resume.jsonresume = {
+                //             username: user.username,
+                //             passphrase: req.body.passphrase || null,
+                //             theme: req.body.theme || null
+                //         };
+                //         console.log('inserted');
+                //         db.collection('resumes').update({
+                //             'jsonresume.username': user.username
+                //         }, resume, {
+                //             upsert: true,
+                //             safe: true
+                //         }, function(err, resume) {
+                //             res.send({
+                //                 url: 'http://registry.jsonresume.org/' + user.username
+                //             });
+                //         });
+
+                //     } else if (user && bcrypt.compareSync(password, user.hash)) {
+                //         var resume = req.body && req.body.resume || {};
+                //         resume.jsonresume = {
+                //             username: user.username,
+                //             passphrase: req.body.passphrase || null,
+                //             theme: req.body.theme || null
+                //         };
+                //         console.log('inserted');
+                //         db.collection('resumes').update({
+                //             'jsonresume.username': user.username
+                //         }, resume, {
+                //             upsert: true,
+                //             safe: true
+                //         }, function(err, resume) {
+                //             res.send({
+                //                 url: 'http://registry.jsonresume.org/' + user.username
+                //             });
+                //         });
+                //     } else {
+                //         res.send({
+                //             message: 'ERRORRRSSSS'
+                //         });
+                //     }
+                // });
             });
         } else {
             var guestUsername = S4() + S4();
@@ -407,7 +271,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     // update theme
     app.put('/resume', function(req, res) {
 
-        console.log(req.body);
+
 
         var password = req.body.password;
         var email = req.body.email;
@@ -417,61 +281,31 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         db.collection('users').findOne({
             'email': email
         }, function(err, user) {
+            if (user && bcrypt.compareSync(password, user.hash)) {
 
-            redis.get(req.body.session, function(err, valueExists) {
-                console.log(err, valueExists, 'theme redis');
-
-                if (!valueExists && user && bcrypt.compareSync(password, user.hash)) {
-
-                    db.collection('resumes').update({
-                        //query
-                        'jsonresume.username': user.username
-                    }, {
-                        // update set new theme
-                        $set: {
-                            'jsonresume.theme': theme
-                        }
-                    }, {
-                        //options
-                        upsert: true,
-                        safe: true
-                    }, function(err, resume) {
-                        res.send({
-                            url: 'http://registry.jsonresume.org/' + user.username
-                        });
-                    });
-                } else if (valueExists === null) {
+                db.collection('resumes').update({
+                    //query
+                    'jsonresume.username': user.username
+                }, {
+                    // update set new theme
+                    $set: {
+                        'jsonresume.theme': theme
+                    }
+                }, {
+                    //options
+                    upsert: true,
+                    safe: true
+                }, function(err, resume) {
                     res.send({
-                        sessionError: 'invalid session'
+                        url: 'http://registry.jsonresume.org/' + user.username
                     });
-                } else if (valueExists === 'true') {
-                    console.log('redis session success');
-                    db.collection('resumes').update({
-                        //query
-                        'jsonresume.username': user.username
-                    }, {
-                        // update set new theme
-                        $set: {
-                            'jsonresume.theme': theme
-                        }
-                    }, {
-                        //options
-                        upsert: true,
-                        safe: true
-                    }, function(err, resume) {
-                        res.send({
-                            url: 'http://registry.jsonresume.org/' + user.username
-                        });
-                    });
-
-
-                } else {
-                    console.log('deleted');
-                    res.send({
-                        message: 'authentication error'
-                    });
-                }
-            });
+                });
+            } else {
+                console.log('deleted');
+                res.send({
+                    message: 'authentication error'
+                });
+            }
         });
 
     });
@@ -531,9 +365,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         }, {
                             safe: true
                         }, function(err, user) {
-                            req.session.username = user[0].username;
-                            req.session.email = user[0].email;
-                            console.log('USE CREATED', req.session, req.session.username);
                             res.send({
                                 // username: user.username,
                                 email: user[0].email,
@@ -549,12 +380,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     });
 
 
-
-
-
     function uid(len) {
         return Math.random().toString(35).substr(2, len);
     }
+
+
+
     app.post('/session', function(req, res) {
         var password = req.body.password;
         var email = req.body.email;
@@ -565,27 +396,24 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             if (user && bcrypt.compareSync(password, user.hash)) {
                 // console.log(email, bcrypt.hashSync(email));
                 // console.log(email, bcrypt.hashSync(email));
-                var sessionUID = uid(32);
+                var sessionUID = uid(17);
 
-                redis.set(sessionUID, true, redis.print);
+                redisClient.set(sessionUID, sha256(email), redis.print);
 
 
 
                 // var session = value.toString();
 
-                req.session.username = user.username;
-                req.session.email = email;
                 res.send({
                     message: 'loggedIn',
                     username: user.username,
                     email: email,
-                    session: sessionUID,
-                    auth: true
+                    session: sessionUID
                 });
 
 
 
-                // redis.quit();
+                redisClient.quit();
             } else {
                 res.send({
                     message: 'authentication error'
@@ -603,12 +431,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         db.collection('users').findOne({
             'email': email
         }, function(err, user) {
-            console.log(err, user, 'waafdkls');
-            if (!user) {
-                res.send({
-                    message: '\nemail not found'
-                });
-            } else if (user && bcrypt.compareSync(password, user.hash)) {
+            if (user && bcrypt.compareSync(password, user.hash)) {
                 // console.log(req.body);
 
                 //remove the users resume
@@ -621,19 +444,12 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         'email': email
                     }, 1, function(err, numberRemoved) {
                         console.log(err, numberRemoved, 'user deleted');
-                        if (err) {
-                            res.send(err);
-                        } else {
+                        if (!err) {
                             res.send({
-                                message: '\nYour account has been successfully deleted.'
+                                message: "account deleted"
                             });
-
                         }
                     });
-                });
-            } else {
-                res.send({
-                    message: "\ninvalid Password"
                 });
             }
         });
@@ -655,6 +471,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     //query
                     'email': email
                 }, {
+                    // update set new theme
                     $set: {
                         'hash': hash
                     }
