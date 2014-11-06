@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
 var gravatar = require('gravatar');
 var app = express();
-var _ = require('lodash');
+var _ = require('lodash');  
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
 var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
@@ -286,11 +286,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         db.collection('tweets').find({vote: {$ne: null}}, {username:1, vote: 1}).toArray(  function (e, tweets) {
             var votes = [];
             _.each(tweets, function(tweet){
-                votes.push({username: tweet.username, vote: tweet.vote})
-                if(typeof leaderboard[tweet.vote] === 'undefined') {
-                    leaderboard[tweet.vote] = 1;
+                votes.push({username: tweet.username, vote: tweet.vote.substr(1)})
+                if(typeof leaderboard[tweet.vote.substr(1)] === 'undefined') {
+                    leaderboard[tweet.vote.substr(1)] = 1;
                 } else {
-                    leaderboard[tweet.vote] += 1
+                    leaderboard[tweet.vote.substr(1)] += 1
                 }
             });
             res.send({leaderboard: leaderboard, votes: votes});
