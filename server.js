@@ -185,6 +185,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     res.send(markdown);
                 })
             } else if (/pdf/.test(format)) {
+                // this code is used for web-based pdf export such as http://registry.jsonresume.org/thomasdavis.pdf - see line ~310 for resume-cli export
                 console.log('Come on PDFCROWD');
                   var theme = req.query.theme || resume.jsonresume.theme || themeName;
                 request
@@ -195,9 +196,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     .set('Content-Type', 'application/json')
                     .end(function(response) {
                     client.convertHtml(response.text, pdf.sendHttpResponse(res), {
-                        hmargin: "0in",
-                        vmargin: "0in",
-                        height: "-1"
+                      use_print_media: "true"
                     });
 
                     });
@@ -308,6 +307,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     });
     // export pdf route
+    // this code is used by resume-cli for pdf export, see line ~188 for web-based export
     app.get('/pdf', function(req, res) {
         console.log(req.body.resume, req.body.theme);
         request
@@ -317,7 +317,9 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             })
             .set('Content-Type', 'application/json')
             .end(function(response) {
-                client.convertHtml(response.text, pdf.sendHttpResponse(res));
+                client.convertHtml(response.text, pdf.sendHttpResponse(res),{
+                      use_print_media: "true"
+                    });
             });
     });
 
