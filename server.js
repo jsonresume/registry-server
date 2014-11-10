@@ -195,7 +195,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     })
                     .set('Content-Type', 'application/json')
                     .end(function(response) {
-                    client.convertHtml(response.text, pdf.sendHttpResponse(res), {
+                    client.convertHtml(response.text, pdf.sendHttpResponse(res,null,uid+".pdf"), {
                       use_print_media: "true"
                     });
 
