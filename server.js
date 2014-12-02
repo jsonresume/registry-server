@@ -282,7 +282,15 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.get('/competition', function (req,res) {
         //{vote: {$ne: null}}, {username:1, vote: 1}
         var leaderboard = {};
+        var currentMonth = new Date().getMonth();
         db.collection('tweets').find({vote: {$ne: null}}, {username:1, vote: 1}).toArray(  function (e, tweets) {
+            tweets = _.filter(tweets, function(tweet){
+                if(currentMonth === new Date(tweet.created_at).getMonth()){
+                    return true;
+                } else {
+                    return false;
+                }
+            });
             var votes = [];
             _.each(tweets, function(tweet){
                 votes.push({username: tweet.username, vote: tweet.vote.substr(1)})
