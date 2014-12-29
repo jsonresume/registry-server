@@ -291,6 +291,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     return false;
                 }
             });
+            console.log(tweets);
             var votes = [];
             _.each(tweets, function(tweet){
                 votes.push({username: tweet.username, vote: tweet.vote.substr(1)})
