@@ -263,12 +263,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             var usernameArray = [];
             docs.forEach(function(doc) {
                 usernameArray.push({
-                    username: doc.username,
-                    gravatar: gravatar.url(doc.email, {
-                        s: '80',
-                        r: 'pg',
-                        d: '404'
-                    })
+                    username: doc.username
+                    
                 });
             });
             var page = Mustache.render(templateHelper.get('members'), {
