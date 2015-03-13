@@ -2,6 +2,7 @@
 
 [![Build Status](https://api.travis-ci.org/jsonresume/registry-server.svg)](http://travis-ci.org/jsonresume/registry-server)
 
+
 ## Installation
 
 Requirements: MongoDB, Redis
