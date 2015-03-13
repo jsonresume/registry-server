@@ -12,6 +12,15 @@ Requirements: MongoDB, Redis
 1. `mongo localhost:27017/jsonresume --eval "db.resumes.insert({})"`
 1. `MONGOHQ_URL=mongodb://localhost:27017/jsonresume node server.js`
 
+*Alternatively:*
+
+Requirements: Vagrant, Virtualbox
+
+1. Clone the repository
+1. `vagrant up`
+1. `vagrant ssh`
+1. `node server.js`
+
 ## Documentation
 For additional documentation please see the [Wiki page](https://github.com/jsonresume/resume-docs/wiki/Registry-Server).
 
