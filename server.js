@@ -713,4 +713,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.listen(port, function() {
         console.log("Listening on " + port);
     });
-})
+});
+
+module.exports = app;

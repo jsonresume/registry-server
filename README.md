@@ -21,6 +21,12 @@ Requirements: Vagrant, Virtualbox
 1. `vagrant ssh`
 1. `node server.js`
 
+## Testing
+
+To run the tests, simply run:
+
+    npm run test:dev
+
 ## Documentation
 For additional documentation please see the [Wiki page](https://github.com/jsonresume/resume-docs/wiki/Registry-Server).
 

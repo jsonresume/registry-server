@@ -1,8 +1,13 @@
-var test = require('tape');
+var request = require('supertest');
+var server = require('../server');
 
-test('Server blank test', function(t) {
-    t.plan(1);
-    t.ok(true, 'blank test');
+var api = request(server);
+
+describe('Homepage', function() {
+
+  it('returns 200 OK', function(done) {
+    api.get('/')
+    .expect(200, done)
+  });
+
 });
-
-//

@@ -3,8 +3,12 @@
   "version": "0.0.0",
   "description": "resumes ======= http://microformats.org/wiki/hresume",
   "main": "index.js",
+  "config": {
+    "reporter": "tap"
+  },
   "scripts": {
-    "test": "node ./test/index.js | tap-spec"
+    "test": "mocha --reporter $npm_package_config_reporter --require test/testHelper.js --colors",
+    "test:dev": "npm run test --resumes:reporter=spec"
   },
   "repository": {
     "type": "git",
@@ -39,7 +43,8 @@
     "superagent": "^0.18.1"
   },
   "devDependencies": {
-    "tap-spec": "^0.2.0",
-    "tape": "^2.13.3"
+    "chai": "^2.2.0",
+    "mocha": "^2.2.4",
+    "supertest": "^0.15.0"
   }
 }
