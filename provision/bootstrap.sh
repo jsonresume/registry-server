@@ -1,35 +1,31 @@
 #!/bin/bash
-VAGRANT_HOME=/home/vagrant
-MONGO_URL=localhost:27017/jsonresume
-PROJECT_DIR=/vagrant
 
-sudo apt-get update
-sudo apt-get install -y git npm mongodb redis-server
+source /vagrant/provision/constants.sh
+source /vagrant/provision/utils.sh
 
-# node setup
-sudo ln -s /usr/bin/nodejs /usr/bin/node
-cd $PROJECT_DIR
-npm install
+echo_heading "Update and install packages"
+{
+  sudo apt-get update -qq
+  sudo apt-get install -y git npm mongodb redis-server
+} > /dev/null
 
-git submodule update --init --recursive
+echo_heading "Setting up NodeJS and project"
+{
+  sudo ln -s /usr/bin/nodejs /usr/bin/node
+  cd $PROJECT_DIR
+  npm install
 
-# mongo config
-mongo $MONGO_URL --eval "db.resumes.insert({})"
+  git submodule update --init --recursive
 
-#
-# idempotently add stuff to .profile
-#
+  # mongo config
+  mongo $MONGO_URL --eval "db.resumes.insert({})"
+} > /dev/null
+
+echo_heading "Idempotently add stuff to .profile"
 cd $VAGRANT_HOME
-
-if [ ! -f .profile_user ]; then
-    # mongo environment variable
-    echo "export MONGOHQ_URL=mongodb://$MONGO_URL" >> .profile_user
-    # ensure we `vagrant ssh` into the project directory
-    echo "cd $PROJECT_DIR" >> .profile_user
+# If not already there, then append command to execute .profile_additions to .profile
+if ! grep -q ".profile_additions" $VAGRANT_HOME/.profile; then
+  echo "source $PROVISION_DIR/.profile_additions" >> $VAGRANT_HOME/.profile
 fi
 
-if ! grep -q ".profile_user" $VAGRANT_HOME/.profile; then
-    # If not already there, then append command to execute .profile_user to .profile
-    echo "if [ -f $VAGRANT_HOME/.profile_user ]; then . $VAGRANT_HOME/.profile_user; fi" >> $VAGRANT_HOME/.profile
-fi
-source $VAGRANT_HOME/.profile
+echo -e "\nFinished provisioning"
