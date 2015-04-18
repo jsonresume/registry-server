@@ -6,12 +6,23 @@ source /vagrant/provision/utils.sh
 echo_heading "Update and install packages"
 {
   sudo apt-get update -qq
-  sudo apt-get install -y git npm mongodb redis-server
+  sudo add-apt-repository ppa:git-core/ppa # for git v2+
+  sudo apt-get update -qq
+  sudo apt-get install -y git mongodb redis-server
+  sudo apt-get install -y build-essential libssl-dev curl # for NVM
+} > /dev/null
+
+echo_heading "Installing latest stable NodeJS using NVM"
+{
+  curl -s https://raw.githubusercontent.com/creationix/nvm/v0.23.3/install.sh | bash
+  chmod +x $VAGRANT_HOME/.nvm/nvm.sh
+  source $VAGRANT_HOME/.nvm/nvm.sh
+  nvm install stable >/dev/null 2>&1 # noisy
+  nvm alias default stable
 } > /dev/null
 
 echo_heading "Setting up NodeJS and project"
 {
-  sudo ln -s /usr/bin/nodejs /usr/bin/node
   cd $PROJECT_DIR
   npm install
 
