@@ -3,6 +3,7 @@ node_js:
   - "0.10"
 services:
   - mongodb
+  - redis-server
 env:
   - MONGOHQ_URL=mongodb://localhost:27017/jsonresume
 git:
