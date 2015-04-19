@@ -14,11 +14,11 @@ echo_heading "Update and install packages"
 
 echo_heading "Installing latest stable NodeJS using NVM"
 {
-  curl -s https://raw.githubusercontent.com/creationix/nvm/v0.23.3/install.sh | bash
+  curl -s https://raw.githubusercontent.com/creationix/nvm/v0.24.1/install.sh | bash
   chmod +x $VAGRANT_HOME/.nvm/nvm.sh
   source $VAGRANT_HOME/.nvm/nvm.sh
-  nvm install stable >/dev/null 2>&1 # noisy
-  nvm alias default stable
+  nvm install v0.10 >/dev/null 2>&1 # noisy
+  nvm alias default v0.10
 } > /dev/null
 
 echo_heading "Setting up NodeJS and project"
