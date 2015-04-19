@@ -18,6 +18,7 @@ var request = require('superagent');
 var sha256 = require('sha256');
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
+var HttpStatus = require('http-status-codes');
 var Pusher = require('pusher');
 var pusher = null;
 if(process.env.PUSHER_KEY) {
@@ -518,7 +519,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         }, function(err, user) {
 
             if (user) {
-                res.send({
+                res.status(HttpStatus.CONFLICT).send({
                     error: {
                         field: 'email',
                         message: 'Email is already in use, maybe you forgot your password?'
@@ -530,7 +531,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     'username': req.body.username
                 }, function(err, user) {
                     if (user) {
-                        res.send({
+                        res.status(HttpStatus.CONFLICT).send({
                             error: {
                                 field: 'username',
                                 message: 'This username is already taken, please try another one'
@@ -566,8 +567,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         }, function(err, user) {
                             req.session.username = user[0].username;
                             req.session.email = user[0].email;
-                            console.log('USE CREATED', req.session, req.session.username);
-                            res.send({
+                            console.log('USER CREATED', req.session, req.session.username);
+                            res.status(HttpStatus.CREATED).send({
                                 // username: user.username,
                                 email: user[0].email,
                                 username: user[0].username,

@@ -7,6 +7,7 @@
     "reporter": "tap"
   },
   "scripts": {
+    "pretest": "mongo localhost:27017/jsonresume --eval \"db.dropDatabase();\" >/dev/null && echo Using blank DB",
     "test": "mocha --reporter $npm_package_config_reporter --require test/testHelper.js --colors",
     "test:dev": "npm run test --resumes:reporter=spec"
   },
@@ -29,6 +30,7 @@
     "express": "~4.4.3",
     "express-session": "^1.6.5",
     "gravatar": "^1.0.6",
+    "http-status-codes": "^1.0.5",
     "lodash": "^2.4.1",
     "mongodb": "~1.4.7",
     "mustache": "^0.8.1",
