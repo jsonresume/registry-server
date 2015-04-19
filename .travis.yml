@@ -11,4 +11,5 @@ git:
 before_install:
   - git submodule update --init --recursive
 before_script:
-  - mongo localhost:27017/jsonresume --eval "db.resumes.insert({})"
+  - echo Give MongoDB time to start accepting connections
+  - sleep 10
