@@ -12,4 +12,4 @@ before_install:
   - git submodule update --init --recursive
 before_script:
   - echo Give MongoDB time to start accepting connections
-  - sleep 10
+  - sleep 15
