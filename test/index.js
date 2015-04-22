@@ -2,7 +2,21 @@ var request = require('supertest');
 var server = require('../server');
 var HttpStatus = require('http-status-codes');
 
-var api = request(server);
+var api = request(server),
+    replaceSpaces = function(s) {
+        return s.replace(/ /g, "_");
+    },
+    getTestName = function(test) {
+        return replaceSpaces(test.fullTitle())
+    },
+    getUser = function(test) {
+        var testName = getTestName(test);
+        return {
+                username: testName,
+                email: testName+"@example.com",
+                password: "password"
+            };
+    };
 
 describe('API', function() {
     describe('/', function() {
@@ -15,13 +29,9 @@ describe('API', function() {
     });
 
     describe('/user', function() {
-        var user = {
-            username: "test user",
-            email: "user@example.com",
-            password: "password"
-        };
-
         describe('POST', function () {
+            var user = getUser(this);
+
             it('should return 201 Created', function(done) {
                 api.post('/user')
                     .send(user)
@@ -33,7 +43,7 @@ describe('API', function() {
                     .send({
                         username: "different",
                         email: user.email,
-                        password: "password"
+                        password: user.password
                     })
                     .expect(HttpStatus.CONFLICT, done);
             });
@@ -43,11 +53,48 @@ describe('API', function() {
                     .send({
                         username: user.username,
                         email: "different",
-                        password: "password"
+                        password: user.password
                     })
                     .expect(HttpStatus.CONFLICT, done);
             });
         });
+    });
 
+    describe('/session', function() {
+        describe('POST', function () {
+            var user = getUser(this);
+
+            before(function(done) {
+                api.post('/user')
+                    .send(user)
+                    .end(function() {
+                        done();
+                    });
+            });
+
+            it('should return 200 OK for a valid user', function(done) {
+                api.post('/session')
+                    .send(user)
+                    .expect(HttpStatus.OK, done);
+            });
+
+            it('should return 401 Unauthorized for an incorrect password', function(done) {
+                api.post('/session')
+                    .send({
+                        email: user.email,
+                        password: "different"
+                    })
+                    .expect(HttpStatus.UNAUTHORIZED, done);
+            });
+
+            it('should return 401 Unauthorized for an unregistered email', function(done) {
+                api.post('/session')
+                    .send({
+                        email: "different",
+                        password: user.password
+                    })
+                    .expect(HttpStatus.UNAUTHORIZED, done);
+            });
+        });
     });
 });

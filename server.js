@@ -621,7 +621,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
                 // redis.quit();
             } else {
-                res.send({
+                res.status(HttpStatus.UNAUTHORIZED).send({
                     message: 'authentication error'
                 });
             }
