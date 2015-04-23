@@ -25,6 +25,13 @@ var api = request(server),
             .then(function(res) {
                 return res.body;
             });
+    },
+    getSession = function(user) {
+        return api.post('/session')
+            .send(user)
+            .then(function(res) {
+                return res.body.session;
+            });
     };
 
 describe('API', function() {
@@ -101,6 +108,52 @@ describe('API', function() {
                         password: user.password
                     })
                     .expect(HttpStatus.UNAUTHORIZED);
+            });
+        });
+    });
+
+    describe('/_username_', function() {
+        describe('GET', function() {
+            var user = getUser(this),
+                session = null;
+
+            before(function() {
+                return createUser(user)
+                    .then(function() {
+                        return user;
+                    })
+                    .then(getSession)
+                    .then(function(newSession) {
+                        session = newSession;
+                    });
+            });
+
+            it('should return 404 Not Found for an invalid user', function() {
+                return api.get('/not_a_real_user')
+                    .send()
+                    .expect(HttpStatus.NOT_FOUND);
+            });
+
+            it('should return 404 Not Found for a valid user with no resume', function() {
+                return api.get('/'+user.username)
+                    .send()
+                    .expect(HttpStatus.NOT_FOUND);
+            });
+
+            it('should return 200 OK for a valid user with a resume', function() {
+                return api.post('/resume')
+                    .send({
+                        email: user.email,
+                        session: session,
+                        resume: {
+                            test: "Put a real resume here?"
+                        }
+                    })
+                    .then(function() {
+                        return api.get('/'+user.username)
+                            .send()
+                            .expect(HttpStatus.OK);
+                    });
             });
         });
     });

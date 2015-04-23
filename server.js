@@ -147,7 +147,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         }, function(err, resume) {
             if (!resume) {
                 var page = Mustache.render(templateHelper.get('noresume'), {});
-                res.send(page);
+                res.status(HttpStatus.NOT_FOUND).send(page);
                 return;
             }
             if (typeof resume.jsonresume.passphrase === 'string' && typeof req.body.passphrase === 'undefined') {
@@ -355,21 +355,20 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.post('/resume', function(req, res) {
         var password = req.body.password;
         var email = req.body.email || req.session.email;
-        // console.log(req.body);
-
-
-        console.log('XXXXXXXXXXXXXXXX', req.session.username);
 
         if (!req.body.guest) {
             db.collection('users').findOne({
                 'email': email
             }, function(err, user) {
-                // console.log(err, user);
-
 
                 redis.get(req.body.session, function(err, valueExists) {
+                    var respondWithResume = function() {
 
-                    if ((user && password && bcrypt.compareSync(password, user.hash)) || (typeof req.session.username !== 'undefined')) {
+                    };
+
+                    if ((user && password && bcrypt.compareSync(password, user.hash))
+                      || (typeof req.session.username !== 'undefined')
+                      || valueExists) {
                         var resume = req.body && req.body.resume || {};
                         resume.jsonresume = {
                             username: user.username,
@@ -388,32 +387,11 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                             });
                         });
                     } else if (valueExists === null) {
-                        res.send({
+                        res.status(HttpStatus.UNAUTHORIZED).send({
                             sessionError: 'invalid session'
                         });
-                    } else if (valueExists) {
-
-                        console.log('success');
-                        var resume = req.body && req.body.resume || {};
-                        resume.jsonresume = {
-                            username: user.username,
-                            passphrase: req.body.passphrase || null,
-                            theme: req.body.theme || null
-                        };
-                        console.log('inserted');
-                        db.collection('resumes').update({
-                            'jsonresume.username': user.username
-                        }, resume, {
-                            upsert: true,
-                            safe: true
-                        }, function(err, resume) {
-                            res.send({
-                                url: 'http://registry.jsonresume.org/' + user.username
-                            });
-                        });
-
                     } else {
-                        res.send({
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
                             message: 'ERRORRRSSSS'
                         });
                     }
@@ -567,7 +545,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         }, function(err, user) {
                             req.session.username = user[0].username;
                             req.session.email = user[0].email;
-                            console.log('USER CREATED', req.session, req.session.username);
+                            // console.log('USER CREATED', req.session, req.session.username);
                             res.status(HttpStatus.CREATED).send({
                                 // username: user.username,
                                 email: user[0].email,
