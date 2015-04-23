@@ -1,13 +1,15 @@
-var request = require('supertest');
+var Q = require('q');
+var request = require("supertest-as-promised")(Q.Promise);
 var server = require('../server');
 var HttpStatus = require('http-status-codes');
 
 var api = request(server),
-    replaceSpaces = function(s) {
-        return s.replace(/ /g, "_");
+    cleanUsername = function(s) {
+        // remove spaces and slashes to make nice URLs
+        return s.replace(/ /g, "_").replace("/", "");
     },
     getTestName = function(test) {
-        return replaceSpaces(test.fullTitle())
+        return cleanUsername(test.fullTitle())
     },
     getUser = function(test) {
         var testName = getTestName(test);
@@ -16,84 +18,89 @@ var api = request(server),
                 email: testName+"@example.com",
                 password: "password"
             };
+    },
+    createUser = function(user) {
+        return api.post('/user')
+            .send(user)
+            .then(function(res) {
+                return res.body;
+            });
     };
 
 describe('API', function() {
     describe('/', function() {
-
-      it('should return 200 OK', function(done) {
-        api.get('/')
-            .expect(200, done);
-      });
-
+        it('should return 200 OK', function() {
+            return api.get('/')
+                .expect(200);
+        });
     });
 
     describe('/user', function() {
         describe('POST', function () {
             var user = getUser(this);
 
-            it('should return 201 Created', function(done) {
-                api.post('/user')
+            it('should return 201 Created', function() {
+                return api.post('/user')
                     .send(user)
-                    .expect(HttpStatus.CREATED, done);
+                    .expect(HttpStatus.CREATED);
             });
 
-            it('should return 409 Conflict when the email already exists', function(done) {
-                api.post('/user')
+            it('should return 409 CONFLICTflict when the email already exists', function() {
+                return api.post('/user')
                     .send({
                         username: "different",
                         email: user.email,
                         password: user.password
                     })
-                    .expect(HttpStatus.CONFLICT, done);
+                    .expect(HttpStatus.CONFLICT);
             });
 
-            it('should return 409 Conflict when the username already exists', function(done) {
-                api.post('/user')
+            it('should return 409 Conflict when the username already exists', function() {
+                return api.post('/user')
                     .send({
                         username: user.username,
                         email: "different",
                         password: user.password
                     })
-                    .expect(HttpStatus.CONFLICT, done);
+                    .expect(HttpStatus.CONFLICT);
             });
         });
     });
 
     describe('/session', function() {
         describe('POST', function () {
-            var user = getUser(this);
+            var user = getUser(this),
+                hasSessionObject = function(res) {
+                    if (!('session' in res.body)) return "Body is missing session property"
+                };
 
-            before(function(done) {
-                api.post('/user')
-                    .send(user)
-                    .end(function() {
-                        done();
-                    });
+            before(function() {
+                return createUser(user);
             });
 
-            it('should return 200 OK for a valid user', function(done) {
-                api.post('/session')
+            it('should return 200 OK and a session for a valid user', function() {
+                return api.post('/session')
                     .send(user)
-                    .expect(HttpStatus.OK, done);
+                    .expect(HttpStatus.OK)
+                    .expect(hasSessionObject);
             });
 
-            it('should return 401 Unauthorized for an incorrect password', function(done) {
-                api.post('/session')
+            it('should return 401 Unauthorized for an incorrect password', function() {
+                return api.post('/session')
                     .send({
                         email: user.email,
                         password: "different"
                     })
-                    .expect(HttpStatus.UNAUTHORIZED, done);
+                    .expect(HttpStatus.UNAUTHORIZED);
             });
 
-            it('should return 401 Unauthorized for an unregistered email', function(done) {
-                api.post('/session')
+            it('should return 401 Unauthorized for an unregistered email', function() {
+                return api.post('/session')
                     .send({
                         email: "different",
                         password: user.password
                     })
-                    .expect(HttpStatus.UNAUTHORIZED, done);
+                    .expect(HttpStatus.UNAUTHORIZED);
             });
         });
     });
