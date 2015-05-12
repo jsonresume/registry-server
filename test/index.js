@@ -11,7 +11,7 @@ var api = request(server),
     getTestName = function(test) {
         return cleanUsername(test.fullTitle())
     },
-    getUser = function(test) {
+    getUserForTest = function(test) {
         var testName = getTestName(test);
         return {
                 username: testName,
@@ -44,7 +44,7 @@ describe('API', function() {
 
     describe('/user', function() {
         describe('POST', function () {
-            var user = getUser(this);
+            var user = getUserForTest(this);
 
             it('should return 201 Created', function() {
                 return api.post('/user')
@@ -76,7 +76,7 @@ describe('API', function() {
 
     describe('/session', function() {
         describe('POST', function () {
-            var user = getUser(this),
+            var user = getUserForTest(this),
                 hasSessionObject = function(res) {
                     if (!('session' in res.body)) return "Body is missing session property"
                 };
@@ -114,18 +114,10 @@ describe('API', function() {
 
     describe('/_username_', function() {
         describe('GET', function() {
-            var user = getUser(this),
-                session = null;
+            var user = getUserForTest(this);
 
             before(function() {
-                return createUser(user)
-                    .then(function() {
-                        return user;
-                    })
-                    .then(getSession)
-                    .then(function(newSession) {
-                        session = newSession;
-                    });
+                return createUser(user);
             });
 
             it('should return 404 Not Found for an invalid user', function() {
@@ -144,7 +136,7 @@ describe('API', function() {
                 return api.post('/resume')
                     .send({
                         email: user.email,
-                        session: session,
+                        password: user.password,
                         resume: {
                             test: "Put a real resume here?"
                         }
