@@ -25,7 +25,7 @@ Requirements: Vagrant, Virtualbox
 
 To run the tests, simply run:
 
-    npm run test
+    npm test
 
 ## Documentation
 For additional documentation please see the [Wiki page](https://github.com/jsonresume/resume-docs/wiki/Registry-Server).

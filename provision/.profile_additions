@@ -13,5 +13,5 @@ cd $PROJECT_DIR
 # help new devs get started
 tput smso
 echo -e "\nRun 'node server.js' to start the server"
-echo "Run 'npm run test:dev' to run the tests"
+echo "Run 'npm test' to run the tests"
 tput rmso
