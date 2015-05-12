@@ -4,7 +4,8 @@
   "description": "resumes ======= http://microformats.org/wiki/hresume",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/index.js | tap-spec"
+    "pretest": "mongo jsonresume --eval \"db.dropDatabase(); db.resume.insert({});\" >/dev/null && echo Using blank DB",
+    "test": "mocha --reporter spec --require test/testHelper.js --colors"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "express": "~4.4.3",
     "express-session": "^1.6.5",
     "gravatar": "^1.0.6",
+    "http-status-codes": "^1.0.5",
     "lodash": "^2.4.1",
     "mongodb": "~1.4.7",
     "mustache": "^0.8.1",
@@ -39,7 +41,8 @@
     "superagent": "^0.18.1"
   },
   "devDependencies": {
-    "tap-spec": "^0.2.0",
-    "tape": "^2.13.3"
+    "chai": "^2.2.0",
+    "mocha": "^2.2.4",
+    "supertest": "^0.15.0"
   }
 }

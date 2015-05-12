@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
 var gravatar = require('gravatar');
 var app = express();
-var _ = require('lodash');  
+var _ = require('lodash');
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
 var MongoClient = require('mongodb').MongoClient;
 var mongo = require('mongodb');
@@ -18,6 +18,7 @@ var request = require('superagent');
 var sha256 = require('sha256');
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
+var HttpStatus = require('http-status-codes');
 var Pusher = require('pusher');
 var pusher = null;
 if(process.env.PUSHER_KEY) {
@@ -50,7 +51,7 @@ var allowCrossDomain = function(req, res, next) {
     'http://backbonetutorials.com',
     'http://localhost'
   ];
-  
+
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.headers.origin)
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -60,7 +61,7 @@ var allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 app.use(cookieParser());
-  app.use(expressSession({ store: new RedisStore({client: redis}), secret: 'keyboard cat' }))
+app.use(expressSession({ store: new RedisStore({client: redis}), secret: 'keyboard cat' }))
 //app.use(expressSession({secret:'somesecrettokenhere'}));
 
 app.use(express.static(__dirname + '/resume-editor', {maxAge: 7200 * 1000}));
@@ -86,6 +87,11 @@ function S4() {
         .substring(1);
 };
 
+var defaulMongoUrl = "mongodb://localhost:27017/jsonresume";
+if (!process.env.MONGOHQ_URL) {
+    console.log("Using default MONGOHQ_URL="+defaulMongoUrl);
+}
+var mongoUrl = process.env.MONGOHQ_URL || defaultMongoUrl;
 MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.all('/*', function(req, res, next) {
         //res.header("Access-Control-Allow-Origin", "*");
@@ -116,7 +122,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 
     var renderResume = function(req, res) {
         realTimeViews++;
-        
+
         redis.get('views', function(err, views) {
             if(err) {
                 redis.set('views', 0);
@@ -215,7 +221,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     });
                 /*
                 resumeToHTML(resume, {
-                    
+
                 }, function(content, errs) {
                     console.log(content, errs);
                     var page = Mustache.render(templateHelper.get('layout'), {
@@ -230,7 +236,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         });
     };
 
-    app.get('/session', function(req, res){ 
+    app.get('/session', function(req, res){
       // This checks the current users auth
       // It runs before Backbones router is started
       // we should return a csrf token for Backbone to use
@@ -240,16 +246,16 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         res.send({auth: false, _csrf: req.session._csrf});
       }
     });
-    app.del('/session/:id', function(req, res, next){  
+    app.del('/session/:id', function(req, res, next){
       // Logout by clearing the session
       req.session.regenerate(function(err){
         // Generate a new csrf token so the user can login again
         // This is pretty hacky, connect.csrf isn't built for rest
         // I will probably release a restful csrf module
         //csrf.generate(req, res, function () {
-          res.send({auth: false, _csrf: req.session._csrf});    
+          res.send({auth: false, _csrf: req.session._csrf});
         //});
-      });  
+      });
     });
 
 
@@ -513,7 +519,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         }, function(err, user) {
 
             if (user) {
-                res.send({
+                res.status(HttpStatus.CONFLICT).send({
                     error: {
                         field: 'email',
                         message: 'Email is already in use, maybe you forgot your password?'
@@ -525,7 +531,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     'username': req.body.username
                 }, function(err, user) {
                     if (user) {
-                        res.send({
+                        res.status(HttpStatus.CONFLICT).send({
                             error: {
                                 field: 'username',
                                 message: 'This username is already taken, please try another one'
@@ -561,8 +567,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         }, function(err, user) {
                             req.session.username = user[0].username;
                             req.session.email = user[0].email;
-                            console.log('USE CREATED', req.session, req.session.username);
-                            res.send({
+                            console.log('USER CREATED', req.session, req.session.username);
+                            res.status(HttpStatus.CREATED).send({
                                 // username: user.username,
                                 email: user[0].email,
                                 username: user[0].username,
@@ -708,4 +714,6 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
     app.listen(port, function() {
         console.log("Listening on " + port);
     });
-})
+});
+
+module.exports = app;

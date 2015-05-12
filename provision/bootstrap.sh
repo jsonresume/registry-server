@@ -1,35 +1,42 @@
 #!/bin/bash
-VAGRANT_HOME=/home/vagrant
-MONGO_URL=localhost:27017/jsonresume
-PROJECT_DIR=/vagrant
 
-sudo apt-get update
-sudo apt-get install -y git npm mongodb redis-server
+source /vagrant/provision/constants.sh
+source /vagrant/provision/utils.sh
 
-# node setup
-sudo ln -s /usr/bin/nodejs /usr/bin/node
-cd $PROJECT_DIR
-npm install
+echo_heading "Update and install packages"
+{
+  sudo apt-get update -qq
+  sudo add-apt-repository ppa:git-core/ppa # for git v2+
+  sudo apt-get update -qq
+  sudo apt-get install -y git mongodb redis-server
+  sudo apt-get install -y build-essential libssl-dev curl # for NVM
+} > /dev/null
 
-git submodule update --init --recursive
+echo_heading "Installing latest stable NodeJS using NVM"
+{
+  curl -s https://raw.githubusercontent.com/creationix/nvm/v0.24.1/install.sh | bash
+  chmod +x $VAGRANT_HOME/.nvm/nvm.sh
+  source $VAGRANT_HOME/.nvm/nvm.sh
+  nvm install v0.10 >/dev/null 2>&1 # noisy
+  nvm alias default v0.10
+} > /dev/null
 
-# mongo config
-mongo $MONGO_URL --eval "db.resumes.insert({})"
+echo_heading "Setting up NodeJS and project"
+{
+  cd $PROJECT_DIR
+  npm install
 
-#
-# idempotently add stuff to .profile
-#
+  git submodule update --init --recursive
+
+  # mongo config
+  mongo $MONGO_URL --eval "db.resumes.insert({})"
+} > /dev/null
+
+echo_heading "Idempotently add stuff to .profile"
 cd $VAGRANT_HOME
-
-if [ ! -f .profile_user ]; then
-    # mongo environment variable
-    echo "export MONGOHQ_URL=mongodb://$MONGO_URL" >> .profile_user
-    # ensure we `vagrant ssh` into the project directory
-    echo "cd $PROJECT_DIR" >> .profile_user
+# If not already there, then append command to execute .profile_additions to .profile
+if ! grep -q ".profile_additions" $VAGRANT_HOME/.profile; then
+  echo "source $PROVISION_DIR/.profile_additions" >> $VAGRANT_HOME/.profile
 fi
 
-if ! grep -q ".profile_user" $VAGRANT_HOME/.profile; then
-    # If not already there, then append command to execute .profile_user to .profile
-    echo "if [ -f $VAGRANT_HOME/.profile_user ]; then . $VAGRANT_HOME/.profile_user; fi" >> $VAGRANT_HOME/.profile
-fi
-source $VAGRANT_HOME/.profile
+echo -e "\nFinished provisioning"
