@@ -10,6 +10,7 @@ var getTestName = function(test) {
 
 module.exports = function(api) {
     return {
+        // should only be used inside callbacks to `describe`
         getUserForTest: function(test) {
             var testName = getTestName(test);
             return {
@@ -31,6 +32,11 @@ module.exports = function(api) {
                 .then(function(res) {
                     return res.body.session;
                 });
+        },
+        property: function(obj) {
+          return function(res) {
+            expect(res.body).to.have.properties(obj);
+          };
         }
     };
 };

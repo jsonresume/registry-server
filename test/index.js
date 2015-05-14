@@ -1,13 +1,14 @@
 var Q = require('q');
-var request = require("supertest-as-promised")(Q.Promise);
+var supertest = require("supertest-as-promised")(Q.Promise);
 var server = require('../server');
 var HttpStatus = require('http-status-codes');
 var createUtilsFor = require('./utils');
 
-var api = request(server),
+var api = supertest(server),
     utils = createUtilsFor(api);
 
 describe('API', function() {
+
     describe('/', function() {
         it('should return 200 OK', function() {
             return api.get('/')
@@ -25,7 +26,7 @@ describe('API', function() {
                     .expect(HttpStatus.CREATED);
             });
 
-            it('should return 409 CONFLICTflict when the email already exists', function() {
+            it('should return 409 CONFLICT when the email already exists', function() {
                 return api.post('/user')
                     .send({
                         username: "different",
@@ -48,6 +49,7 @@ describe('API', function() {
     });
 
     describe('/session', function() {
+
         describe('POST', function () {
             var user = utils.getUserForTest(this),
                 hasSessionObject = function(res) {
@@ -81,6 +83,27 @@ describe('API', function() {
                         password: user.password
                     })
                     .expect(HttpStatus.UNAUTHORIZED);
+            });
+        });
+
+        describe('GET', function() {
+            var agent = supertest.agent(server), // use cookies
+                agentUtils = createUtilsFor(agent),
+                user = utils.getUserForTest(this);
+
+            it('should return {auth: false} if there is no session', function() {
+                return agent.get('/session')
+                    .send()
+                    .expect(utils.property({auth: false}));
+            });
+
+            it('should return {auth: true} if there is a valid session', function() {
+                return agentUtils.createUser(user)
+                    .then(function() {
+                        return agent.get('/session')
+                            .send()
+                            .expect(utils.property({auth: true}));
+                    });
             });
         });
     });

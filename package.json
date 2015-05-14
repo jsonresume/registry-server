@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "chai": "^2.2.0",
+    "chai-properties": "^1.2.0",
     "mocha": "^2.2.4",
     "q": "^1.2.0",
     "supertest": "^0.15.0",
