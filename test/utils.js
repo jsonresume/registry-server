@@ -8,17 +8,8 @@ var getTestName = function(test) {
     return cleanUsername(test.fullTitle());
 };
 
-module.exports = function(api) {
+var utils = function(api) {
     return {
-        // should only be used inside callbacks to `describe`
-        getUserForTest: function(test) {
-            var testName = getTestName(test);
-            return {
-                    username: testName,
-                    email: testName+"@example.com",
-                    password: "password"
-                };
-        },
         createUser: function(user) {
             return api.post('/user')
                 .send(user)
@@ -32,11 +23,25 @@ module.exports = function(api) {
                 .then(function(res) {
                     return res.body.session;
                 });
-        },
-        property: function(obj) {
-          return function(res) {
-            expect(res.body).to.have.properties(obj);
-          };
         }
     };
 };
+
+// should only be used inside callbacks to `describe`
+utils.getUserForTest = function(test) {
+    var testName = getTestName(test);
+    return {
+        username: testName,
+        email: testName+"@example.com",
+        password: "password"
+    };
+};
+
+utils.property = function(obj) {
+  return function(res) {
+    expect(res.body).to.have.properties(obj);
+  };
+};
+
+module.exports = utils;
+

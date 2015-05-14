@@ -2,10 +2,10 @@ var Q = require('q');
 var supertest = require("supertest-as-promised")(Q.Promise);
 var server = require('../server');
 var HttpStatus = require('http-status-codes');
-var createUtilsFor = require('./utils');
+var utils = require('./utils');
 
 var api = supertest(server),
-    utils = createUtilsFor(api);
+    apiUtils = utils(api);
 
 describe('API', function() {
 
@@ -57,7 +57,7 @@ describe('API', function() {
                 };
 
             before(function() {
-                return utils.createUser(user);
+                return apiUtils.createUser(user);
             });
 
             it('should return 200 OK and a session for a valid user', function() {
@@ -88,7 +88,7 @@ describe('API', function() {
 
         describe('GET', function() {
             var agent = supertest.agent(server), // use cookies
-                agentUtils = createUtilsFor(agent),
+                agentUtils = utils(agent),
                 user = utils.getUserForTest(this);
 
             it('should return {auth: false} if there is no session', function() {
@@ -113,7 +113,7 @@ describe('API', function() {
             var user = utils.getUserForTest(this);
 
             before(function() {
-                return utils.createUser(user);
+                return apiUtils.createUser(user);
             });
 
             it('should return 404 Not Found for an invalid user', function() {
