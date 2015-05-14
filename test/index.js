@@ -2,37 +2,10 @@ var Q = require('q');
 var request = require("supertest-as-promised")(Q.Promise);
 var server = require('../server');
 var HttpStatus = require('http-status-codes');
+var createUtilsFor = require('./utils');
 
 var api = request(server),
-    cleanUsername = function(s) {
-        // remove spaces and slashes to make nice URLs
-        return s.replace(/ /g, "_").replace("/", "");
-    },
-    getTestName = function(test) {
-        return cleanUsername(test.fullTitle())
-    },
-    getUserForTest = function(test) {
-        var testName = getTestName(test);
-        return {
-                username: testName,
-                email: testName+"@example.com",
-                password: "password"
-            };
-    },
-    createUser = function(user) {
-        return api.post('/user')
-            .send(user)
-            .then(function(res) {
-                return res.body;
-            });
-    },
-    getSession = function(user) {
-        return api.post('/session')
-            .send(user)
-            .then(function(res) {
-                return res.body.session;
-            });
-    };
+    utils = createUtilsFor(api);
 
 describe('API', function() {
     describe('/', function() {
@@ -44,7 +17,7 @@ describe('API', function() {
 
     describe('/user', function() {
         describe('POST', function () {
-            var user = getUserForTest(this);
+            var user = utils.getUserForTest(this);
 
             it('should return 201 Created', function() {
                 return api.post('/user')
@@ -76,13 +49,13 @@ describe('API', function() {
 
     describe('/session', function() {
         describe('POST', function () {
-            var user = getUserForTest(this),
+            var user = utils.getUserForTest(this),
                 hasSessionObject = function(res) {
                     if (!('session' in res.body)) return "Body is missing session property"
                 };
 
             before(function() {
-                return createUser(user);
+                return utils.createUser(user);
             });
 
             it('should return 200 OK and a session for a valid user', function() {
@@ -114,10 +87,10 @@ describe('API', function() {
 
     describe('/_username_', function() {
         describe('GET', function() {
-            var user = getUserForTest(this);
+            var user = utils.getUserForTest(this);
 
             before(function() {
-                return createUser(user);
+                return utils.createUser(user);
             });
 
             it('should return 404 Not Found for an invalid user', function() {
