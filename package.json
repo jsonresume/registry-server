@@ -33,7 +33,7 @@
     "pdfcrowd": "^1.1.1",
     "postmark": "~0.2.5",
     "pusher": "^1.0.0",
-    "redis": "^0.11.0",
+    "redis": "^0.12",
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "latest",
     "resume-to-text": "latest",
