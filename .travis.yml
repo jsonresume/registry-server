@@ -8,6 +8,7 @@ env:
   - MONGOHQ_URL=mongodb://localhost:27017/jsonresume
 git:
   submodules: false
+  depth: 10
 before_install:
   - git submodule update --init --recursive
 before_script:
