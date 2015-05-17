@@ -21,6 +21,7 @@ var cookieParser = require('cookie-parser');
 var HttpStatus = require('http-status-codes');
 var Pusher = require('pusher');
 var compress = require('compression');
+var minify = require('express-minify');
 var pusher = null;
 if(process.env.PUSHER_KEY) {
     pusher = new Pusher({
@@ -61,6 +62,11 @@ var allowCrossDomain = function(req, res, next) {
 }
 
 app.use(compress());
+app.use(minify(
+{
+  js_match: /js/,
+  cache: __dirname + '/cache'
+}));
 app.use(allowCrossDomain);
 app.use(cookieParser());
 app.use(expressSession({ store: new RedisStore({client: redis}), secret: 'keyboard cat' }))
