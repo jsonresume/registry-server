@@ -1,6 +1,9 @@
 {
   "name": "resumes",
   "version": "0.0.0",
+  "engines": {
+    "node": "0.12.2"
+  },
   "description": "resumes ======= http://microformats.org/wiki/hresume",
   "main": "index.js",
   "scripts": {
