@@ -26,7 +26,7 @@ echo_heading "Setting up NodeJS and project"
   cd $PROJECT_DIR
   npm install
 
-  git submodule update --init --recursive
+  git submodule update --init --recursive --depth 1
 
   # mongo config
   mongo $MONGO_URL --eval "db.resumes.insert({})"

@@ -7,7 +7,7 @@
     <title>Json Resume</title>
 
     <!-- Bootstrap -->
-    <link href="http://bootswatch.com/lumen/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.4/lumen/bootstrap.min.css" rel="stylesheet">
 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -46,17 +46,9 @@
 
 
        {{#usernames}}
-       <div class="col-lg-6">
-       <div class="media">
       <a class="pull-left" href="/{{username}}">
-        <img class="media-object img-circle" data-src="holder.js/64x64" alt="64x64" src="{{gravatar}}" style="width: 64px; height: 64px;">
-      </a>
-      <div class="media-body">
-        <h4 class="media-heading">{{username}}</h4>
-        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.
-      </div>
-    </div>
-        </div>
+       {{username}}
+       </a><br />
       {{/usernames}}
   </div>
 

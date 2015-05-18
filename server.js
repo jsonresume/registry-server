@@ -20,6 +20,8 @@ var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
 var HttpStatus = require('http-status-codes');
 var Pusher = require('pusher');
+var compress = require('compression');
+var minify = require('express-minify');
 var pusher = null;
 if(process.env.PUSHER_KEY) {
     pusher = new Pusher({
@@ -59,12 +61,17 @@ var allowCrossDomain = function(req, res, next) {
     next();
 }
 
+app.use(compress());
+app.use(minify(
+{
+  cache: __dirname + '/cache'
+}));
 app.use(allowCrossDomain);
 app.use(cookieParser());
 app.use(expressSession({ store: new RedisStore({client: redis}), secret: 'keyboard cat' }))
 //app.use(expressSession({secret:'somesecrettokenhere'}));
 
-app.use(express.static(__dirname + '/resume-editor', {maxAge: 7200 * 1000}));
+app.use(express.static(__dirname + '/editor', {maxAge: 21600 * 1000}));
 
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
@@ -200,7 +207,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         resume: resume
                     })
                     .set('Content-Type', 'application/json')
-                    .end(function(response) {
+                    .end(function(err, response) {
                     client.convertHtml(response.text, pdf.sendHttpResponse(res,null,uid+".pdf"), {
                       use_print_media: "true"
                     });
@@ -216,7 +223,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         resume: resume
                     })
                     .set('Content-Type', 'application/json')
-                    .end(function(response) {
+                    .end(function(err, response) {
                         res.send(response.text);
                     });
                 /*
@@ -269,12 +276,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             var usernameArray = [];
             docs.forEach(function(doc) {
                 usernameArray.push({
-                    username: doc.username,
-                    gravatar: gravatar.url(doc.email, {
-                        s: '80',
-                        r: 'pg',
-                        d: '404'
-                    })
+                    username: doc.username
+                    
                 });
             });
             var page = Mustache.render(templateHelper.get('members'), {
@@ -331,7 +334,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 resume: req.body.resume
             })
             .set('Content-Type', 'application/json')
-            .end(function(response) {
+            .end(function(err, response) {
                 client.convertHtml(response.text, pdf.sendHttpResponse(res),{
                       use_print_media: "true"
                     });

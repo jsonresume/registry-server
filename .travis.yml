@@ -1,6 +1,8 @@
 language: node_js
 node_js:
   - "0.10"
+  - "0.11"
+  - "0.12"
 services:
   - mongodb
   - redis-server
@@ -8,8 +10,18 @@ env:
   - MONGOHQ_URL=mongodb://localhost:27017/jsonresume
 git:
   submodules: false
+  depth: 10
 before_install:
   - git submodule update --init --recursive
 before_script:
   - echo Give MongoDB time to start accepting connections
   - sleep 15
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/45ac156371db25c81ab9
+    on_start: always
