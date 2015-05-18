@@ -41,7 +41,7 @@
     "redis": "^0.12",
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "0.0.14",
-    "resume-to-text": "latest",
+    "resume-to-text": "0.0.15",
     "sha256": "^0.2.0",
     "superagent": "^1.2"
   },
