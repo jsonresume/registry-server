@@ -43,7 +43,7 @@
     "resume-to-markdown": "latest",
     "resume-to-text": "latest",
     "sha256": "^0.2.0",
-    "superagent": "^0.18.1"
+    "superagent": "^1.2"
   },
   "devDependencies": {
     "chai": "^2.2.0",
