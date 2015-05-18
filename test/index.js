@@ -131,6 +131,12 @@ describe('API', function() {
             });
 
             it('should return 200 OK for a valid user with a resume', function() {
+                // this test has a dependency on the theme manager:
+                /*
+                    request
+                    .post('http://themes.jsonresume.org/theme/' + theme)
+                */
+                // this should probably be mocked
                 return api.post('/resume')
                     .send({
                         email: user.email,
