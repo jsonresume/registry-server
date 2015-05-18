@@ -47,7 +47,10 @@
   },
   "devDependencies": {
     "chai": "^2.2.0",
+    "chai-properties": "^1.2.0",
     "mocha": "^2.2.4",
-    "supertest": "^1.0"
+    "q": "^1.2.0",
+    "supertest": "^1.0",
+    "supertest-as-promised": "^2.0.0"
   }
 }
