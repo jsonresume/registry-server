@@ -7,7 +7,7 @@ services:
   - mongodb
   - redis-server
 env:
-  - MONGOHQ_URL=mongodb://localhost:27017/jsonresume
+  - MONGOHQ_URL=mongodb://localhost:27017/jsonresume-tests
 git:
   submodules: false
   depth: 10
