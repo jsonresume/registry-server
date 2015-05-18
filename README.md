@@ -1,5 +1,7 @@
 # JSON Resume Registry Server
 
+[![Join the chat at https://gitter.im/jsonresume/registry-server](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jsonresume/registry-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/jsonresume/registry-server.svg?branch=master)](https://travis-ci.org/jsonresume/registry-server) [![Dependency Status](https://david-dm.org/jsonresume/registry-server.svg)](https://david-dm.org/jsonresume/registry-server) [![devDependency Status](https://david-dm.org/jsonresume/registry-server/dev-status.svg)](https://david-dm.org/jsonresume/registry-server#info=devDependencies)
 
 
