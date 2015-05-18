@@ -1,6 +1,6 @@
 # JSON Resume Registry Server
 
-[![Build Status](https://api.travis-ci.org/jsonresume/registry-server.svg)](http://travis-ci.org/jsonresume/registry-server)
+[![Build Status](https://travis-ci.org/jsonresume/registry-server.svg?branch=master)](https://travis-ci.org/jsonresume/registry-server) [![Dependency Status](https://david-dm.org/jsonresume/registry-server.svg)](https://david-dm.org/jsonresume/registry-server) [![devDependency Status](https://david-dm.org/jsonresume/registry-server/dev-status.svg)](https://david-dm.org/jsonresume/registry-server#info=devDependencies)
 
 
 ## Installation
@@ -12,6 +12,21 @@ Requirements: MongoDB, Redis
 1. `git submodule update --init --recursive`
 1. `mongo localhost:27017/jsonresume --eval "db.resumes.insert({})"`
 1. `MONGOHQ_URL=mongodb://localhost:27017/jsonresume node server.js`
+
+*Alternatively:*
+
+Requirements: Vagrant, Virtualbox
+
+1. Clone the repository
+1. `vagrant up`
+1. `vagrant ssh`
+1. `node server.js`
+
+## Testing
+
+To run the tests, simply run:
+
+    npm run test:dev
 
 ## Documentation
 For additional documentation please see the [Wiki page](https://github.com/jsonresume/resume-docs/wiki/Registry-Server).
