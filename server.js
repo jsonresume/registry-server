@@ -223,7 +223,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         resume: resume
                     })
                     .set('Content-Type', 'application/json')
-                    .end(function(response) {
+                    .end(function(err, response) {
                         res.send(response.text);
                     });
                 /*
