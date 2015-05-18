@@ -14,7 +14,7 @@ git:
   submodules: false
   depth: 10
 before_install:
-  - git submodule update --init --recursive
+  - git submodule update --init --recursive --depth 1
 before_script:
   - echo Give MongoDB time to start accepting connections
   - sleep 15
