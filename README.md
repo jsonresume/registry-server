@@ -1,6 +1,6 @@
 # JSON Resume Registry Server
 
-[![Build Status](https://travis-ci.org/jsonresume/registry-server.svg?branch=master)](https://travis-ci.org/jsonresume/registry-server) [![Dependency Status](https://david-dm.org/jsonresume/registry-server.svg)](https://david-dm.org/jsonresume/registry-server) [![devDependency Status](https://david-dm.org/jsonresume/registry-server/dev-status.svg)](https://david-dm.org/jsonresume/registry-server#info=devDependencies)
+[![Join the chat at https://gitter.im/jsonresume/public](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jsonresume/public?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/jsonresume/registry-server.svg?branch=master)](https://travis-ci.org/jsonresume/registry-server) [![Dependency Status](https://david-dm.org/jsonresume/registry-server.svg)](https://david-dm.org/jsonresume/registry-server) [![devDependency Status](https://david-dm.org/jsonresume/registry-server/dev-status.svg)](https://david-dm.org/jsonresume/registry-server#info=devDependencies)
 
 
 ## Installation
@@ -9,7 +9,7 @@ Requirements: MongoDB, Redis
 
 1. Clone the repository
 1. `npm install`
-1. `git submodule update --init --recursive`
+1. `git submodule update --init --recursive --depth 1`
 1. `mongo localhost:27017/jsonresume --eval "db.resumes.insert({})"`
 1. `MONGOHQ_URL=mongodb://localhost:27017/jsonresume node server.js`
 
