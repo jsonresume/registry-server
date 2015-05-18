@@ -1,9 +1,6 @@
-[submodule "resume-editor"]
-	path = resume-editor
-	url = git://github.com/erming/resume-editor
 [submodule "json-builder"]
 	path = json-builder
 	url = https://github.com/erming/json-builder
-[submodule "resume-builder"]
-	path = resume-builder
-	url = git://github.com/erming/resume-editor
+[submodule "resume-editor"]
+	path = resume-editor
+	url = https://github.com/erming/resume-editor
