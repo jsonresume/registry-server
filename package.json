@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "pretest": "mongo jsonresume-tests --eval \"db.dropDatabase(); db.resume.insert({});\" >/dev/null && echo Using blank DB",
-    "test": "mocha --reporter spec --require test/testHelper.js --colors"
+    "test": "mocha --reporter spec --require test/testHelper.js --colors --slow 800 --timeout 5000"
   },
   "repository": {
     "type": "git",
