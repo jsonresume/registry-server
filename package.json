@@ -40,7 +40,7 @@
     "pusher": "^1.0.0",
     "redis": "^0.12",
     "resume-to-html": "0.0.21",
-    "resume-to-markdown": "latest",
+    "resume-to-markdown": "0.0.14",
     "resume-to-text": "latest",
     "sha256": "^0.2.0",
     "superagent": "^1.2"
