@@ -64,7 +64,6 @@ var allowCrossDomain = function(req, res, next) {
 app.use(compress());
 app.use(minify(
 {
-  js_match: /js/,
   cache: __dirname + '/cache'
 }));
 app.use(allowCrossDomain);
