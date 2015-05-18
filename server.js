@@ -207,7 +207,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                         resume: resume
                     })
                     .set('Content-Type', 'application/json')
-                    .end(function(response) {
+                    .end(function(err, response) {
                     client.convertHtml(response.text, pdf.sendHttpResponse(res,null,uid+".pdf"), {
                       use_print_media: "true"
                     });
@@ -334,7 +334,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 resume: req.body.resume
             })
             .set('Content-Type', 'application/json')
-            .end(function(response) {
+            .end(function(err, response) {
                 client.convertHtml(response.text, pdf.sendHttpResponse(res),{
                       use_print_media: "true"
                     });
