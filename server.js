@@ -71,7 +71,7 @@ app.use(cookieParser());
 app.use(expressSession({ store: new RedisStore({client: redis}), secret: 'keyboard cat' }))
 //app.use(expressSession({secret:'somesecrettokenhere'}));
 
-app.use(express.static(__dirname + '/resume-editor', {maxAge: 7200 * 1000}));
+app.use(express.static(__dirname + '/editor', {maxAge: 7200 * 1000}));
 
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
