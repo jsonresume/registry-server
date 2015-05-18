@@ -45,7 +45,7 @@
     "chai-properties": "^1.2.0",
     "mocha": "^2.2.4",
     "q": "^1.2.0",
-    "supertest": "^0.15.0",
+    "supertest": "^1.0",
     "supertest-as-promised": "^2.0.0"
   }
 }
