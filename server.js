@@ -33,6 +33,7 @@ if(process.env.PUSHER_KEY) {
 var points = [];
 var realTimeViews = 0;
 
+var DEFAULT_THEME = 'modern';
 
 if (process.env.REDISTOGO_URL) {
     var rtg = require("url").parse(process.env.REDISTOGO_URL);
@@ -146,7 +147,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             };
         });
 
-        var themeName = req.query.theme || 'modern';
+        var themeName = req.query.theme || DEFAULT_THEME;
         var uid = req.params.uid;
         var format = req.params.format || req.headers.accept || 'html';
         db.collection('resumes').findOne({
@@ -224,7 +225,8 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                     })
                     .set('Content-Type', 'application/json')
                     .end(function(err, response) {
-                        res.send(response.text);
+                        if (err) res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+                        else res.send(response.text);
                     });
                 /*
                 resumeToHTML(resume, {
@@ -659,7 +661,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         var email = req.body.email;
         var password = req.body.currentPassword;
         var hash = bcrypt.hashSync(req.body.newPassword);
-        console.log(email, password, hash);
+        // console.log(email, password, hash); probably shouldn't log passwords
 
         db.collection('users').findOne({
             'email': email
@@ -698,3 +700,4 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
 });
 
 module.exports = app;
+module.exports.DEFAULT_THEME = DEFAULT_THEME;
