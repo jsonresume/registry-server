@@ -659,7 +659,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         var email = req.body.email;
         var password = req.body.currentPassword;
         var hash = bcrypt.hashSync(req.body.newPassword);
-        console.log(email, password, hash);
+        // console.log(email, password, hash); probably shouldn't log passwords
 
         db.collection('users').findOne({
             'email': email
