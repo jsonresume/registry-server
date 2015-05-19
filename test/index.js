@@ -110,10 +110,7 @@ describe('API', function() {
         describe('DELETE session ID', function () {
             var agent = supertest.agent(server), // use cookies
                 agentUtils = utils(agent),
-                user = utils.getUserForTest(this),
-                hasSessionObject = function(res) {
-                    if (!('session' in res.body)) return "Body is missing session property"
-                };
+                user = utils.getUserForTest(this);
 
             before(function() {
                 return agentUtils.createUser(user);
