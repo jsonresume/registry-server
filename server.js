@@ -137,7 +137,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
                 redis.set('views', views*1+1, redis.print);
 
             }
-            console.log(views);
+            // console.log(views);
 
             if(pusher !== null) {
             pusher.trigger('test_channel', 'my_event', {
@@ -253,7 +253,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
         res.send({auth: false, _csrf: req.session._csrf});
       }
     });
-    app.del('/session/:id', function(req, res, next){
+    app.delete('/session/:id', function(req, res, next){
       // Logout by clearing the session
       req.session.regenerate(function(err){
         // Generate a new csrf token so the user can login again
@@ -277,7 +277,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, db) {
             docs.forEach(function(doc) {
                 usernameArray.push({
                     username: doc.username
-                    
+
                 });
             });
             var page = Mustache.render(templateHelper.get('members'), {
