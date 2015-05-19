@@ -1,6 +1,7 @@
 var Q = require('q');
 var supertest = require("supertest-as-promised")(Q.Promise);
 var HttpStatus = require('http-status-codes');
+var nock = require('nock');
 var utils = require('./utils');
 
 process.env.MONGOHQ_URL = 'mongodb://localhost:27017/jsonresume-tests';
@@ -9,6 +10,7 @@ var server = require('../server');
 var api = supertest(server),
     apiUtils = utils(api);
 
+nock.enableNetConnect('127.0.0.1'); // HTTP requests outside of localhost are blocked
 
 describe('API', function() {
 
@@ -160,12 +162,9 @@ describe('API', function() {
             });
 
             it('should return 200 OK for a valid user with a resume', function() {
-                // this test has a dependency on the theme manager:
-                /*
-                    request
-                    .post('http://themes.jsonresume.org/theme/' + theme)
-                */
-                // this should probably be mocked
+                var themeReq = nock('http://themes.jsonresume.org')
+                                .post('/theme/'+server.DEFAULT_THEME)
+                                .reply(200, 'An example resume');
                 return api.post('/resume')
                     .send({
                         email: user.email,
@@ -177,7 +176,34 @@ describe('API', function() {
                     .then(function() {
                         return api.get('/'+user.username)
                             .send()
-                            .expect(HttpStatus.OK);
+                            .expect(HttpStatus.OK)
+                            .expect('An example resume');
+                    })
+                    .then(function() {
+                        expect(themeReq.isDone()).to.be.true;
+                    });
+            });
+
+            it('should return 500 Internal Server Error if the theme manager service returns an error', function() {
+                var themeReq = nock('http://themes.jsonresume.org')
+                                .post('/theme/'+server.DEFAULT_THEME)
+                                .replyWithError({message: 'server is down'});
+                return api.post('/resume')
+                    .send({
+                        email: user.email,
+                        password: user.password,
+                        resume: {
+                            test: "Put a real resume here?"
+                        }
+                    })
+                    .then(function() {
+                        return api.get('/'+user.username)
+                            .send()
+                            .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .expect({message: 'server is down'});
+                    })
+                    .then(function() {
+                        expect(themeReq.isDone()).to.be.true;
                     });
             });
         });
