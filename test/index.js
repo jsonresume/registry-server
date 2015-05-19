@@ -54,10 +54,7 @@ describe('API', function() {
     describe('/session', function() {
 
         describe('POST', function () {
-            var user = utils.getUserForTest(this),
-                hasSessionObject = function(res) {
-                    if (!('session' in res.body)) return "Body is missing session property"
-                };
+            var user = utils.getUserForTest(this);
 
             before(function() {
                 return apiUtils.createUser(user);
@@ -67,7 +64,7 @@ describe('API', function() {
                 return api.post('/session')
                     .send(user)
                     .expect(HttpStatus.OK)
-                    .expect(hasSessionObject);
+                    .expect(utils.property('session'));
             });
 
             it('should return 401 Unauthorized for an incorrect password', function() {
@@ -108,6 +105,34 @@ describe('API', function() {
                             .expect(utils.property({auth: true}));
                     });
             });
+        });
+
+        describe('DELETE session ID', function () {
+            var agent = supertest.agent(server), // use cookies
+                agentUtils = utils(agent),
+                user = utils.getUserForTest(this);
+
+            before(function() {
+                return agentUtils.createUser(user);
+            });
+
+            it('should end the session', function() {
+                return agent.post('/session')
+                    .send(user)
+                    .then(function(res) {
+                        expect(res.body.session).to.exist;
+                        return agent.delete('/session/'+res.body.session)
+                            .send()
+                            .expect(HttpStatus.OK)
+                            .expect(utils.property({auth: false}));
+                    })
+                    .then(function(){
+                        return agent.get('/session')
+                            .send()
+                            .expect(utils.property({auth: false}));
+                    });
+            });
+
         });
     });
 
