@@ -54,10 +54,7 @@ describe('API', function() {
     describe('/session', function() {
 
         describe('POST', function () {
-            var user = utils.getUserForTest(this),
-                hasSessionObject = function(res) {
-                    if (!('session' in res.body)) return "Body is missing session property"
-                };
+            var user = utils.getUserForTest(this);
 
             before(function() {
                 return apiUtils.createUser(user);
@@ -67,7 +64,7 @@ describe('API', function() {
                 return api.post('/session')
                     .send(user)
                     .expect(HttpStatus.OK)
-                    .expect(hasSessionObject);
+                    .expect(utils.property('session'));
             });
 
             it('should return 401 Unauthorized for an incorrect password', function() {

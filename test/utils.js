@@ -38,9 +38,15 @@ utils.getUserForTest = function(test) {
 };
 
 utils.property = function(obj) {
-  return function(res) {
-    expect(res.body).to.have.properties(obj);
-  };
+    if (typeof obj === 'string') {
+        return function(res) {
+            expect(res.body).to.have.property(obj);
+        };
+    } else {
+        return function(res) {
+            expect(res.body).to.have.properties(obj);
+        };
+    }
 };
 
 module.exports = utils;
