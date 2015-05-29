@@ -24,3 +24,4 @@ notifications:
     urls:
       - https://webhooks.gitter.im/e/45ac156371db25c81ab9
     on_start: always
+sudo: false   # use container-based architecture; starts up faster
