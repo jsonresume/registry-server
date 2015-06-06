@@ -273,9 +273,7 @@ var renderResume = function(req, res) {
 app.get('/session', controller.session.check);
 app.delete('/session/:id', controller.session.remove);
 
-
 //app.get('/', renderHomePage);
-
 
 var renderMembersPage = function(req, res) {
     console.log('================================');
@@ -366,7 +364,7 @@ redis.on("error", function(err) {
     });
 });
 
-
+// post resume
 app.post('/resume', function(req, res) {
     var password = req.body.password;
     var email = req.body.email || req.session.email;
@@ -502,16 +500,10 @@ app.put('/resume', function(req, res) {
 });
 
 app.post('/user', controller.user);
-
-
 app.post('/session', controller.session.login);
-
 app.put('/account', controller.account.changePassword);
 app.delete('/account', controller.account.remove);
-
 app.post('/:uid', renderResume);
-
-
 
 module.exports = app;
 module.exports.DEFAULT_THEME = DEFAULT_THEME;

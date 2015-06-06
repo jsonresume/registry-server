@@ -16,15 +16,20 @@ nock.enableNetConnect('127.0.0.1'); // HTTP requests outside of localhost are bl
 describe('API', function() {
 
     describe('/', function() {
-        it('should return 200 OK', function() {
-            return api.get('/')
-                .expect(200);
+        it('should return 200 OK', function(done) {
+            api.get('/')
+                .expect(200, function(err, res) {
+                    console.log(err, res.body);
+                    should.not.exist(err);
+
+                    done();
+                });
         });
     });
 
     describe('/stats', function() {
         it('should return stats', function(done) {
-            return api.get('/stats')
+            api.get('/stats')
                 .expect(200, function(err, res) {
                     should.not.exist(err);
                     // TODO acturlly test stat numbers
@@ -37,12 +42,12 @@ describe('API', function() {
         });
     });
 
-    describe('/user', function() {
+    describe('User routes', function() {
         describe('POST', function() {
             var user = utils.getUserForTest(this);
 
-            it('should return 201 Created', function(done) {
-                 api.post('/user')
+            it('`/user` should return 201 Created', function(done) {
+                api.post('/user')
                     .send(user)
                     .expect(HttpStatus.CREATED, function(err, res) {
                         should.not.exist(err);
@@ -51,8 +56,8 @@ describe('API', function() {
                     });
             });
 
-            it('should return 409 CONFLICT when the email already exists', function(done) {
-                 api.post('/user')
+            it('`/user` should return 409 CONFLICT when the email already exists', function(done) {
+                api.post('/user')
                     .send({
                         username: "different",
                         email: user.email,
@@ -65,8 +70,8 @@ describe('API', function() {
                     });
             });
 
-            it('should return 409 Conflict when the username already exists', function(done) {
-                 api.post('/user')
+            it('`/user` should return 409 Conflict when the username already exists', function(done) {
+                api.post('/user')
                     .send({
                         username: user.username,
                         email: "different",
@@ -81,7 +86,7 @@ describe('API', function() {
             });
 
             it('`/account` should change user password', function(done) {
-                 api.put('/account')
+                api.put('/account')
 
                 .send({
                         email: user.email,
@@ -89,7 +94,7 @@ describe('API', function() {
                         newPassword: 'newPassword'
                     })
                     .expect(200, function(err, res) {
-                      should.not.exist(err);
+                        should.not.exist(err);
                         console.log(err, res.body);
 
                         done();
@@ -97,14 +102,14 @@ describe('API', function() {
             });
 
             it('`/account` should delete user account', function(done) {
-                 api.delete('/account')
+                api.delete('/account')
 
                 .send({
                         email: user.email,
                         password: 'newPassword',
                     })
                     .expect(200, function(err, res) {
-                      should.not.exist(err);
+                        should.not.exist(err);
 
                         console.log(err, res.body);
 

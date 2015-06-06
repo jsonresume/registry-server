@@ -52,6 +52,7 @@
     "mocha": "^2.2.4",
     "nock": "^2.0.1",
     "q": "^1.2.0",
+    "should": "^6.0.3",
     "supertest": "^1.0",
     "supertest-as-promised": "^2.0.0"
   }
