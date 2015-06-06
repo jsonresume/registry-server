@@ -115,6 +115,7 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, database) {
 
     db = database;
 
+    // start the application only after the database connection is ready
     var port = Number(process.env.PORT || 5000);
     app.listen(port, function() {
         console.log("Listening on " + port);
@@ -124,7 +125,10 @@ MongoClient.connect(process.env.MONGOHQ_URL, function(err, database) {
 app.all('/*', function(req, res, next) {
     //res.header("Access-Control-Allow-Origin", "*");
     //res.header("Access-Control-Allow-Headers", "X-Requested-With");
+
+    // Make the db accessible to the router
     req.db = db;
+    req.redis = redis;
     next();
 });
 
@@ -542,47 +546,8 @@ app.put('/resume', function(req, res) {
 
 app.post('/user', controller.user);
 
-function uid(len) {
-    return Math.random().toString(35).substr(2, len);
-}
-app.post('/session', function(req, res) {
-    var password = req.body.password;
-    var email = req.body.email;
-    // console.log(req.body);
-    db.collection('users').findOne({
-        'email': email
-    }, function(err, user) {
-        if (user && bcrypt.compareSync(password, user.hash)) {
-            // console.log(email, bcrypt.hashSync(email));
-            // console.log(email, bcrypt.hashSync(email));
-            var sessionUID = uid(32);
 
-            redis.set(sessionUID, true, redis.print);
-
-
-
-            // var session = value.toString();
-
-            req.session.username = user.username;
-            req.session.email = email;
-            res.send({
-                message: 'loggedIn',
-                username: user.username,
-                email: email,
-                session: sessionUID,
-                auth: true
-            });
-
-
-
-            // redis.quit();
-        } else {
-            res.status(HttpStatus.UNAUTHORIZED).send({
-                message: 'authentication error'
-            });
-        }
-    });
-});
+app.post('/session', controller.session.login);
 
 //delete user
 app.delete('/account', function(req, res) {
