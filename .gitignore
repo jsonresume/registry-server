@@ -2,3 +2,7 @@ node_modules
 npm-debug.log
 .vagrant
 cache/*
+
+# Environment
+.env*
+!.env.example

@@ -1,3 +1,4 @@
+require('dotenv').load();
 var express = require("express");
 var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
