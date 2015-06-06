@@ -42,7 +42,7 @@ describe('API', function() {
             var user = utils.getUserForTest(this);
 
             it('should return 201 Created', function(done) {
-                return api.post('/user')
+                 api.post('/user')
                     .send(user)
                     .expect(HttpStatus.CREATED, function(err, res) {
                         should.not.exist(err);
@@ -52,7 +52,7 @@ describe('API', function() {
             });
 
             it('should return 409 CONFLICT when the email already exists', function(done) {
-                return api.post('/user')
+                 api.post('/user')
                     .send({
                         username: "different",
                         email: user.email,
@@ -66,7 +66,7 @@ describe('API', function() {
             });
 
             it('should return 409 Conflict when the username already exists', function(done) {
-                return api.post('/user')
+                 api.post('/user')
                     .send({
                         username: user.username,
                         email: "different",
@@ -81,7 +81,7 @@ describe('API', function() {
             });
 
             it('`/account` should change user password', function(done) {
-                return api.put('/account')
+                 api.put('/account')
 
                 .send({
                         email: user.email,
@@ -97,7 +97,7 @@ describe('API', function() {
             });
 
             it('`/account` should delete user account', function(done) {
-                return api.delete('/account')
+                 api.delete('/account')
 
                 .send({
                         email: user.email,
