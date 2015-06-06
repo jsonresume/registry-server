@@ -25,53 +25,81 @@ describe('API', function() {
     describe('/stats', function() {
         it('should return stats', function(done) {
             return api.get('/stats')
-                .expect(200, function(err, res){
-                  should.not.exist(err);
-                  // TODO acturlly test stat numbers
-                  res.body.should.have.property('userCount');
-                  res.body.should.have.property('resumeCount');
-                  res.body.should.have.property('views');
+                .expect(200, function(err, res) {
+                    should.not.exist(err);
+                    // TODO acturlly test stat numbers
+                    res.body.should.have.property('userCount');
+                    res.body.should.have.property('resumeCount');
+                    res.body.should.have.property('views');
 
-                  done();
+                    done();
                 });
         });
     });
 
     describe('/user', function() {
-        describe('POST', function () {
+        describe('POST', function() {
             var user = utils.getUserForTest(this);
 
-            it('should return 201 Created', function() {
+            it('should return 201 Created', function(done) {
                 return api.post('/user')
                     .send(user)
-                    .expect(HttpStatus.CREATED);
+                    .expect(HttpStatus.CREATED, function(err, res) {
+                        should.not.exist(err);
+
+                        done();
+                    });
             });
 
-            it('should return 409 CONFLICT when the email already exists', function() {
+            it('should return 409 CONFLICT when the email already exists', function(done) {
                 return api.post('/user')
                     .send({
                         username: "different",
                         email: user.email,
                         password: user.password
                     })
-                    .expect(HttpStatus.CONFLICT);
+                    .expect(HttpStatus.CONFLICT, function(err, res) {
+                        should.not.exist(err);
+
+                        done();
+                    });
             });
 
-            it('should return 409 Conflict when the username already exists', function() {
+            it('should return 409 Conflict when the username already exists', function(done) {
                 return api.post('/user')
                     .send({
                         username: user.username,
                         email: "different",
                         password: user.password
                     })
-                    .expect(HttpStatus.CONFLICT);
+                    .expect(HttpStatus.CONFLICT, function(err, res) {
+                        // should.not.exsit(err);
+
+                        done();
+
+                    });
+            });
+
+            it('`/account` should change user password', function(done) {
+                return api.put('/account')
+
+                .send({
+                        email: user.email,
+                        currentPassword: user.password,
+                        newPassword: 'newPassword'
+                    })
+                    .expect(200, function(err, res) {
+                        console.log(err, res.body);
+
+                        done();
+                    });
             });
         });
     });
 
     describe('/session', function() {
 
-        describe('POST', function () {
+        describe('POST', function() {
             var user = utils.getUserForTest(this);
 
             before(function() {
@@ -112,7 +140,9 @@ describe('API', function() {
             it('should return {auth: false} if there is no session', function() {
                 return agent.get('/session')
                     .send()
-                    .expect(utils.property({auth: false}));
+                    .expect(utils.property({
+                        auth: false
+                    }));
             });
 
             it('should return {auth: true} if there is a valid session', function() {
@@ -120,12 +150,14 @@ describe('API', function() {
                     .then(function() {
                         return agent.get('/session')
                             .send()
-                            .expect(utils.property({auth: true}));
+                            .expect(utils.property({
+                                auth: true
+                            }));
                     });
             });
         });
 
-        describe('DELETE session ID', function () {
+        describe('DELETE session ID', function() {
             var agent = supertest.agent(server), // use cookies
                 agentUtils = utils(agent),
                 user = utils.getUserForTest(this);
@@ -139,15 +171,19 @@ describe('API', function() {
                     .send(user)
                     .then(function(res) {
                         expect(res.body.session).to.exist;
-                        return agent.delete('/session/'+res.body.session)
+                        return agent.delete('/session/' + res.body.session)
                             .send()
                             .expect(HttpStatus.OK)
-                            .expect(utils.property({auth: false}));
+                            .expect(utils.property({
+                                auth: false
+                            }));
                     })
-                    .then(function(){
+                    .then(function() {
                         return agent.get('/session')
                             .send()
-                            .expect(utils.property({auth: false}));
+                            .expect(utils.property({
+                                auth: false
+                            }));
                     });
             });
 
@@ -169,15 +205,15 @@ describe('API', function() {
             });
 
             it('should return 404 Not Found for a valid user with no resume', function() {
-                return api.get('/'+user.username)
+                return api.get('/' + user.username)
                     .send()
                     .expect(HttpStatus.NOT_FOUND);
             });
 
             it('should return 200 OK for a valid user with a resume', function() {
                 var themeReq = nock('http://themes.jsonresume.org')
-                                .post('/theme/'+server.DEFAULT_THEME)
-                                .reply(200, 'An example resume');
+                    .post('/theme/' + server.DEFAULT_THEME)
+                    .reply(200, 'An example resume');
                 return api.post('/resume')
                     .send({
                         email: user.email,
@@ -187,7 +223,7 @@ describe('API', function() {
                         }
                     })
                     .then(function() {
-                        return api.get('/'+user.username)
+                        return api.get('/' + user.username)
                             .send()
                             .expect(HttpStatus.OK)
                             .expect('An example resume');
@@ -199,8 +235,10 @@ describe('API', function() {
 
             it('should return 500 Internal Server Error if the theme manager service returns an error', function() {
                 var themeReq = nock('http://themes.jsonresume.org')
-                                .post('/theme/'+server.DEFAULT_THEME)
-                                .replyWithError({message: 'server is down'});
+                    .post('/theme/' + server.DEFAULT_THEME)
+                    .replyWithError({
+                        message: 'server is down'
+                    });
                 return api.post('/resume')
                     .send({
                         email: user.email,
@@ -210,10 +248,12 @@ describe('API', function() {
                         }
                     })
                     .then(function() {
-                        return api.get('/'+user.username)
+                        return api.get('/' + user.username)
                             .send()
                             .expect(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .expect({message: 'server is down'});
+                            .expect({
+                                message: 'server is down'
+                            });
                     })
                     .then(function() {
                         expect(themeReq.isDone()).to.be.true;

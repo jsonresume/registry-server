@@ -551,40 +551,7 @@ app.delete('/account', function(req, res) {
     });
 });
 
-//change password
-app.put('/account', function(req, res) {
-    var email = req.body.email;
-    var password = req.body.currentPassword;
-    var hash = bcrypt.hashSync(req.body.newPassword);
-    // console.log(email, password, hash); probably shouldn't log passwords
-
-    db.collection('users').findOne({
-        'email': email
-    }, function(err, user) {
-        if (user && bcrypt.compareSync(password, user.hash)) {
-            // console.log(req.body);
-            db.collection('users').update({
-                //query
-                'email': email
-            }, {
-                $set: {
-                    'hash': hash
-                }
-            }, {
-                //options
-                upsert: true,
-                safe: true
-            }, function(err, user) {
-                console.log(err, user);
-                if (!err) {
-                    res.send({
-                        message: "password updated"
-                    });
-                }
-            });
-        }
-    });
-});
+app.put('/account', controller.account.changePassword);
 
 app.post('/:uid', renderResume);
 
