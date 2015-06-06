@@ -89,6 +89,23 @@ describe('API', function() {
                         newPassword: 'newPassword'
                     })
                     .expect(200, function(err, res) {
+                      should.not.exist(err);
+                        console.log(err, res.body);
+
+                        done();
+                    });
+            });
+
+            it('`/account` should delete user account', function(done) {
+                return api.delete('/account')
+
+                .send({
+                        email: user.email,
+                        password: 'newPassword',
+                    })
+                    .expect(200, function(err, res) {
+                      should.not.exist(err);
+
                         console.log(err, res.body);
 
                         done();
