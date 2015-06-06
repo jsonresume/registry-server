@@ -270,38 +270,8 @@ var renderResume = function(req, res) {
     });
 };
 
-app.get('/session', function(req, res) {
-    // This checks the current users auth
-    // It runs before Backbones router is started
-    // we should return a csrf token for Backbone to use
-    if (typeof req.session.username !== 'undefined') {
-        res.send({
-            auth: true,
-            id: req.session.id,
-            username: req.session.username,
-            _csrf: req.session._csrf
-        });
-    } else {
-        res.send({
-            auth: false,
-            _csrf: req.session._csrf
-        });
-    }
-});
-app.delete('/session/:id', function(req, res, next) {
-    // Logout by clearing the session
-    req.session.regenerate(function(err) {
-        // Generate a new csrf token so the user can login again
-        // This is pretty hacky, connect.csrf isn't built for rest
-        // I will probably release a restful csrf module
-        //csrf.generate(req, res, function () {
-        res.send({
-            auth: false,
-            _csrf: req.session._csrf
-        });
-        //});
-    });
-});
+app.get('/session', controller.session.check);
+app.delete('/session/:id', controller.session.remove);
 
 
 //app.get('/', renderHomePage);
@@ -364,21 +334,8 @@ app.get('/competition', function(req, res) {
         });
     });
 });
-app.get('/stats', function(req, res) {
 
-    redis.get('views', function(err, views) {
-        db.collection('users').find().count(function(e, usercount) {
-            db.collection('resumes').find().count(function(e, resumecount) {
-                res.send({
-                    userCount: usercount,
-                    resumeCount: resumecount,
-                    views: views * 1
-                });
-            });
-        });
-    });
-
-});
+app.get('/stats', controller.stats);
 // export pdf route
 // this code is used by resume-cli for pdf export, see line ~188 for web-based export
 app.get('/pdf', function(req, res) {

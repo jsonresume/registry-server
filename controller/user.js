@@ -12,7 +12,6 @@ module.exports = function userController(req, res) {
     db.collection('users').findOne({
         'email': req.body.email
     }, function(err, user) {
-
         if (user) {
             res.status(HttpStatus.CONFLICT).send({
                 error: {
@@ -52,7 +51,6 @@ module.exports = function userController(req, res) {
                     });
 
 
-
                     db.collection('users').insert({
                         username: req.body.username,
                         email: req.body.email,
@@ -75,4 +73,4 @@ module.exports = function userController(req, res) {
         }
 
     });
-}
+};
