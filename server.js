@@ -505,5 +505,11 @@ app.put('/account', controller.account.changePassword);
 app.delete('/account', controller.account.remove);
 app.post('/:uid', renderResume);
 
+process.addListener('uncaughtException', function(err) {
+	logger.error('Uncaught error in server.js', { err:err, stack: err.stack });
+	// TODO some sort of notification
+	process.exit(1);
+});
+
 module.exports = app;
 module.exports.DEFAULT_THEME = DEFAULT_THEME;
