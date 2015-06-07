@@ -1,4 +1,5 @@
 var bcrypt = require('bcrypt-nodejs');
+var HttpStatus = require('http-status-codes');
 
 function S4() {
     return Math.floor((1 + Math.random()) * 0x10000)
