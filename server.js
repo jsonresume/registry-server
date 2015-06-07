@@ -111,7 +111,7 @@ var mongoUrl = process.env.MONGOHQ_URL || defaultMongoUrl;
 
 var db;
 
-MongoClient.connect(process.env.MONGOHQ_URL, function(err, database) {
+MongoClient.connect(mongoUrl, function(err, database) {
     if (err) throw err;
 
     db = database;
