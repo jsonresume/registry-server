@@ -86,9 +86,9 @@ describe('API', function() {
             });
 
             it('`/account` should return a 401 Unauthorized Error when attempting to change password with incorrect credentials', function(done) {
-                api.put('/account')
 
-                .send({
+                api.put('/account')
+                    .send({
                         email: 'someRandomEmail',
                         currentPassword: user.password,
                         newPassword: 'newPassword'
@@ -105,9 +105,9 @@ describe('API', function() {
             });
 
             it('`/account` should return a 401 Unauthorized Error when attempting to change password with invalid password', function(done) {
-                api.put('/account')
 
-                .send({
+                api.put('/account')
+                    .send({
                         email: user.email,
                         currentPassword: 'someWrongPassword',
                         newPassword: 'newPassword'
@@ -116,7 +116,7 @@ describe('API', function() {
                         should.not.exist(err);
                         console.log(err, res.body);
                         res.body.should.have.properties({
-                          message: 'invalid password'
+                            message: 'invalid password'
                         })
 
                         done();
@@ -124,9 +124,9 @@ describe('API', function() {
             });
 
             it('`/account` change user password', function(done) {
-                api.put('/account')
 
-                .send({
+                api.put('/account')
+                    .send({
                         email: user.email,
                         currentPassword: user.password,
                         newPassword: 'newPassword'
@@ -141,9 +141,9 @@ describe('API', function() {
             });
 
             it('`/account` should delete user account', function(done) {
-                api.delete('/account')
 
-                .send({
+                api.delete('/account')
+                    .send({
                         email: user.email,
                         password: 'newPassword',
                     })
@@ -320,6 +320,28 @@ describe('API', function() {
                         expect(themeReq.isDone()).to.be.true;
                     });
             });
+        });
+    });
+
+    describe('Resumes: ', function() {
+
+        var resumeJson = require('./resume.json');
+
+        it('should create a new guest resume', function(done) {
+
+            api.post('/resume')
+                .send({
+                    guest: true,
+                    resume: resumeJson
+                })
+                .expect(200, function(err, res) {
+
+                    should.not.exist(err);
+                    res.body.should.have.property('url');
+                    res.body.url.should.startWith('http://registry.jsonresume.org/');
+
+                    done();
+                });
         });
     });
 });
