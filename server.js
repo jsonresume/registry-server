@@ -365,7 +365,7 @@ redis.on("error", function(err) {
 });
 
 // post resume
-app.post('/resume', function(req, res) {
+app.post('/resume', function(req, res, next) {
     var password = req.body.password;
     var email = req.body.email || req.session.email;
 
@@ -373,6 +373,9 @@ app.post('/resume', function(req, res) {
         db.collection('users').findOne({
             'email': email
         }, function(err, user) {
+          if (err) {
+            return next(err);
+          }
 
             redis.get(req.body.session, function(err, valueExists) {
                 var respondWithResume = function() {
@@ -386,13 +389,18 @@ app.post('/resume', function(req, res) {
                         passphrase: req.body.passphrase || null,
                         theme: req.body.theme || null
                     };
-                    console.log('inserted');
+                    console.log('inserted at path one');
                     db.collection('resumes').update({
                         'jsonresume.username': user.username
                     }, resume, {
                         upsert: true,
                         safe: true
                     }, function(err, resume) {
+                        console.log(err, resume, 'update reueme');
+                        if (err) {
+                            return next(err);
+                        }
+
                         res.send({
                             url: 'http://registry.jsonresume.org/' + user.username
                         });
@@ -420,6 +428,11 @@ app.post('/resume', function(req, res) {
         db.collection('resumes').insert(resume, {
             safe: true
         }, function(err, resume) {
+            console.log(err, resume);
+            if (err) {
+                return next(err);
+            }
+
             res.send({
                 url: 'http://registry.jsonresume.org/' + guestUsername
             });
@@ -506,9 +519,12 @@ app.delete('/account', controller.account.remove);
 app.post('/:uid', renderResume);
 
 process.addListener('uncaughtException', function(err) {
-	logger.error('Uncaught error in server.js', { err:err, stack: err.stack });
-	// TODO some sort of notification
-	process.exit(1);
+    console.error('Uncaught error in server.js', {
+        err: err,
+        stack: err.stack
+    });
+    // TODO some sort of notification
+    // process.exit(1);
 });
 
 module.exports = app;
