@@ -1,5 +1,6 @@
 require('dotenv').load();
 var express = require("express");
+var mongo = require('./lib/mongo');
 var Mustache = require('mustache');
 var resumeToText = require('resume-to-text');
 var path = require('path');
@@ -11,8 +12,6 @@ var gravatar = require('gravatar');
 var app = express();
 var _ = require('lodash');
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
-var MongoClient = require('mongodb').MongoClient;
-var mongo = require('mongodb');
 var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
 var request = require('superagent');
@@ -103,23 +102,19 @@ function S4() {
         .substring(1);
 };
 
-var defaultMongoUrl = "mongodb://localhost:27017/jsonresume";
-if (!process.env.MONGOHQ_URL) {
-    console.log("Using default MONGOHQ_URL=" + defaultMongoUrl);
-}
-var mongoUrl = process.env.MONGOHQ_URL || defaultMongoUrl;
+
 
 var db;
-MongoClient.connect(process.env.MONGOHQ_URL, function(err, database) {
-    if (err) throw err;
 
-    db = database;
+mongo.init(function(err){
+  if (err) throw err;
 
-    // start the application only after the database connection is ready
-    var port = Number(process.env.PORT || 5000);
-    app.listen(port, function() {
-        console.log("Listening on " + port);
-    });
+  db = mongo.db;
+
+  var port = Number(process.env.PORT || 5000);
+  app.listen(port, function() {
+      console.log("Listening on " + port);
+  });
 });
 
 app.all('/*', function(req, res, next) {
@@ -127,6 +122,8 @@ app.all('/*', function(req, res, next) {
     //res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
     // Make the db accessible to the router
+    // probably not the most performant way to pass the db's around
+    // TODO find a better way
     req.db = db;
     req.redis = redis;
     next();
@@ -369,10 +366,13 @@ app.post('/resume', function(req, res, next) {
     var password = req.body.password;
     var email = req.body.email || req.session.email;
 
+    console.log(email, password, 'hohohoho');
+
     if (!req.body.guest) {
         db.collection('users').findOne({
             'email': email
         }, function(err, user) {
+          console.log(err, user);
           if (err) {
             return next(err);
           }
