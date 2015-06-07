@@ -1,6 +1,5 @@
 process.env.MONGOHQ_URL = 'mongodb://localhost:27017/jsonresume-tests';
 process.env.POSTMARK_API_KEY = 'POSTMARK_API_TEST'; // http://blog.postmarkapp.com/post/913165552/handling-email-in-your-test-environment
-
 var Q = require('q');
 var should = require('should');
 var supertest = require("supertest-as-promised")(Q.Promise);
@@ -325,6 +324,24 @@ describe('API', function() {
 
     describe('Resumes: ', function() {
 
+        var user = {
+            username: 'someTestUsername',
+            email: 'someTestEmail',
+            password: 'someTestPassword'
+        };
+
+        before(function(done) {
+            // create a test user
+            api.post('/user')
+                .send(user)
+                .expect(201, function(err, res) {
+                    console.log(err, res.body);
+                    should.not.exist(err);
+
+                    done();
+                });
+        });
+
         var resumeJson = require('./resume.json');
 
         it('should create a new guest resume', function(done) {
@@ -339,6 +356,23 @@ describe('API', function() {
                     should.not.exist(err);
                     res.body.should.have.property('url');
                     res.body.url.should.startWith('http://registry.jsonresume.org/');
+                    // url should end with the randomly generated guestUsername
+
+                    done();
+                });
+        });
+
+        it('should create a resume for an existing user', function(done) {
+
+            api.post('/resume')
+                .send({
+                    password: user.password,
+                    email: user.email,
+                    resume: resumeJson
+                })
+                .expect(200, function(err, res) {
+                    should.not.exist(err);
+                    res.body.should.have.property('url', 'http://registry.jsonresume.org/' + user.username);
 
                     done();
                 });
