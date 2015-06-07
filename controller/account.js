@@ -1,6 +1,6 @@
 var bcrypt = require('bcrypt-nodejs');
 
-var changePassword = function(req, res) {
+var changePassword = function(req, res, next) {
 
     console.log('hehehehehe', req.body);
     var email = req.body.email;
@@ -12,32 +12,44 @@ var changePassword = function(req, res) {
     db.collection('users').findOne({
         'email': email
     }, function(err, user) {
-
-        console.log(err, user);
-        if (user && bcrypt.compareSync(password, user.hash)) {
-            // console.log(req.body);
-            db.collection('users').update({
-                //query
-                'email': email
-            }, {
-                $set: {
-                    'hash': hash
-                }
-            }, {
-                //options
-                upsert: true,
-                safe: true
-            }, function(err, user) {
-                console.log(err, user);
-                if (!err) {
-                    res.send({
-                        message: "password updated"
-                    });
-                }
-            });
-        } else {
-            // TODO send some code cannot find user or password is wrong
+        if (err) {
+            return next(err);
         }
+
+        if (!user) {
+            return res.status(401).json({ //HTTP Error 401 Unauthorized
+                message: 'email not found'
+            });
+
+        }
+
+        if (!bcrypt.compareSync(password, user.hash)) {
+            return res.status(401).json({ //HTTP Error 401 Unauthorized
+                message: 'invalid password'
+            });
+        }
+
+        db.collection('users').update({
+            //query
+            'email': email
+        }, {
+            $set: {
+                'hash': hash
+            }
+        }, {
+            //options
+            upsert: true,
+            safe: true
+        }, function(err, user) {
+            if (err) {
+              return next(err);
+            }
+
+            res.send({
+                message: 'password updated'
+            });
+
+        });
     });
 };
 
@@ -80,7 +92,7 @@ var remove = function(req, res) {
             });
         } else {
             res.send({
-                message: "\ninvalid Password"
+                message: '\ninvalid Password'
             });
         }
     });

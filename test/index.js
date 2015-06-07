@@ -85,7 +85,45 @@ describe('API', function() {
                     });
             });
 
-            it('`/account` should change user password', function(done) {
+            it('`/account` should return a 401 Unauthorized Error when attempting to change password with incorrect credentials', function(done) {
+                api.put('/account')
+
+                .send({
+                        email: 'someRandomEmail',
+                        currentPassword: user.password,
+                        newPassword: 'newPassword'
+                    })
+                    .expect(401, function(err, res) {
+                        should.not.exist(err);
+                        console.log(err, res.body);
+                        res.body.should.have.properties({
+                            message: 'email not found'
+                        })
+
+                        done();
+                    });
+            });
+
+            it('`/account` should return a 401 Unauthorized Error when attempting to change password with invalid password', function(done) {
+                api.put('/account')
+
+                .send({
+                        email: user.email,
+                        currentPassword: 'someWrongPassword',
+                        newPassword: 'newPassword'
+                    })
+                    .expect(401, function(err, res) {
+                        should.not.exist(err);
+                        console.log(err, res.body);
+                        res.body.should.have.properties({
+                          message: 'invalid password'
+                        })
+
+                        done();
+                    });
+            });
+
+            it('`/account` change user password', function(done) {
                 api.put('/account')
 
                 .send({
@@ -96,6 +134,7 @@ describe('API', function() {
                     .expect(200, function(err, res) {
                         should.not.exist(err);
                         console.log(err, res.body);
+
 
                         done();
                     });
