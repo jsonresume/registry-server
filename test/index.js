@@ -18,23 +18,7 @@ describe('API', function() {
         it('should return 200 OK', function(done) {
             api.get('/')
                 .expect(200, function(err, res) {
-                    console.log(err, res.body);
                     should.not.exist(err);
-
-                    done();
-                });
-        });
-    });
-
-    describe('/stats', function() {
-        it('should return stats', function(done) {
-            api.get('/stats')
-                .expect(200, function(err, res) {
-                    should.not.exist(err);
-                    // TODO acturlly test stat numbers
-                    res.body.should.have.property('userCount');
-                    res.body.should.have.property('resumeCount');
-                    res.body.should.have.property('views');
 
                     done();
                 });
@@ -94,7 +78,6 @@ describe('API', function() {
                     })
                     .expect(401, function(err, res) {
                         should.not.exist(err);
-                        console.log(err, res.body);
                         res.body.should.have.properties({
                             message: 'email not found'
                         })
@@ -113,7 +96,6 @@ describe('API', function() {
                     })
                     .expect(401, function(err, res) {
                         should.not.exist(err);
-                        console.log(err, res.body);
                         res.body.should.have.properties({
                             message: 'invalid password'
                         })
@@ -132,8 +114,6 @@ describe('API', function() {
                     })
                     .expect(200, function(err, res) {
                         should.not.exist(err);
-                        console.log(err, res.body);
-
 
                         done();
                     });
@@ -148,8 +128,6 @@ describe('API', function() {
                     })
                     .expect(200, function(err, res) {
                         should.not.exist(err);
-
-                        console.log(err, res.body);
 
                         done();
                     });
@@ -335,7 +313,6 @@ describe('API', function() {
             api.post('/user')
                 .send(user)
                 .expect(201, function(err, res) {
-                    console.log(err, res.body);
                     should.not.exist(err);
 
                     done();
@@ -357,6 +334,7 @@ describe('API', function() {
                     res.body.should.have.property('url');
                     res.body.url.should.startWith('http://registry.jsonresume.org/');
                     // url should end with the randomly generated guestUsername
+                    // TODO test that test resume was actually created.
 
                     done();
                 });
@@ -373,6 +351,74 @@ describe('API', function() {
                 .expect(200, function(err, res) {
                     should.not.exist(err);
                     res.body.should.have.property('url', 'http://registry.jsonresume.org/' + user.username);
+
+                    done();
+                });
+        });
+
+        it('should update resume theme', function(done) {
+
+            api.put('/resume')
+                .send({
+                    password: user.password,
+                    email: user.email,
+                    theme: 'flat'
+                })
+                .expect(200, function(err, res) {
+                    should.not.exist(err);
+                    res.body.should.have.property('url', 'http://registry.jsonresume.org/' + user.username);
+                    // TODO find resume and check theme field
+
+                    done();
+                });
+        });
+
+        it('should not update resume theme with wrongPassword', function(done) {
+
+            api.put('/resume')
+                .send({
+                    password: 'wrongPassword',
+                    email: user.email,
+                    theme: 'flat'
+                })
+                .expect(200, function(err, res) { // TODO return some HTTP error code
+                    should.not.exist(err);
+
+                    // should probably be invalid password not session
+                    res.body.should.have.property('sessionError', 'invalid session');
+                    done();
+                });
+        });
+
+        it('should not update resume theme with non-existant email', function(done) {
+
+            api.put('/resume')
+                .send({
+                    password: user.password,
+                    email: 'nonExistatnEmail',
+                    theme: 'flat'
+                })
+                .expect(200, function(err, res) {
+                    should.not.exist(err);
+
+                    res.body.should.have.property('sessionError', 'invalid session'); // TODO change returned msg to invalid email
+                    done();
+                });
+        });
+
+        xit('TODO: should return some error if theme does not exist??');
+
+    });
+
+    describe('/stats', function() {
+        it('should return stats', function(done) {
+            api.get('/stats')
+                .expect(200, function(err, res) {
+                    should.not.exist(err);
+                    // TODO acturlly test stat numbers
+                    res.body.should.have.property('userCount');
+                    res.body.should.have.property('resumeCount');
+                    res.body.should.have.property('views');
 
                     done();
                 });

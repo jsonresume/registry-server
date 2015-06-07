@@ -354,11 +354,8 @@ app.get('/pdf', function(req, res) {
         });
 });
 
-
 app.get('/:uid.:format', renderResume);
 app.get('/:uid', renderResume);
-
-
 
 redis.on("error", function(err) {
     console.log("Error " + err);
@@ -367,157 +364,8 @@ redis.on("error", function(err) {
     });
 });
 
-// post resume
-app.post('/resume', function(req, res, next) {
-    var password = req.body.password;
-    var email = req.body.email || req.session.email;
-
-    console.log(email, password, 'hohohoho');
-
-    if (!req.body.guest) {
-        db.collection('users').findOne({
-            'email': email
-        }, function(err, user) {
-          console.log(err, user);
-          if (err) {
-            return next(err);
-          }
-
-            redis.get(req.body.session, function(err, valueExists) {
-                var respondWithResume = function() {
-
-                };
-
-                if ((user && password && bcrypt.compareSync(password, user.hash)) || (typeof req.session.username !== 'undefined') || valueExists) {
-                    var resume = req.body && req.body.resume || {};
-                    resume.jsonresume = {
-                        username: user.username,
-                        passphrase: req.body.passphrase || null,
-                        theme: req.body.theme || null
-                    };
-                    console.log('inserted at path one');
-                    db.collection('resumes').update({
-                        'jsonresume.username': user.username
-                    }, resume, {
-                        upsert: true,
-                        safe: true
-                    }, function(err, resume) {
-                        console.log(err, resume, 'update reueme');
-                        if (err) {
-                            return next(err);
-                        }
-
-                        res.send({
-                            url: 'http://registry.jsonresume.org/' + user.username
-                        });
-                    });
-                } else if (valueExists === null) {
-                    res.status(HttpStatus.UNAUTHORIZED).send({
-                        sessionError: 'invalid session'
-                    });
-                } else {
-                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-                        message: 'ERRORRRSSSS'
-                    });
-                }
-            });
-        });
-    } else {
-        var guestUsername = S4() + S4();
-        var resume = req.body && req.body.resume || {};
-        resume.jsonresume = {
-            username: guestUsername,
-            passphrase: req.body.passphrase || null,
-            theme: req.body.theme || null
-        };
-        console.log('inserted');
-        db.collection('resumes').insert(resume, {
-            safe: true
-        }, function(err, resume) {
-            console.log(err, resume);
-            if (err) {
-                return next(err);
-            }
-
-            res.send({
-                url: 'http://registry.jsonresume.org/' + guestUsername
-            });
-        });
-    }
-});
-
-// update theme
-app.put('/resume', function(req, res) {
-
-    console.log(req.body);
-
-    var password = req.body.password;
-    var email = req.body.email;
-    var theme = req.body.theme;
-    console.log(theme, "theme update!!!!!!!!!!!!1111");
-    // console.log(req.body);
-    db.collection('users').findOne({
-        'email': email
-    }, function(err, user) {
-
-        redis.get(req.body.session, function(err, valueExists) {
-            console.log(err, valueExists, 'theme redis');
-
-            if (!valueExists && user && bcrypt.compareSync(password, user.hash)) {
-
-                db.collection('resumes').update({
-                    //query
-                    'jsonresume.username': user.username
-                }, {
-                    // update set new theme
-                    $set: {
-                        'jsonresume.theme': theme
-                    }
-                }, {
-                    //options
-                    upsert: true,
-                    safe: true
-                }, function(err, resume) {
-                    res.send({
-                        url: 'http://registry.jsonresume.org/' + user.username
-                    });
-                });
-            } else if (valueExists === null) {
-                res.send({
-                    sessionError: 'invalid session'
-                });
-            } else if (valueExists === 'true') {
-                console.log('redis session success');
-                db.collection('resumes').update({
-                    //query
-                    'jsonresume.username': user.username
-                }, {
-                    // update set new theme
-                    $set: {
-                        'jsonresume.theme': theme
-                    }
-                }, {
-                    //options
-                    upsert: true,
-                    safe: true
-                }, function(err, resume) {
-                    res.send({
-                        url: 'http://registry.jsonresume.org/' + user.username
-                    });
-                });
-
-
-            } else {
-                console.log('deleted');
-                res.send({
-                    message: 'authentication error'
-                });
-            }
-        });
-    });
-
-});
-
+app.post('/resume', controller.resume.upsert);
+app.put('/resume', controller.resume['update-theme']);
 app.post('/user', controller.user);
 app.post('/session', controller.session.login);
 app.put('/account', controller.account.changePassword);
