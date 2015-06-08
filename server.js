@@ -1,18 +1,14 @@
 require('dotenv').load();
 var express = require("express");
-var Mustache = require('mustache');
-
 var path = require('path');
 var resumeToHTML = require('resume-to-html');
-
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
 var gravatar = require('gravatar');
+var pdf = require('pdfcrowd');
+var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 var app = express();
 var _ = require('lodash');
-var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
-var templateHelper = require('./template-helper');
-var pdf = require('pdfcrowd');
 var request = require('superagent');
 var sha256 = require('sha256');
 var expressSession = require('express-session');
@@ -23,8 +19,6 @@ var minify = require('express-minify');
 var controller = require('./controller');
 
 var points = [];
-
-
 var DEFAULT_THEME = 'modern';
 
 if (process.env.REDISTOGO_URL) {
@@ -72,7 +66,6 @@ app.use(express.static(__dirname + '/editor', {
     maxAge: 21600 * 1000
 }));
 
-var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 app.use(bodyParser());
 var fs = require('fs');
 var guid = (function() {
@@ -99,7 +92,6 @@ if (!process.env.MONGOHQ_URL) {
 }
 var mongoUrl = process.env.MONGOHQ_URL || defaultMongoUrl;
 var mongo = require('./db');
-var db;
 // Connect to Mongo on start
 mongo.connect(mongoUrl, function(err) {
     if (err) {
@@ -112,7 +104,6 @@ mongo.connect(mongoUrl, function(err) {
     var port = Number(process.env.PORT || 5000);
     app.listen(port, function() {
         console.log("Listening on " + port);
-        db = mongo.get();
     });
 });
 
@@ -123,66 +114,13 @@ app.all('/*', function(req, res, next) {
     // Make the db accessible to the router
     // probably not the most performant way to pass the db's around
     // TODO find a better way
-    req.db = db;
     req.redis = redis;
     next();
 });
 
-var User = require('./models/user');
-var Resume = require('./models/resume');
-
-
-// not in use
-// var renderHomePage = function(req, res) {
-//     User.find({}, function(err, docs) {
-//         var usernameArray = [];
-//         docs.forEach(function(doc) {
-//             usernameArray.push({
-//                 username: doc.username,
-//                 gravatar: gravatar.url(doc.email, {
-//                     s: '80',
-//                     r: 'pg',
-//                     d: '404'
-//                 })
-//             });
-//         });
-//         var page = Mustache.render(templateHelper.get('home'), {
-//             usernames: usernameArray
-//         });
-//         res.send(page);
-//     });
-//
-// };
-
-
-
 app.get('/session', controller.session.check);
 app.delete('/session/:id', controller.session.remove);
-
-//app.get('/', renderHomePage);
-
-var renderMembersPage = function(req, res, next) {
-    console.log('================================');
-    User.find({}, function(err, docs) {
-        if (err) {
-          return next(err);
-        }
-        var usernameArray = [];
-        docs.forEach(function(doc) {
-            usernameArray.push({
-                username: doc.username
-
-            });
-        });
-        var page = Mustache.render(templateHelper.get('members'), {
-            usernames: usernameArray
-        });
-        res.send(page);
-    });
-
-};
-app.get('/members', renderMembersPage);
-
+app.get('/members', controller.render['members-page']);
 app.get('/stats', controller.stats);
 // export pdf route
 // this code is used by resume-cli for pdf export, see line ~188 for web-based export

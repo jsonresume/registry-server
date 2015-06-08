@@ -1,5 +1,7 @@
 var bcrypt = require('bcrypt-nodejs');
 var HttpStatus = require('http-status-codes');
+var User = require('../../models/user');
+var Resume = require('../../models/resume');
 
 function S4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -8,14 +10,14 @@ function S4() {
 };
 
 module.exports = function upsert(req, res, next) {
-    var db = req.db;
+
     var redis = req.redis;
 
     var password = req.body.password;
     var email = req.body.email || req.session.email;
 
     if (!req.body.guest) {
-        db.collection('users').findOne({
+        User.findOne({
             'email': email
         }, function(err, user) {
           if (err) {
@@ -34,12 +36,12 @@ module.exports = function upsert(req, res, next) {
                         passphrase: req.body.passphrase || null,
                         theme: req.body.theme || null
                     };
-                    db.collection('resumes').update({
+
+                    var conditions = {
                         'jsonresume.username': user.username
-                    }, resume, {
-                        upsert: true,
-                        safe: true
-                    }, function(err, resume) {
+                    };
+
+                    Resume.update(conditions, resume, function(err, resume) {
                         if (err) {
                             return next(err);
                         }
@@ -67,14 +69,12 @@ module.exports = function upsert(req, res, next) {
             passphrase: req.body.passphrase || null,
             theme: req.body.theme || null
         };
-        console.log('inserted');
-        db.collection('resumes').insert(resume, {
-            safe: true
-        }, function(err, resume) {
+
+        Resume.create(resume, function(err, resume) {
             if (err) {
                 return next(err);
             }
-
+            
             res.send({
                 url: 'http://registry.jsonresume.org/' + guestUsername
             });

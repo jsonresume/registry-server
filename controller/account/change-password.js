@@ -7,8 +7,6 @@ module.exports = function changePassword(req, res, next) {
     var password = req.body.currentPassword;
     var hash = bcrypt.hashSync(req.body.newPassword);
 
-    var db = req.db
-
     User.findOne({
         'email': email
     }, function(err, user) {
@@ -29,20 +27,17 @@ module.exports = function changePassword(req, res, next) {
             });
         }
 
-        db.collection('users').update({
-            //query
+        var conditions = {
             'email': email
-        }, {
-            $set: {
-                'hash': hash
-            }
-        }, {
-            //options
-            upsert: true,
-            safe: true
-        }, function(err, user) {
+        };
+
+        var update = {
+            'hash': hash
+        };
+
+        User.update(conditions, update, function(err, user) {
             if (err) {
-              return next(err);
+                return next(err);
             }
 
             res.send({

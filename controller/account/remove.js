@@ -1,14 +1,13 @@
 var bcrypt = require('bcrypt-nodejs');
 var User = require('../../models/user');
+var Resume = require('../../models/resume');
 
 module.exports = function remove(req, res, next) {
 
     var password = req.body.password;
     var email = req.body.email;
 
-    var db = req.db
-
-    db.collection('users').findOne({
+    User.findOne({
         'email': email
     }, function(err, user) {
         if (err) {
@@ -23,15 +22,16 @@ module.exports = function remove(req, res, next) {
             // console.log(req.body);
 
             //remove the users resume
-            db.collection('resumes').remove({
+            Resume.remove({
                 'jsonresume.username': user.username
-            }, 1, function(err, numberRemoved) {
-                console.log(err, numberRemoved, 'resume deleted');
+            }, function(err, numberRemoved) {
+                if(err) {
+                  return next(err);
+                }
                 // then remove user
-                db.collection('users').remove({
+                User.remove({
                     'email': email
-                }, 1, function(err, numberRemoved) {
-                    console.log(err, numberRemoved, 'user deleted');
+                }, function(err, numberRemoved) {
                     if (err) {
                         res.send(err);
                     } else {

@@ -1,4 +1,6 @@
 var bcrypt = require('bcrypt-nodejs');
+var User = require('../../models/user');
+var Resume = require('../../models/resume');
 
 module.exports = function updateTheme(req, res, next) {
 
@@ -10,7 +12,7 @@ module.exports = function updateTheme(req, res, next) {
     var theme = req.body.theme;
     console.log(theme, "theme update!!!!!!!!!!!!1111");
     // console.log(req.body);
-    db.collection('users').findOne({
+    User.findOne({
         'email': email
     }, function(err, user) {
 
@@ -19,18 +21,12 @@ module.exports = function updateTheme(req, res, next) {
 
             if (!valueExists && user && bcrypt.compareSync(password, user.hash)) {
 
-                db.collection('resumes').update({
+                Resume.update({
                     //query
                     'jsonresume.username': user.username
                 }, {
                     // update set new theme
-                    $set: {
-                        'jsonresume.theme': theme
-                    }
-                }, {
-                    //options
-                    upsert: true,
-                    safe: true
+                    'jsonresume.theme': theme
                 }, function(err, resume) {
                     res.send({
                         url: 'http://registry.jsonresume.org/' + user.username
@@ -42,18 +38,12 @@ module.exports = function updateTheme(req, res, next) {
                 });
             } else if (valueExists === 'true') {
                 console.log('redis session success');
-                db.collection('resumes').update({
+                Resume.update({
                     //query
                     'jsonresume.username': user.username
                 }, {
                     // update set new theme
-                    $set: {
-                        'jsonresume.theme': theme
-                    }
-                }, {
-                    //options
-                    upsert: true,
-                    safe: true
+                    'jsonresume.theme': theme
                 }, function(err, resume) {
                     res.send({
                         url: 'http://registry.jsonresume.org/' + user.username

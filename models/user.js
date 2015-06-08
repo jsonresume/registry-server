@@ -22,7 +22,6 @@ exports.find = function find(conditions, callback) {
     });
 };
 
-
 exports.create = function create(conditions, callback) {
 
     var collection = db.get().collection('users');
@@ -33,4 +32,37 @@ exports.create = function create(conditions, callback) {
 
         callback(err, user);
     });
+};
+
+exports.update = function update(conditions, update, callback) {
+
+    var collection = db.get().collection('users');
+
+    collection.update(conditions, {
+        $set: update
+    }, {
+        //options
+        upsert: true,
+        safe: true
+    }, function(err, user) {
+
+        callback(err, user);
+    });
+};
+
+exports.remove = function remove(conditions, callback) {
+
+    var collection = db.get().collection('users');
+
+    collection.remove(conditions, 1, function(err, numberRemoved) {
+        callback(err, numberRemoved);
+    });
+};
+
+exports.count = function count(conditions, callback) {
+
+    var collection = db.get().collection('users');
+
+    collection.find(conditions).count(callback);
+
 };
