@@ -10,3 +10,16 @@ exports.findOne = function findOne(conditions, callback) {
         callback(err, user);
     });
 };
+
+
+exports.create = function create(conditions, callback) {
+
+    var collection = db.get().collection('users');
+
+    collection.insert(conditions, {
+        safe: true
+    }, function(err, user) {
+
+        callback(err, user);
+    });
+};

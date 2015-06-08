@@ -5,7 +5,7 @@ var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
 var HttpStatus = require('http-status-codes');
 var User = require('../models/users');
 
-module.exports = function userController(req, res) {
+module.exports = function userController(req, res, next) {
 
     var db = req.db
 
@@ -22,7 +22,7 @@ module.exports = function userController(req, res) {
             });
         } else {
 
-          User.findOne({
+            User.findOne({
                 'username': req.body.username
             }, function(err, user) {
                 if (user) {
@@ -52,13 +52,17 @@ module.exports = function userController(req, res) {
                     });
 
 
-                    db.collection('users').insert({
+                    var newUser = {
                         username: req.body.username,
                         email: req.body.email,
                         hash: hash
-                    }, {
-                        safe: true
-                    }, function(err, user) {
+                    };
+
+                    User.create(newUser, function(err, user) {
+                        if (err) {
+                            return next(err);
+                        }
+
                         req.session.username = user[0].username;
                         req.session.email = user[0].email;
                         // console.log('USER CREATED', req.session, req.session.username);
