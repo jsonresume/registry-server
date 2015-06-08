@@ -1,0 +1,54 @@
+var bcrypt = require('bcrypt-nodejs');
+var User = require('../../models/user');
+
+module.exports = function changePassword(req, res, next) {
+
+    var email = req.body.email;
+    var password = req.body.currentPassword;
+    var hash = bcrypt.hashSync(req.body.newPassword);
+
+    var db = req.db
+
+    User.findOne({
+        'email': email
+    }, function(err, user) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!user) {
+            return res.status(401).json({ //HTTP Error 401 Unauthorized
+                message: 'email not found'
+            });
+
+        }
+
+        if (!bcrypt.compareSync(password, user.hash)) {
+            return res.status(401).json({ //HTTP Error 401 Unauthorized
+                message: 'invalid password'
+            });
+        }
+
+        db.collection('users').update({
+            //query
+            'email': email
+        }, {
+            $set: {
+                'hash': hash
+            }
+        }, {
+            //options
+            upsert: true,
+            safe: true
+        }, function(err, user) {
+            if (err) {
+              return next(err);
+            }
+
+            res.send({
+                message: 'password updated'
+            });
+
+        });
+    });
+};

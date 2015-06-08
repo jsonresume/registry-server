@@ -1,9 +1,9 @@
 var HttpStatus = require('http-status-codes');
 var bcrypt = require('bcrypt-nodejs');
+var User = require('../models/user');
 
 var login = function(req, res) {
 
-    var db = req.db
     var redis = req.redis
 
     function uid(len) {
@@ -13,7 +13,7 @@ var login = function(req, res) {
     var password = req.body.password;
     var email = req.body.email;
     // console.log(req.body);
-    db.collection('users').findOne({
+    User.findOne({
         'email': email
     }, function(err, user) {
 

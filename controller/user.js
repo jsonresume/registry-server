@@ -7,8 +7,6 @@ var User = require('../models/user');
 
 module.exports = function userController(req, res, next) {
 
-    var db = req.db
-
     // console.log(req.body);
     User.findOne({
         'email': req.body.email

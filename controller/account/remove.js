@@ -1,10 +1,10 @@
 var bcrypt = require('bcrypt-nodejs');
+var User = require('../../models/user');
 
-var changePassword = function(req, res, next) {
+module.exports = function remove(req, res, next) {
 
+    var password = req.body.password;
     var email = req.body.email;
-    var password = req.body.currentPassword;
-    var hash = bcrypt.hashSync(req.body.newPassword);
 
     var db = req.db
 
@@ -15,53 +15,6 @@ var changePassword = function(req, res, next) {
             return next(err);
         }
 
-        if (!user) {
-            return res.status(401).json({ //HTTP Error 401 Unauthorized
-                message: 'email not found'
-            });
-
-        }
-
-        if (!bcrypt.compareSync(password, user.hash)) {
-            return res.status(401).json({ //HTTP Error 401 Unauthorized
-                message: 'invalid password'
-            });
-        }
-
-        db.collection('users').update({
-            //query
-            'email': email
-        }, {
-            $set: {
-                'hash': hash
-            }
-        }, {
-            //options
-            upsert: true,
-            safe: true
-        }, function(err, user) {
-            if (err) {
-              return next(err);
-            }
-
-            res.send({
-                message: 'password updated'
-            });
-
-        });
-    });
-};
-
-var remove = function(req, res) {
-
-    var password = req.body.password;
-    var email = req.body.email;
-
-    var db = req.db
-
-    db.collection('users').findOne({
-        'email': email
-    }, function(err, user) {
         if (!user) {
             res.send({
                 message: '\nemail not found'
@@ -96,8 +49,3 @@ var remove = function(req, res) {
         }
     });
 };
-
-module.exports = {
-    changePassword: changePassword,
-    remove: remove
-}
