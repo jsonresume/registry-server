@@ -3,6 +3,7 @@ process.env.POSTMARK_API_KEY = 'POSTMARK_API_TEST'; // http://blog.postmarkapp.c
 var Q = require('q');
 var bcrypt = require('bcrypt-nodejs');
 var should = require('should');
+var fixtures = require('./fixtures');
 var supertest = require("supertest-as-promised")(Q.Promise);
 var HttpStatus = require('http-status-codes');
 var nock = require('nock');
@@ -300,16 +301,12 @@ describe('/_username_ GET:', function() {
 
 describe('Resumes: ', function() {
 
-    var user = {
-        username: 'someTestUsername',
-        email: 'someTestEmail',
-        password: 'someTestPassword'
-    };
+    var user = fixtures.user.default;
     user.hash = bcrypt.hashSync(user.password);
 
     before(function(done) {
       // create a test user
-        User.create(done);
+        User.create(user, done);
     });
 
     var resumeJson = require('./resume.json');
