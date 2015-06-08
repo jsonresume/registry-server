@@ -157,7 +157,6 @@ var renderHomePage = function(req, res) {
 
 };
 
-var renderResume = function(req, res) {
 var renderResume = function(req, res, err) {
     realTimeViews++;
 
