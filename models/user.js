@@ -11,6 +11,17 @@ exports.findOne = function findOne(conditions, callback) {
     });
 };
 
+exports.find = function find(conditions, callback) {
+
+    var collection = db.get().collection('users');
+
+    // todo validate conditions
+
+    collection.find(conditions).toArray(function(err, user) {
+        callback(err, user);
+    });
+};
+
 
 exports.create = function create(conditions, callback) {
 

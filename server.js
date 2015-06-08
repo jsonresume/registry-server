@@ -136,26 +136,31 @@ app.all('/*', function(req, res, next) {
     next();
 });
 
-var renderHomePage = function(req, res) {
-    db.collection('users').find({}).toArray(function(err, docs) {
-        var usernameArray = [];
-        docs.forEach(function(doc) {
-            usernameArray.push({
-                username: doc.username,
-                gravatar: gravatar.url(doc.email, {
-                    s: '80',
-                    r: 'pg',
-                    d: '404'
-                })
-            });
-        });
-        var page = Mustache.render(templateHelper.get('home'), {
-            usernames: usernameArray
-        });
-        res.send(page);
-    });
+var User = require('./models/user');
+var Resume = require('./models/resume');
 
-};
+
+// not in use
+// var renderHomePage = function(req, res) {
+//     User.find({}, function(err, docs) {
+//         var usernameArray = [];
+//         docs.forEach(function(doc) {
+//             usernameArray.push({
+//                 username: doc.username,
+//                 gravatar: gravatar.url(doc.email, {
+//                     s: '80',
+//                     r: 'pg',
+//                     d: '404'
+//                 })
+//             });
+//         });
+//         var page = Mustache.render(templateHelper.get('home'), {
+//             usernames: usernameArray
+//         });
+//         res.send(page);
+//     });
+//
+// };
 
 var renderResume = function(req, res, err) {
     realTimeViews++;
@@ -179,12 +184,12 @@ var renderResume = function(req, res, err) {
     var themeName = req.query.theme || DEFAULT_THEME;
     var uid = req.params.uid;
     var format = req.params.format || req.headers.accept || 'html';
-    db.collection('resumes').findOne({
+    Resume.findOne({
         'jsonresume.username': uid,
     }, function(err, resume) {
-      if (err) {
-        return next(err);
-      }
+        if (err) {
+            return next(err);
+        }
         if (!resume) {
             var page = Mustache.render(templateHelper.get('noresume'), {});
             res.status(HttpStatus.NOT_FOUND).send(page);
@@ -282,10 +287,12 @@ app.delete('/session/:id', controller.session.remove);
 
 //app.get('/', renderHomePage);
 
-var renderMembersPage = function(req, res) {
+var renderMembersPage = function(req, res, next) {
     console.log('================================');
-    db.collection('users').find({}).toArray(function(err, docs) {
-        console.log(err);
+    User.find({}, function(err, docs) {
+        if (err) {
+          return next(err);
+        }
         var usernameArray = [];
         docs.forEach(function(doc) {
             usernameArray.push({
