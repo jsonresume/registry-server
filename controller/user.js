@@ -3,13 +3,14 @@ var bcrypt = require('bcrypt-nodejs');
 var Mustache = require('mustache');
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
 var HttpStatus = require('http-status-codes');
+var User = require('../models/users');
 
 module.exports = function userController(req, res) {
 
     var db = req.db
 
     // console.log(req.body);
-    db.collection('users').findOne({
+    User.findOne({
         'email': req.body.email
     }, function(err, user) {
         if (user) {
@@ -21,7 +22,7 @@ module.exports = function userController(req, res) {
             });
         } else {
 
-            db.collection('users').findOne({
+          User.findOne({
                 'username': req.body.username
             }, function(err, user) {
                 if (user) {

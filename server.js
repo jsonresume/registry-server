@@ -106,7 +106,7 @@ if (!process.env.MONGOHQ_URL) {
     console.log("Using default MONGOHQ_URL=" + defaultMongoUrl);
 }
 var mongoUrl = process.env.MONGOHQ_URL || defaultMongoUrl;
-var mongo = require('./mongo');
+var mongo = require('./db');
 var db;
 // Connect to Mongo on start
 mongo.connect(mongoUrl, function(err) {
