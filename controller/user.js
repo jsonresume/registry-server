@@ -3,7 +3,7 @@ var bcrypt = require('bcrypt-nodejs');
 var Mustache = require('mustache');
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
 var HttpStatus = require('http-status-codes');
-var User = require('../models/users');
+var User = require('../models/user');
 
 module.exports = function userController(req, res, next) {
 
