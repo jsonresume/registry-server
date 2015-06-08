@@ -3,5 +3,6 @@ module.exports = {
   session: require('./session'),
   stats: require('./stats'),
   account: require('./account'),
-  resume: require('./resume')
+  resume: require('./resume'),
+  render: require('./render')
 };

@@ -18,20 +18,12 @@ var sha256 = require('sha256');
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
 var HttpStatus = require('http-status-codes');
-var Pusher = require('pusher');
 var compress = require('compression');
 var minify = require('express-minify');
-var pusher = null;
 var controller = require('./controller');
-if (process.env.PUSHER_KEY) {
-    pusher = new Pusher({
-        appId: '83846',
-        key: process.env.PUSHER_KEY,
-        secret: process.env.PUSHER_SECRET
-    });
-};
+
 var points = [];
-var realTimeViews = 0;
+
 
 var DEFAULT_THEME = 'modern';
 
@@ -162,125 +154,7 @@ var Resume = require('./models/resume');
 //
 // };
 
-var renderResume = function(req, res, err) {
-    realTimeViews++;
 
-    redis.get('views', function(err, views) {
-        if (err) {
-            redis.set('views', 0);
-        } else {
-            redis.set('views', views * 1 + 1, redis.print);
-
-        }
-        // console.log(views);
-
-        if (pusher !== null) {
-            pusher.trigger('test_channel', 'my_event', {
-                views: views
-            });
-        };
-    });
-
-    var themeName = req.query.theme || DEFAULT_THEME;
-    var uid = req.params.uid;
-    var format = req.params.format || req.headers.accept || 'html';
-    Resume.findOne({
-        'jsonresume.username': uid,
-    }, function(err, resume) {
-        if (err) {
-            return next(err);
-        }
-        if (!resume) {
-            var page = Mustache.render(templateHelper.get('noresume'), {});
-            res.status(HttpStatus.NOT_FOUND).send(page);
-            return;
-        }
-        if (typeof resume.jsonresume.passphrase === 'string' && typeof req.body.passphrase === 'undefined') {
-
-            var page = Mustache.render(templateHelper.get('password'), {});
-            res.send(page);
-            return;
-        }
-        if (typeof req.body.passphrase !== 'undefined' && req.body.passphrase !== resume.jsonresume.passphrase) {
-            res.send('Password was wrong, go back and try again');
-            return;
-        }
-        var content = '';
-        if (/json/.test(format)) {
-            if (typeof req.session.username === 'undefined') {
-                delete resume.jsonresume; // This removes our registry server config vars from the resume.json
-            }
-            delete resume._id; // This removes the document id of mongo
-            content = JSON.stringify(resume, undefined, 4);
-            res.set({
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(content, 'utf8') // TODO - This is a hack to try get the right content length
-                    // http://stackoverflow.com/questions/17922748/what-is-the-correct-method-for-calculating-the-content-length-header-in-node-js
-            });
-
-            res.send(content);
-        } else if (/txt/.test(format)) {
-            content = resumeToText(resume, function(plainText) {
-                res.set({
-                    'Content-Type': 'text/plain',
-                    'Content-Length': plainText.length
-                });
-                res.send(200, plainText);
-            });
-        } else if (/md/.test(format)) {
-            resumeToMarkdown(resume, function(markdown, errs) {
-                res.set({
-                    'Content-Type': 'text/plain',
-                    'Content-Length': markdown.length
-                });
-                res.send(markdown);
-            })
-        } else if (/pdf/.test(format)) {
-            // this code is used for web-based pdf export such as http://registry.jsonresume.org/thomasdavis.pdf - see line ~310 for resume-cli export
-            console.log('Come on PDFCROWD');
-            var theme = req.query.theme || resume.jsonresume.theme || themeName;
-            request
-                .post('http://themes.jsonresume.org/theme/' + theme)
-                .send({
-                    resume: resume
-                })
-                .set('Content-Type', 'application/json')
-                .end(function(err, response) {
-                    client.convertHtml(response.text, pdf.sendHttpResponse(res, null, uid + ".pdf"), {
-                        use_print_media: "true"
-                    });
-
-                });
-
-
-        } else {
-            var theme = req.query.theme || resume.jsonresume.theme || themeName;
-            request
-                .post('http://themes.jsonresume.org/theme/' + theme)
-                .send({
-                    resume: resume
-                })
-                .set('Content-Type', 'application/json')
-                .end(function(err, response) {
-                    if (err) res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
-                    else res.send(response.text);
-                });
-            /*
-            resumeToHTML(resume, {
-
-            }, function(content, errs) {
-                console.log(content, errs);
-                var page = Mustache.render(templateHelper.get('layout'), {
-                    output: content,
-                    resume: resume,
-                    username: uid
-                });
-                res.send(content);
-            });
-            */
-        }
-    });
-};
 
 app.get('/session', controller.session.check);
 app.delete('/session/:id', controller.session.remove);
@@ -365,8 +239,8 @@ app.get('/pdf', function(req, res) {
         });
 });
 
-app.get('/:uid.:format', renderResume);
-app.get('/:uid', renderResume);
+app.get('/:uid.:format', controller.render.resume);
+app.get('/:uid', controller.render.resume);
 
 redis.on("error", function(err) {
     console.log("Error " + err);
@@ -381,7 +255,7 @@ app.post('/user', controller.user);
 app.post('/session', controller.session.login);
 app.put('/account', controller.account.changePassword);
 app.delete('/account', controller.account.remove);
-app.post('/:uid', renderResume);
+app.post('/:uid', controller.render.resume);
 
 process.addListener('uncaughtException', function(err) {
     console.error('Uncaught error in server.js', {
