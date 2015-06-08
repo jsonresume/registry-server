@@ -2,6 +2,8 @@ var request = require('superagent');
 var Mustache = require('mustache');
 var templateHelper = require('../../template-helper');
 var HttpStatus = require('http-status-codes');
+var resumeToText = require('resume-to-text');
+var resumeToMarkdown = require('resume-to-markdown');
 var Pusher = require('pusher');
 var pdf = require('pdfcrowd');
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
@@ -85,7 +87,10 @@ module.exports = function renderResume(req, res, err) {
                 res.send(200, plainText);
             });
         } else if (/md/.test(format)) {
+          console.log(resume);
             resumeToMarkdown(resume, function(markdown, errs) {
+              // TODO fix resumeToMarkdown validation errors
+                console.log(markdown, errs);
                 res.set({
                     'Content-Type': 'text/plain',
                     'Content-Length': markdown.length
