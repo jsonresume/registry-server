@@ -38,11 +38,8 @@ var login = function(req, res) {
                 auth: true
             });
 
-
-
             // redis.quit();
         } else {
-            console.log('ney');
             res.status(HttpStatus.UNAUTHORIZED).send({
                 message: 'authentication error'
             });

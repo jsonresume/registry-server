@@ -11,8 +11,6 @@ var gravatar = require('gravatar');
 var app = express();
 var _ = require('lodash');
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
-var MongoClient = require('mongodb').MongoClient;
-var mongo = require('mongodb');
 var templateHelper = require('./template-helper');
 var pdf = require('pdfcrowd');
 var request = require('superagent');
@@ -108,18 +106,21 @@ if (!process.env.MONGOHQ_URL) {
     console.log("Using default MONGOHQ_URL=" + defaultMongoUrl);
 }
 var mongoUrl = process.env.MONGOHQ_URL || defaultMongoUrl;
-
+var mongo = require('./mongo');
 var db;
-
-MongoClient.connect(mongoUrl, function(err, database) {
-    if (err) throw err;
-
-    db = database;
-
+// Connect to Mongo on start
+mongo.connect(mongoUrl, function(err) {
+    if (err) {
+        console.log('Error connecting to Mongo.', {
+            err: err
+        });
+        return process.exit(1)
+    }
     // start the application only after the database connection is ready
     var port = Number(process.env.PORT || 5000);
     app.listen(port, function() {
         console.log("Listening on " + port);
+        db = mongo.get();
     });
 });
 

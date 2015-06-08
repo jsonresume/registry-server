@@ -2,7 +2,6 @@ var bcrypt = require('bcrypt-nodejs');
 
 var changePassword = function(req, res, next) {
 
-    console.log('hehehehehe', req.body);
     var email = req.body.email;
     var password = req.body.currentPassword;
     var hash = bcrypt.hashSync(req.body.newPassword);

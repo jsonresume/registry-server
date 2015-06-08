@@ -71,7 +71,6 @@ module.exports = function upsert(req, res, next) {
         db.collection('resumes').insert(resume, {
             safe: true
         }, function(err, resume) {
-            console.log(err, resume);
             if (err) {
                 return next(err);
             }
