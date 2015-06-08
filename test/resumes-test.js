@@ -1,11 +1,8 @@
 process.env.MONGOHQ_URL = 'mongodb://localhost:27017/jsonresume-tests';
-process.env.POSTMARK_API_KEY = 'POSTMARK_API_TEST'; // http://blog.postmarkapp.com/post/913165552/handling-email-in-your-test-environment
-var supertest = require('supertest')(require('../server'));
+var request = require('supertest')(require('../server'));
 var bcrypt = require('bcrypt-nodejs');
 var should = require('should');
 var fixtures = require('./fixtures');
-var HttpStatus = require('http-status-codes');
-
 var User = require('../models/user');
 
 
