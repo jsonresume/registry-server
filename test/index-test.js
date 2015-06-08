@@ -353,3 +353,8 @@ describe('/stats', function() {
             });
     });
 });
+
+describe('TODO:', function () {
+  it('fix renderMarkdonw');
+  it('remove redis from request middleware');
+});
