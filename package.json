@@ -7,8 +7,7 @@
   "description": "resumes ======= http://microformats.org/wiki/hresume",
   "main": "index.js",
   "scripts": {
-    "pretest": "mongo jsonresume-tests --eval \"db.dropDatabase(); db.resume.insert({});\" >/dev/null && echo Using blank DB",
-    "test": "mocha --reporter spec --require test/testHelper.js --colors --slow 800 --timeout 5000"
+    "test": "mocha --reporter spec --require test/testHelper.js --colors --timeout 5000"
   },
   "repository": {
     "type": "git",
@@ -52,6 +51,7 @@
     "mocha": "^2.2.4",
     "nock": "^2.0.1",
     "q": "^1.2.0",
+    "should": "^6.0.3",
     "supertest": "^1.0",
     "supertest-as-promised": "^2.0.0"
   }
