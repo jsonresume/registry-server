@@ -138,116 +138,154 @@ describe('User routes: POST', function() {
 describe('/session', function() {
 
     describe('POST', function() {
-        var user = utils.getUserForTest(this);
+        var user = fixtures.user.sessionUser;
+        user.hash = bcrypt.hashSync(user.password);
 
-        before(function() {
-            return apiUtils.createUser(user);
+        before(function(done) {
+            // create a test user
+            User.create(user, done);
         });
 
-        it('POST: should return 200 OK and a session for a valid user', function() {
-            return api.post('/session')
+        // TODO test session from resume-cli
+
+
+        it('POST: should return 200 OK and a session for a valid user', function(done) {
+
+            api.post('/session')
                 .send(user)
-                .expect(HttpStatus.OK)
-                .expect(utils.property('session'));
+                .expect(200, function(err, res) {
+
+                    should.not.exist(err);
+                    res.body.should.have.property('session');
+
+                    res.body.should.have.properties({
+                        auth: true,
+                        email: user.email,
+                        message: 'loggedIn',
+                        username: user.username
+                    });
+
+                    done();
+                });
         });
 
-        it('POST: should return 401 Unauthorized for an incorrect password', function() {
-            return api.post('/session')
+        it('POST: should return 401 Unauthorized for an incorrect password', function(done) {
+            api.post('/session')
                 .send({
                     email: user.email,
                     password: "different"
                 })
-                .expect(HttpStatus.UNAUTHORIZED);
+                .expect(HttpStatus.UNAUTHORIZED, function(err, res) {
+
+                    done()
+
+                });
         });
 
-        it('POST: should return 401 Unauthorized for an unregistered email', function() {
-            return api.post('/session')
+        it('POST: should return 401 Unauthorized for an unregistered email', function(done) {
+            api.post('/session')
                 .send({
                     email: "different",
                     password: user.password
                 })
-                .expect(HttpStatus.UNAUTHORIZED);
-        });
-    });
+                .expect(HttpStatus.UNAUTHORIZED, function(err, res) {
 
-    describe('GET', function() {
-        var agent = supertest.agent(server), // use cookies
-            agentUtils = utils(agent),
-            user = utils.getUserForTest(this);
+                    done()
 
-        it('should return {auth: false} if there is no session', function() {
-            return agent.get('/session')
-                .send()
-                .expect(utils.property({
-                    auth: false
-                }));
-        });
-
-        it('should return {auth: true} if there is a valid session', function() {
-            return agentUtils.createUser(user)
-                .then(function() {
-                    return agent.get('/session')
-                        .send()
-                        .expect(utils.property({
-                            auth: true
-                        }));
-                });
-        });
-    });
-
-    describe('DELETE session ID', function() {
-        var agent = supertest.agent(server), // use cookies
-            agentUtils = utils(agent),
-            user = utils.getUserForTest(this);
-
-        before(function() {
-            return agentUtils.createUser(user);
-        });
-
-        it('should end the session', function() {
-            return agent.post('/session')
-                .send(user)
-                .then(function(res) {
-                    expect(res.body.session).to.exist;
-                    return agent.delete('/session/' + res.body.session)
-                        .send()
-                        .expect(HttpStatus.OK)
-                        .expect(utils.property({
-                            auth: false
-                        }));
-                })
-                .then(function() {
-                    return agent.get('/session')
-                        .send()
-                        .expect(utils.property({
-                            auth: false
-                        }));
                 });
         });
 
     });
 });
 
-describe('/_username_ GET:', function() {
+describe('GET', function() {
+    var agent = supertest.agent(server), // use cookies
+        agentUtils = utils(agent),
+        user = utils.getUserForTest(this);
 
-  var user = fixtures.user.test1;
-  user.hash = bcrypt.hashSync(user.password);
-
-  before(function(done) {
-    // create a test user
-      User.create(user, done);
-  });
-
-    it('should return 404 Not Found for an invalid user', function() {
-        return api.get('/not_a_real_user')
+    it('should return {auth: false} if there is no session', function() {
+        return agent.get('/session')
             .send()
-            .expect(HttpStatus.NOT_FOUND);
+            .expect(utils.property({
+                auth: false
+            }));
     });
 
-    it('should return 404 Not Found for a valid user with no resume', function() {
-        return api.get('/' + user.username)
+    it('should return {auth: true} if there is a valid session', function() {
+        return agentUtils.createUser(user)
+            .then(function() {
+                return agent.get('/session')
+                    .send()
+                    .expect(utils.property({
+                        auth: true
+                    }));
+            });
+    });
+});
+
+describe('DELETE session ID', function() {
+    var agent = supertest.agent(server), // use cookies
+        agentUtils = utils(agent),
+        user = utils.getUserForTest(this);
+
+    before(function() {
+        return agentUtils.createUser(user);
+    });
+
+    it('should end the session', function() {
+        return agent.post('/session')
+            .send(user)
+            .then(function(res) {
+                expect(res.body.session).to.exist;
+                return agent.delete('/session/' + res.body.session)
+                    .send()
+                    .expect(HttpStatus.OK)
+                    .expect(utils.property({
+                        auth: false
+                    }));
+            })
+            .then(function() {
+                return agent.get('/session')
+                    .send()
+                    .expect(utils.property({
+                        auth: false
+                    }));
+            });
+
+
+    });
+});
+
+describe('/_username_ GET:', function() {
+
+    var user = fixtures.user.test3;
+    user.hash = bcrypt.hashSync(user.password);
+
+    before(function(done) {
+        // create a test user
+        User.create(user, done);
+    });
+
+    it('should return 404 Not Found for an invalid user', function(done) {
+        api.get('/not_a_real_user')
             .send()
-            .expect(HttpStatus.NOT_FOUND);
+            .expect(HttpStatus.NOT_FOUND, function(err, res) {
+                should.not.exist(err);
+
+                done();
+            });
+    });
+
+    it('should return 404 Not Found for a valid user with no resume', function(done) {
+        api.get('/' + user.username)
+            .send()
+            .expect(HttpStatus.NOT_FOUND, function(err, res) {
+                should.not.exist(err);
+
+                console.log(err, res.body);
+
+                done();
+            });
     });
 
     it('should return 200 OK for a valid user with a resume', function() {

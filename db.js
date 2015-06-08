@@ -27,3 +27,11 @@ exports.close = function(done) {
         });
     }
 };
+
+exports.drop = function(done) {
+    if (state.db) {
+        state.db.dropDatabase(function(err) {
+            done(err);
+        });
+    }
+};

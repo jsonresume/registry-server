@@ -13,6 +13,7 @@ before(function beforeAllTests(done) {
             });
             return process.exit(1)
         }
-        done();
+
+        mongo.drop(done);
     });
 });

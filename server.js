@@ -158,6 +158,7 @@ var renderHomePage = function(req, res) {
 };
 
 var renderResume = function(req, res) {
+var renderResume = function(req, res, err) {
     realTimeViews++;
 
     redis.get('views', function(err, views) {
@@ -182,6 +183,9 @@ var renderResume = function(req, res) {
     db.collection('resumes').findOne({
         'jsonresume.username': uid,
     }, function(err, resume) {
+      if (err) {
+        return next(err);
+      }
         if (!resume) {
             var page = Mustache.render(templateHelper.get('noresume'), {});
             res.status(HttpStatus.NOT_FOUND).send(page);
