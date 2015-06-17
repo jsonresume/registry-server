@@ -1,4 +1,4 @@
-require('dotenv').load();
+// require('dotenv').load();
 var express = require("express");
 var path = require('path');
 var resumeToHTML = require('resume-to-html');
