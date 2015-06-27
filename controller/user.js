@@ -2,17 +2,16 @@ var fs = require('fs');
 var bcrypt = require('bcrypt-nodejs');
 var Mustache = require('mustache');
 var postmark = require("postmark")(process.env.POSTMARK_API_KEY);
-var HttpStatus = require('http-status-codes');
 var User = require('../models/user');
 
 module.exports = function userController(req, res, next) {
-
+console.log('hit the user controller');
     // console.log(req.body);
     User.findOne({
         'email': req.body.email
     }, function(err, user) {
         if (user) {
-            res.status(HttpStatus.CONFLICT).send({
+            res.status(409).json({  // HTTP Status 409 Conflict
                 error: {
                     field: 'email',
                     message: 'Email is already in use, maybe you forgot your password?'
@@ -24,7 +23,7 @@ module.exports = function userController(req, res, next) {
                 'username': req.body.username
             }, function(err, user) {
                 if (user) {
-                    res.status(HttpStatus.CONFLICT).send({
+                    res.status(409).json({ // HTTP Status 409 Conflict
                         error: {
                             field: 'username',
                             message: 'This username is already taken, please try another one'
@@ -64,7 +63,7 @@ module.exports = function userController(req, res, next) {
                         req.session.username = user[0].username;
                         req.session.email = user[0].email;
                         // console.log('USER CREATED', req.session, req.session.username);
-                        res.status(HttpStatus.CREATED).send({
+                        res.status(201).json({ // HTTP status 201 created
                             // username: user.username,
                             email: user[0].email,
                             username: user[0].username,
