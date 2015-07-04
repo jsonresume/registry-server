@@ -34,6 +34,7 @@
     "http-status-codes": "^1.0.5",
     "lodash": "^3.8.0",
     "mongodb": "~1.4.7",
+    "mongoose": "^4.0.6",
     "mustache": "^2.0.0",
     "pdfcrowd": "^1.1.1",
     "postmark": "~0.2.5",
