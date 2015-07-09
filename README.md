@@ -12,8 +12,8 @@ Requirements: MongoDB, Redis
 1. Clone the repository
 1. `npm install`
 1. `git submodule update --init --recursive --depth 1`
-1. `mongo localhost:27017/jsonresume --eval "db.resumes.insert({})"`
-1. `MONGOHQ_URL=mongodb://localhost:27017/jsonresume node server.js`
+1. `mongo 127.0.0.1:27017/jsonresume --eval "db.resumes.insert({})"`
+1. `MONGOHQ_URL=mongodb://127.0.0.1:27017/jsonresume node server.js`
 
 *Alternatively:*
 
