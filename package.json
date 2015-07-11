@@ -1,24 +1,21 @@
 {
-  "name": "resumes",
+  "name": "registry-server",
   "version": "0.0.0",
   "engines": {
     "node": "0.12.2"
   },
-  "description": "resumes ======= http://microformats.org/wiki/hresume",
-  "main": "index.js",
+  "description": "",
+  "main": "server.js",
   "scripts": {
+  	"start": "node server",
     "test": "mocha --reporter spec --require test/testHelper.js --colors --timeout 5000"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/thomasdavis/resumes.git"
+    "url": "https://github.com/jsonresume/registry-server"
   },
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/thomasdavis/resumes/issues"
-  },
-  "homepage": "https://github.com/thomasdavis/resumes",
+  "license": "MIT",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.12.4",
