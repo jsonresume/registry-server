@@ -292,7 +292,7 @@ describe('/_username_ GET:', function() {
       });
   });
 
-  it.only('should return 200 OK for a valid user with a resume', function() {
+  it('should return 200 OK for a valid user with a resume', function() {
     var themeReq = nock('http://themes.jsonresume.org')
       .post('/theme/' + server.DEFAULT_THEME)
       .reply(200, 'An example resume');
