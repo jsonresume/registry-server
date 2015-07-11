@@ -2,7 +2,7 @@
   "name": "registry-server",
   "version": "0.0.0",
   "engines": {
-    "node": "0.12.2"
+    "node": "0.12.6"
   },
   "description": "",
   "main": "server.js",
@@ -31,6 +31,7 @@
     "http-status-codes": "^1.0.5",
     "lodash": "^3.8.0",
     "mongodb": "~1.4.7",
+    "mongoose": "^4.0.6",
     "mustache": "^2.0.0",
     "pdfcrowd": "^1.1.1",
     "postmark": "~0.2.5",
@@ -40,7 +41,8 @@
     "resume-to-markdown": "0.0.14",
     "resume-to-text": "0.0.15",
     "sha256": "^0.2.0",
-    "superagent": "^1.2"
+    "superagent": "^1.2",
+    "supertest-as-promised": "^2.0.1"
   },
   "devDependencies": {
     "chai": "^2.2.0",
@@ -49,7 +51,6 @@
     "nock": "^2.0.1",
     "q": "^1.2.0",
     "should": "^6.0.3",
-    "supertest": "^1.0",
-    "supertest-as-promised": "^2.0.0"
+    "supertest": "^1.0.1"
   }
 }

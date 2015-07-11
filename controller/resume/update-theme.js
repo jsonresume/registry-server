@@ -10,14 +10,18 @@ module.exports = function updateTheme(req, res, next) {
     var password = req.body.password;
     var email = req.body.email;
     var theme = req.body.theme;
-    console.log(theme, "theme update!!!!!!!!!!!!1111");
-    // console.log(req.body);
+
     User.findOne({
         'email': email
     }, function(err, user) {
+      if (err){
+        return next(err);
+      }
+
+      // Why isn't mongoose returning a user object
+      if (user) user = user.toObject();
 
         redis.get(req.body.session, function(err, valueExists) {
-            console.log(err, valueExists, 'theme redis');
 
             if (!valueExists && user && bcrypt.compareSync(password, user.hash)) {
 
@@ -37,7 +41,6 @@ module.exports = function updateTheme(req, res, next) {
                     sessionError: 'invalid session'
                 });
             } else if (valueExists === 'true') {
-                console.log('redis session success');
                 Resume.update({
                     //query
                     'jsonresume.username': user.username
@@ -52,7 +55,6 @@ module.exports = function updateTheme(req, res, next) {
 
 
             } else {
-                console.log('deleted');
                 res.send({
                     message: 'authentication error'
                 });

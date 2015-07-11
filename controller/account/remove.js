@@ -13,6 +13,8 @@ module.exports = function remove(req, res, next) {
         if (err) {
             return next(err);
         }
+        // Why isn't mongoose returning a user object
+        if (user) user = user.toObject();
 
         if (!user) {
             res.send({
