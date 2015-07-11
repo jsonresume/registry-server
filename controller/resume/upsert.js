@@ -27,8 +27,6 @@ module.exports = function upsert(req, res, next) {
       // Why isn't mongoose returning a user object
     if (user) user = user.toObject();
 
-    console.log('are we getting this far', user);
-
       redis.get(req.body.session, function(err, valueExists) {
         if (err) {
           return next(err);
@@ -49,10 +47,8 @@ module.exports = function upsert(req, res, next) {
           var conditions = {
             'jsonresume.username': user.username
           };
-// console.log('conditions', conditions, resume);
-Resume.find(function(err, resume) {
-          // Resume.update(conditions, resume, function(err, resume) {
-            console.log('resume update pass', err, resume);
+
+          Resume.update(conditions, resume, {upsert: true}, function(err, resume) {
             if (err) {
               return next(err);
             }
