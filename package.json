@@ -44,7 +44,8 @@
     "resume-to-markdown": "0.0.14",
     "resume-to-text": "0.0.15",
     "sha256": "^0.2.0",
-    "superagent": "^1.2"
+    "superagent": "^1.2",
+    "supertest-as-promised": "^2.0.1"
   },
   "devDependencies": {
     "chai": "^2.2.0",
@@ -53,7 +54,6 @@
     "nock": "^2.0.1",
     "q": "^1.2.0",
     "should": "^6.0.3",
-    "supertest": "^1.0",
-    "supertest-as-promised": "^2.0.0"
+    "supertest": "^1.0.1"
   }
 }
