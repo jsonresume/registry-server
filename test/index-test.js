@@ -292,11 +292,11 @@ describe('/_username_ GET:', function() {
       });
   });
 
-  it('should return 200 OK for a valid user with a resume', function() {
+  it('should return 200 OK for a valid user with a resume', function(done) {
     var themeReq = nock('http://themes.jsonresume.org')
       .post('/theme/' + server.DEFAULT_THEME)
       .reply(200, 'An example resume');
-    return api.post('/resume')
+    api.post('/resume')
       .send({
         email: user.email,
         password: user.password,
@@ -304,14 +304,18 @@ describe('/_username_ GET:', function() {
           test: "Put a real resume here?"
         }
       })
-      .then(function() {
-        return api.get('/' + user.username)
+      .expect(200, function(err, res) {
+        console.log(err, res.body, 'one');
+
+
+        api.get('/' + user.username)
           .send()
-          .expect(HttpStatus.OK)
-          .expect('An example resume');
-      })
-      .then(function() {
-        expect(themeReq.isDone()).to.be.true;
+          .expect(200, function(err, res) {
+
+            should.not.exist(err);
+            done();
+          });
+
       });
   });
 

@@ -56,6 +56,9 @@ console.log(uid);
       res.status(HttpStatus.NOT_FOUND).send(page);
       return;
     }
+
+    resume = resume.toObject();
+
     if (typeof resume.jsonresume.passphrase === 'string' && typeof req.body.passphrase === 'undefined') {
 
       var page = Mustache.render(templateHelper.get('password'), {});

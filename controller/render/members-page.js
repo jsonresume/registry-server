@@ -9,6 +9,8 @@ module.exports = function renderMembersPage(req, res, next) {
             return next(err);
         }
 
+        docs = docs.toObject();
+
         var usernameArray = [];
 
         docs.forEach(function(doc) {
