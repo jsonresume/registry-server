@@ -1,5 +1,6 @@
 // require('dotenv').load();
 require('./lib/mongoose-connection');
+var redis = require('./lib/redis-connection');
 var express = require("express");
 var path = require('path');
 var resumeToHTML = require('resume-to-html');
@@ -22,17 +23,7 @@ var controller = require('./controller');
 var points = [];
 var DEFAULT_THEME = 'modern';
 
-if (process.env.REDISTOGO_URL) {
-    var rtg = require("url").parse(process.env.REDISTOGO_URL);
-    var redis = require("redis").createClient(rtg.port, rtg.hostname);
-    redis.auth(rtg.auth.split(":")[1]);
-} else {
-    var redis = require("redis").createClient();
-}
 var RedisStore = require('connect-redis')(expressSession);
-redis.on("error", function(err) {
-    console.log("error event - " + redis.host + ":" + redis.port + " - " + err);
-});
 
 var allowCrossDomain = function(req, res, next) {
     // Added other domains you want the server to give access to
@@ -121,14 +112,6 @@ app.get('/pdf', function(req, res) {
 
 app.get('/:uid.:format', controller.render.resume);
 app.get('/:uid', controller.render.resume);
-
-redis.on("error", function(err) {
-    console.log("Error " + err);
-    res.send({
-        sessionError: err
-    });
-});
-
 app.post('/resume', controller.resume.upsert);
 app.put('/resume', controller.resume['update-theme']);
 app.post('/user', controller.user);
