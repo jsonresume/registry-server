@@ -28,6 +28,7 @@ describe('/', function() {
 });
 
 describe('User routes: POST', function() {
+    this.timeout(10000);
     var user = utils.getUserForTest(this);
 
     it('`/user` should return 201 Created', function(done) {
