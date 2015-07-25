@@ -8,8 +8,6 @@ module.exports = function renderMembersPage(req, res, next) {
         if (err) {
             return next(err);
         }
-        
-        if (docs) docs = docs.toObject();
 
         var usernameArray = [];
 

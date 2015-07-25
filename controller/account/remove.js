@@ -14,9 +14,6 @@ module.exports = function remove(req, res, next) {
             return next(err);
         }
 
-        // Why isn't mongoose returning the user as an object?
-        if (user) user = user.toObject();
-
         if (!user) {
             res.send({
                 message: '\nemail not found'

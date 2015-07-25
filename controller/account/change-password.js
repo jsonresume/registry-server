@@ -13,8 +13,6 @@ module.exports = function changePassword(req, res, next) {
         if (err) {
             return next(err);
         }
-        // Why isn't mongoose returning the user as an object?
-        if (user) user = user.toObject();
 
         if (!user) {
             return res.status(401).json({ //HTTP Error 401 Unauthorized

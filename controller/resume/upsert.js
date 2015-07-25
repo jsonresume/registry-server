@@ -24,8 +24,6 @@ module.exports = function upsert(req, res, next) {
             return next(err);
           }
 
-          if (user) user = user.toObject();
-
             redis.get(req.body.session, function(err, valueExists) {
                 var respondWithResume = function() {
 
@@ -76,7 +74,7 @@ module.exports = function upsert(req, res, next) {
             if (err) {
                 return next(err);
             }
-            
+
             res.send({
                 url: 'http://registry.jsonresume.org/' + guestUsername
             });
