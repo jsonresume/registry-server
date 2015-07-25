@@ -3,19 +3,13 @@ require('./lib/mongoose-connection');
 var redis = require('./lib/redis-connection');
 var express = require("express");
 var path = require('path');
-var resumeToHTML = require('resume-to-html');
 var bodyParser = require('body-parser');
-var bcrypt = require('bcrypt-nodejs');
-var gravatar = require('gravatar');
 var pdf = require('pdfcrowd');
 var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 var app = express();
-var _ = require('lodash');
 var request = require('superagent');
-var sha256 = require('sha256');
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
-var HttpStatus = require('http-status-codes');
 var compress = require('compression');
 var minify = require('express-minify');
 var controller = require('./controller');
@@ -25,26 +19,11 @@ var DEFAULT_THEME = 'modern';
 
 var RedisStore = require('connect-redis')(expressSession);
 
-var allowCrossDomain = function(req, res, next) {
-    // Added other domains you want the server to give access to
-    // WARNING - Be careful with what origins you give access to
-    var allowedHost = [
-        'http://backbonetutorials.com',
-        'http://localhost'
-    ];
-
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', req.headers.origin)
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-    next();
-};
-
 app.use(compress());
 app.use(minify({
     cache: __dirname + '/cache'
 }));
-app.use(allowCrossDomain);
+app.use(require('./middleware/allow-cross-domain'));
 app.use(cookieParser());
 app.use(expressSession({
     store: new RedisStore({
