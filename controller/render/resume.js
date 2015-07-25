@@ -49,6 +49,9 @@ module.exports = function renderResume(req, res, err) {
         if (err) {
             return next(err);
         }
+
+        if (resume) resume = resume.toObject();
+
         if (!resume) {
             var page = Mustache.render(templateHelper.get('noresume'), {});
             res.status(HttpStatus.NOT_FOUND).send(page);

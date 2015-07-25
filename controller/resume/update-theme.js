@@ -16,6 +16,8 @@ module.exports = function updateTheme(req, res, next) {
         'email': email
     }, function(err, user) {
 
+      if (user) user = user.toObject();
+
         redis.get(req.body.session, function(err, valueExists) {
             console.log(err, valueExists, 'theme redis');
 

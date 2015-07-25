@@ -10,6 +10,9 @@ console.log('hit the user controller');
     User.findOne({
         'email': req.body.email
     }, function(err, user) {
+
+        if (user) user = user.toObject();
+
         if (user) {
             res.status(409).json({  // HTTP Status 409 Conflict
                 error: {
@@ -22,6 +25,9 @@ console.log('hit the user controller');
             User.findOne({
                 'username': req.body.username
             }, function(err, user) {
+
+                if (user) user = user.toObject();
+
                 if (user) {
                     res.status(409).json({ // HTTP Status 409 Conflict
                         error: {
@@ -60,13 +66,15 @@ console.log('hit the user controller');
                             return next(err);
                         }
 
-                        req.session.username = user[0].username;
-                        req.session.email = user[0].email;
+                        if (user) user = user.toObject();
+
+                        req.session.username = user.username;
+                        req.session.email = user.email;
                         // console.log('USER CREATED', req.session, req.session.username);
                         res.status(201).json({ // HTTP status 201 created
                             // username: user.username,
-                            email: user[0].email,
-                            username: user[0].username,
+                            email: user.email,
+                            username: user.username,
                             message: "success"
                         });
                     });

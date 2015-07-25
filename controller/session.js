@@ -17,6 +17,8 @@ var login = function(req, res) {
         'email': email
     }, function(err, user) {
 
+        if (user) user = user.toObject();
+
         if (user && bcrypt.compareSync(password, user.hash)) {
             // console.log(email, bcrypt.hashSync(email));
             // console.log(email, bcrypt.hashSync(email));
