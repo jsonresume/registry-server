@@ -43,7 +43,7 @@ module.exports = function upsert(req, res, next) {
                         'jsonresume.username': user.username
                     };
 
-                    Resume.update(conditions, resume, function(err, resume) {
+                    Resume.update(conditions, resume, { upsert: true }, function(err, resume) {
                         if (err) {
                             return next(err);
                         }
