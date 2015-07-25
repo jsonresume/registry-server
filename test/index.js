@@ -1,19 +1,36 @@
+var mongoose = require('mongoose');
 process.env.MONGOHQ_URL = 'mongodb://localhost:27017/jsonresume-tests';
-var mongoUrl = process.env.MONGOHQ_URL;
-var mongo = require('../db');
+// register model schemas
+require('../models/user');
+require('../models/resume');
+
+
+require('../lib/mongoose-connection');
+
+function dropMongoDatabase(callback) {
+	// Drop the database once connected (or immediately if connected).
+	var CONNECTION_STATES = mongoose.Connection.STATES;
+	var readyState = mongoose.connection.readyState;
+	var connected = false;
+
+	var drop = function() {
+		mongoose.connection.db.dropDatabase(function(err) {
+			if (err) {
+				throw err;
+			}
+			callback(err);
+		});
+	};
+
+	if (CONNECTION_STATES[readyState] === 'connected') {
+		drop();
+	} else {
+		mongoose.connection.once('connected', drop);
+	}
+}
 
 // This bit of code runs before ANY tests start.
 before(function beforeAllTests(done) {
 
-    // Connect to db before running tests
-    mongo.connect(mongoUrl, function(err) {
-        if (err) {
-            console.log('Error connecting to Mongo.', {
-                err: err
-            });
-            return process.exit(1)
-        }
-
-        mongo.drop(done);
-    });
+		dropMongoDatabase(done);
 });

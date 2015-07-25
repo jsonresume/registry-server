@@ -1,4 +1,5 @@
 // require('dotenv').load();
+require('./lib/mongoose-connection');
 var express = require("express");
 var path = require('path');
 var resumeToHTML = require('resume-to-html');
@@ -86,27 +87,6 @@ function S4() {
         .substring(1);
 };
 
-var defaultMongoUrl = "mongodb://localhost:27017/jsonresume";
-if (!process.env.MONGOHQ_URL) {
-    console.log("Using default MONGOHQ_URL=" + defaultMongoUrl);
-}
-var mongoUrl = process.env.MONGOHQ_URL || defaultMongoUrl;
-var mongo = require('./db');
-// Connect to Mongo on start
-mongo.connect(mongoUrl, function(err) {
-    if (err) {
-        console.log('Error connecting to Mongo.', {
-            err: err
-        });
-        return process.exit(1)
-    }
-    // start the application only after the database connection is ready
-    var port = Number(process.env.PORT || 5000);
-    app.listen(port, function() {
-        console.log("Listening on " + port);
-    });
-});
-
 app.all('/*', function(req, res, next) {
     //res.header("Access-Control-Allow-Origin", "*");
     //res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -164,6 +144,12 @@ process.addListener('uncaughtException', function(err) {
     });
     // TODO some sort of notification
     // process.exit(1);
+});
+
+var port = Number(process.env.PORT || 5000);
+
+app.listen(port, function() {
+    console.log("Listening on " + port);
 });
 
 module.exports = app;
