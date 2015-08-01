@@ -7,8 +7,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server",
-    "test": "mocha --reporter spec --require test/testHelper.js --colors --timeout 5000"
+    "test": "NODE_ENV=test node node_modules/mocha/bin/mocha test"
   },
   "repository": {
     "type": "git",
