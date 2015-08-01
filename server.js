@@ -68,7 +68,7 @@ app.all('/*', function(req, res, next) {
     next();
 });
 
-app.get('/session', controller.session.check);
+app.get('/session', controller.checkSession);
 app.delete('/session/:id', controller.session.remove);
 app.get('/members', controller.render['members-page']);
 app.get('/stats', controller.stats);
@@ -93,10 +93,10 @@ app.get('/:uid.:format', controller.render.resume);
 app.get('/:uid', controller.render.resume);
 app.post('/resume', controller.resume.upsert);
 app.put('/resume', controller.resume['update-theme']);
-app.post('/user', controller.user);
-app.post('/session', controller.session.login);
-app.put('/account', controller.account.changePassword);
-app.delete('/account', controller.account.remove);
+app.post('/user', controller.createUser);
+app.post('/session', controller.createSession);
+app.put('/account', controller.changePassword);
+app.delete('/account', controller.deleteUser);
 app.post('/:uid', controller.render.resume);
 
 process.addListener('uncaughtException', function(err) {

@@ -1,8 +1,8 @@
 var bcrypt = require('bcrypt-nodejs');
-var User = require('../../models/user');
-var Resume = require('../../models/resume');
+var User = require('../models/user');
+var Resume = require('../models/resume');
 
-module.exports = function remove(req, res, next) {
+module.exports = function deleteUser(req, res, next) {
 
     var password = req.body.password;
     var email = req.body.email;
@@ -35,6 +35,8 @@ module.exports = function remove(req, res, next) {
                     if (err) {
                         res.send(err);
                     } else {
+                      // something like this is probably a better response
+                      // res.sendStatus(204); // Status: 204 No Content
                         res.send({
                             message: '\nYour account has been successfully deleted.'
                         });

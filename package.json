@@ -7,7 +7,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "NODE_ENV=test node node_modules/mocha/bin/mocha test"
+    "test": "NODE_ENV=test node node_modules/mocha/bin/mocha test/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "postmark": "~0.2.5",
     "pusher": "^1.0.0",
     "redis": "^0.12",
+    "require-directory": "^2.1.1",
     "resume-to-html": "0.0.21",
     "resume-to-markdown": "0.0.14",
     "resume-to-text": "0.0.15",

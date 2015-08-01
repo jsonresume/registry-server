@@ -37,18 +37,18 @@ console.log('hit the user controller');
                         username: req.body.username
                     });
                     var hash = bcrypt.hashSync(req.body.password);
-                    postmark.send({
-                        "From": "admin@jsonresume.org",
-                        "To": req.body.email,
-                        "Subject": "Json Resume - Community driven HR",
-                        "TextBody": emailCopy
-                    }, function(error, success) {
-                        if (error) {
-                            console.error("Unable to send via postmark: " + error.message);
-                            return;
-                        }
-                        console.info("Sent to postmark for delivery")
-                    });
+                    // postmark.send({
+                    //     "From": "admin@jsonresume.org",
+                    //     "To": req.body.email,
+                    //     "Subject": "Json Resume - Community driven HR",
+                    //     "TextBody": emailCopy
+                    // }, function(error, success) {
+                    //     if (error) {
+                    //         console.error("Unable to send via postmark: " + error.message);
+                    //         return;
+                    //     }
+                    //     console.info("Sent to postmark for delivery")
+                    // });
 
 
                     var newUser = {
@@ -57,7 +57,11 @@ console.log('hit the user controller');
                         hash: hash
                     };
 
+
+
                     User.create(newUser, function(err, user) {
+
+                      console.log(err, user, 'create error');
                         if (err) {
                             return next(err);
                         }
