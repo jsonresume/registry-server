@@ -4,10 +4,7 @@ var redis = require('./lib/redis-connection');
 var express = require("express");
 var path = require('path');
 var bodyParser = require('body-parser');
-var pdf = require('pdfcrowd');
-var client = new pdf.Pdfcrowd('thomasdavis', '7d2352eade77858f102032829a2ac64e');
 var app = express();
-var request = require('superagent');
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
 var compress = require('compression');
@@ -72,23 +69,7 @@ app.get('/session', controller.checkSession);
 app.delete('/session/:id', controller.deleteSession);
 app.get('/members', controller.renderMembersPage);
 app.get('/stats', controller.showStats);
-// export pdf route
-// this code is used by resume-cli for pdf export, see line ~188 for web-based export
-app.get('/pdf', function(req, res) {
-    console.log(req.body.resume, req.body.theme);
-    request
-        .post('http://themes.jsonresume.org/theme/' + req.body.theme)
-        .send({
-            resume: req.body.resume
-        })
-        .set('Content-Type', 'application/json')
-        .end(function(err, response) {
-            client.convertHtml(response.text, pdf.sendHttpResponse(res), {
-                use_print_media: "true"
-            });
-        });
-});
-
+app.get('/pdf', controller.exportPdf);
 app.get('/:uid.:format', controller.renderResume);
 app.get('/:uid', controller.renderResume);
 app.post('/resume', controller.upsertResume);
