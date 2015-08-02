@@ -97,7 +97,7 @@ app.post('/user', controller.createUser);
 app.post('/session', controller.createSession);
 app.put('/account', controller.changePassword);
 app.delete('/account', controller.deleteUser);
-app.post('/:uid', controller.render.resume);
+app.post('/:uid', controller.renderResume);
 
 process.addListener('uncaughtException', function(err) {
     console.error('Uncaught error in server.js', {

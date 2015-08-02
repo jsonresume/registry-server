@@ -7,7 +7,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "NODE_ENV=test node node_modules/mocha/bin/mocha test/**/*.js --timeout 10000"
+    "test": "NODE_ENV=test node node_modules/mocha/bin/mocha test/**/*.js"
   },
   "repository": {
     "type": "git",
