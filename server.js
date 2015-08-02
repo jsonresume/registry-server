@@ -71,7 +71,7 @@ app.all('/*', function(req, res, next) {
 app.get('/session', controller.checkSession);
 app.delete('/session/:id', controller.deleteSession);
 app.get('/members', controller.render['members-page']);
-app.get('/stats', controller.stats);
+app.get('/stats', controller.showStats);
 // export pdf route
 // this code is used by resume-cli for pdf export, see line ~188 for web-based export
 app.get('/pdf', function(req, res) {
