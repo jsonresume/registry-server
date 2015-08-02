@@ -1,7 +1,7 @@
 var bcrypt = require('bcrypt-nodejs');
 var HttpStatus = require('http-status-codes');
-var User = require('../models/user');
-var Resume = require('../models/resume');
+var User = require('../../models/user');
+var Resume = require('../../models/resume');
 
 function S4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -9,7 +9,7 @@ function S4() {
         .substring(1);
 };
 
-module.exports = function upsertResume(req, res, next) {
+module.exports = function upsert(req, res, next) {
 
     var redis = req.redis;
 

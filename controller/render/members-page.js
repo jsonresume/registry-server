@@ -1,6 +1,6 @@
 var Mustache = require('mustache');
-var templateHelper = require('../template-helper');
-var User = require('../models/user');
+var templateHelper = require('../../template-helper');
+var User = require('../../models/user');
 
 module.exports = function renderMembersPage(req, res, next) {
 
