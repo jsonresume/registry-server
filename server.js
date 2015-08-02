@@ -70,7 +70,7 @@ app.all('/*', function(req, res, next) {
 
 app.get('/session', controller.checkSession);
 app.delete('/session/:id', controller.deleteSession);
-app.get('/members', controller.render['members-page']);
+app.get('/members', controller.renderMembersPage);
 app.get('/stats', controller.showStats);
 // export pdf route
 // this code is used by resume-cli for pdf export, see line ~188 for web-based export
@@ -91,8 +91,8 @@ app.get('/pdf', function(req, res) {
 
 app.get('/:uid.:format', controller.renderResume);
 app.get('/:uid', controller.renderResume);
-app.post('/resume', controller.resume.upsert);
-app.put('/resume', controller.resume['update-theme']);
+app.post('/resume', controller.upsertResume);
+app.put('/resume', controller.updateTheme);
 app.post('/user', controller.createUser);
 app.post('/session', controller.createSession);
 app.put('/account', controller.changePassword);
@@ -101,8 +101,9 @@ app.post('/:uid', controller.renderResume);
 
 process.addListener('uncaughtException', function(err) {
     console.error('Uncaught error in server.js', {
-        err: err,
-        stack: err.stack
+        err: err
+        // hide stack in production
+        //, stack: err.stack
     });
     // TODO some sort of notification
     // process.exit(1);

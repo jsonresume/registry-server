@@ -1,6 +1,6 @@
 var bcrypt = require('bcrypt-nodejs');
-var User = require('../../models/user');
-var Resume = require('../../models/resume');
+var User = require('../models/user');
+var Resume = require('../models/resume');
 
 module.exports = function updateTheme(req, res, next) {
 
@@ -49,7 +49,6 @@ module.exports = function updateTheme(req, res, next) {
                         url: 'http://registry.jsonresume.org/' + user.username
                     });
                 });
-
 
             } else {
                 console.log('deleted');
