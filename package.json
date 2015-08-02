@@ -44,13 +44,13 @@
     "superagent": "^1.2"
   },
   "devDependencies": {
-    "chai": "^2.2.0",
-    "chai-properties": "^1.2.0",
-    "mocha": "^2.2.4",
-    "nock": "^2.0.1",
-    "q": "^1.2.0",
-    "should": "^6.0.3",
+    "chai": "^3.2.0",
+    "chai-properties": "^1.2.1",
+    "mocha": "^2.2.5",
+    "nock": "^2.9.1",
+    "q": "^1.4.1",
+    "should": "^7.0.2",
     "supertest": "^1.0",
-    "supertest-as-promised": "^2.0.0"
+    "supertest-as-promised": "^2.0.2"
   }
 }
