@@ -1,6 +1,6 @@
 var request = require('superagent');
 var Mustache = require('mustache');
-var templateHelper = require('../../template-helper');
+var templateHelper = require('../template-helper');
 var HttpStatus = require('http-status-codes');
 var resumeToText = require('resume-to-text');
 var resumeToMarkdown = require('resume-to-markdown');
@@ -17,7 +17,7 @@ if (process.env.PUSHER_KEY) {
 };
 var realTimeViews = 0;
 var DEFAULT_THEME = 'modern';
-var Resume = require('../../models/resume');
+var Resume = require('../models/resume');
 
 module.exports = function renderResume(req, res, err) {
     realTimeViews++;
@@ -31,7 +31,6 @@ module.exports = function renderResume(req, res, err) {
             redis.set('views', views * 1 + 1, redis.print);
 
         }
-        // console.log(views);
 
         if (pusher !== null) {
             pusher.trigger('test_channel', 'my_event', {
@@ -43,8 +42,9 @@ module.exports = function renderResume(req, res, err) {
     var themeName = req.query.theme || DEFAULT_THEME;
     var uid = req.params.uid;
     var format = req.params.format || req.headers.accept || 'html';
+
     Resume.findOne({
-        'jsonresume.username': uid,
+        'jsonresume.username': uid
     }, function(err, resume) {
         if (err) {
             return next(err);

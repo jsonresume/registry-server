@@ -57,7 +57,11 @@ console.log('hit the user controller');
                         hash: hash
                     };
 
+
+
                     User.create(newUser, function(err, user) {
+
+                      console.log(err, user, 'create error');
                         if (err) {
                             return next(err);
                         }

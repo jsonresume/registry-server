@@ -1,3 +1,9 @@
+var chai = require('chai');
+global.expect = chai.expect;
+
+chai.use(require('chai-properties'));
+
+
 var mongoose = require('mongoose');
 process.env.MONGOHQ_URL = 'mongodb://localhost:27017/jsonresume-tests';
 // register model schemas

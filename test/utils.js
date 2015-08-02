@@ -1,3 +1,7 @@
+var chai = require('chai');
+global.expect = chai.expect;
+
+chai.use(require('chai-properties'));
 
 var cleanUsername = function(s) {
     // remove spaces and slashes to make nice URLs
@@ -50,4 +54,3 @@ utils.property = function(obj) {
 };
 
 module.exports = utils;
-
