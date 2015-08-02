@@ -5,6 +5,7 @@ var bcrypt = require('bcrypt-nodejs');
 var should = require('should');
 var fixtures = require('../fixtures');
 var supertest = require("supertest-as-promised")(Q.Promise);
+var xrequest = require('supertest');
 var HttpStatus = require('http-status-codes');
 var nock = require('nock');
 var utils = require('../utils');
@@ -13,63 +14,22 @@ var api = supertest(server),
   apiUtils = utils(api);
 
 var User = require('../../models/user');
-
-nock.enableNetConnect('127.0.0.1'); // HTTP requests outside of localhost are blocked
-
-describe('/', function() {
-  it('should return 200 OK', function(done) {
-    api.get('/')
-      .expect(200, function(err, res) {
-        should.not.exist(err);
-
-        done();
-      });
-  });
-});
+var Resume = require('../../models/resume');
 
 
 
-describe('DELETE session ID', function() {
-  var agent = supertest.agent(server), // use cookies
-    agentUtils = utils(agent),
-    user = utils.getUserForTest(this);
-
-  before(function() {
-    return agentUtils.createUser(user);
-  });
-
-  it('should end the session', function() {
-    return agent.post('/session')
-      .send(user)
-      .then(function(res) {
-        expect(res.body.session).to.exist;
-        return agent.delete('/session/' + res.body.session)
-          .send()
-          .expect(HttpStatus.OK)
-          .expect(utils.property({
-            auth: false
-          }));
-      })
-      .then(function() {
-        return agent.get('/session')
-          .send()
-          .expect(utils.property({
-            auth: false
-          }));
-      });
-
-
-  });
-});
-
-describe('/_username_ GET:', function() {
+describe('renderResume: GET /:username ', function() {
 
   var user = fixtures.user.test3;
   user.hash = bcrypt.hashSync(user.password);
 
   before(function(done) {
     // create a test user
-    User.create(user, done);
+    User.remove({}, function(err) {
+      Resume.remove({}, function(err) {
+        User.create(user, done);
+      });
+    });
   });
 
   it('should return 404 Not Found for an invalid user', function(done) {
@@ -83,12 +43,11 @@ describe('/_username_ GET:', function() {
   });
 
   it('should return 404 Not Found for a valid user with no resume', function(done) {
+
     api.get('/' + user.username)
       .send()
       .expect(HttpStatus.NOT_FOUND, function(err, res) {
         should.not.exist(err);
-
-        console.log(err, res.body);
 
         done();
       });

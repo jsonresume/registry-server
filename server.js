@@ -69,7 +69,7 @@ app.all('/*', function(req, res, next) {
 });
 
 app.get('/session', controller.checkSession);
-app.delete('/session/:id', controller.session.remove);
+app.delete('/session/:id', controller.deleteSession);
 app.get('/members', controller.render['members-page']);
 app.get('/stats', controller.stats);
 // export pdf route
@@ -89,8 +89,8 @@ app.get('/pdf', function(req, res) {
         });
 });
 
-app.get('/:uid.:format', controller.render.resume);
-app.get('/:uid', controller.render.resume);
+app.get('/:uid.:format', controller.renderResume);
+app.get('/:uid', controller.renderResume);
 app.post('/resume', controller.resume.upsert);
 app.put('/resume', controller.resume['update-theme']);
 app.post('/user', controller.createUser);

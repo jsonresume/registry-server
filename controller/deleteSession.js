@@ -2,7 +2,7 @@ var HttpStatus = require('http-status-codes');
 var bcrypt = require('bcrypt-nodejs');
 var User = require('../models/user');
 
-var remove = function(req, res, next) {
+module.exports = function deleteSession(req, res, next) {
     // Logout by clearing the session
     req.session.regenerate(function(err) {
         // Generate a new csrf token so the user can login again
@@ -15,9 +15,4 @@ var remove = function(req, res, next) {
         });
         //});
     });
-};
-
-
-module.exports = {
-    remove: remove
 };
