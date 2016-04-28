@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+	<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<title>Edit</title>
+
+	<link rel="shortcut icon" href="favicon.png">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="json-builder/css/json-builder.css">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/style.css">
+
+	</head>
+	<body class="preload">
+
+	<aside id="sidebar">
+		<div id="panel">
+			<div class="inner">
+			<div class="actions">
+				<button id="export" class="button" data-placement="bottom" title="Download JSON"></button>
+				<button id="reset" class="button hidden">Reset</button>
+				<button id="clear" class="button">Clear</button>
+			</div>
+			<div class="theme">
+				Current theme:
+				<strong id="theme-current"></strong>
+			</div>
+			<div class="tabs">
+				<a href="#editor" data-toggle="tab" class="active">Editor</a>
+				<a href="#themes" data-toggle="tab">Themes</a>
+			</div>
+			<div class="view">
+				<a href="" class="active" data-type="html">HTML</a>
+				<a href="" data-type="json">JSON</a>
+			</div>
+		</div>
+		</div>
+		<div id="editor" class="tab-pane active">
+			<div class="tse-scrollable">
+				<div id="form" class="tse-content"></div>
+			</div>
+		</div>
+		<div id="themes" class="tab-pane">
+			<div class="tse-scrollable">
+				<div id="themes-list" class="tse-content">
+					<a href="" class="item">
+						<span class="version"></span>
+						<span class="name"></span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</aside>
+	<div id="preview">
+		<div id="overlay"></div>
+		<textarea id="json-editor"></textarea>
+		<div id="iframe-wrapper">
+			<iframe id="iframe"></iframe>
+		</div>
+	</div>
+
+	<div class="modal" id="register-modal" tabindex="-1">
+		<div class="modal-dialog" style="width: 400px;">
+			<form class="register-form">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Register an Account</h4>
+					</div>
+					<div class="modal-body">
+						<input type="text" class="form-control register-email" placeholder="Email" required autofocus><br />
+						<input type="text" class="form-control register-username" placeholder="Username" required><br />
+						<input type="password" class="form-control register-password" placeholder="Password" required>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="button">Register</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="modal" id="login-modal" tabindex="-1">
+		<div class="modal-dialog" style="width: 400px;">
+			<form class="login-form">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Login to your Account</h4>
+					</div>
+					<div class="modal-body">
+						<input type="text" class="form-control login-email" value="thomasalwyndavis@gmail.com" placeholder="Email" required autofocus><br />
+						<input type="password" class="form-control login-password" placeholder="Password" value="" required>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="button">Login</button>
+					</div>
+			</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal" id="publish-modal" tabindex="-1">
+		<div class="modal-dialog" style="width: 400px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Publish</h4>
+				</div>
+				<div class="modal-body">
+					<p>Publishing...</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="js/libs.min.js"></script>
+	<script src="json-builder/src/builder.js"></script>
+	<script src="json-builder/src/builder.templates.js"></script>
+	<script src="js/main.js"></script>
+
+	</body>
+</html>
