@@ -137,7 +137,7 @@ $(function() {
             type: "POST",
             contentType: "application/json",
             data: data,
-            url: "http://themes.jsonresume.org/theme/" + theme,
+            url: "https://themes.jsonresume.org/theme/" + theme,
             success: function(html) {
                 $("#iframe").contents().find("body").html(html);
 								preview.removeClass("loading");
@@ -148,7 +148,7 @@ $(function() {
     var themes = $(".dropdown-menu");
     (function populateThemeMenu() {
         themes.empty();
-        $.getJSON("http://themes.jsonresume.org/themes.json", function(json) {
+        $.getJSON("https://themes.jsonresume.org/themes.json", function(json) {
             if (!json.themes) {
                 return;
             }
@@ -248,7 +248,7 @@ $(function() {
 		if (!options.xhrFields) {
 		  options.xhrFields = {withCredentials:true};
 		}
-        options.url = 'http://registry.jsonresume.org' + model.url();
+        options.url = 'https://registry.jsonresume.org' + model.url();
 		return proxiedSync(method, model, options);
 	};
     /* Session */
@@ -312,7 +312,7 @@ $(function() {
 
         if (session.get('auth')) {
             $('#logout-button').fadeIn(200);
-            $.ajax('http://registry.jsonresume.org/' + session.get('username') + '.json', {
+            $.ajax('https://registry.jsonresume.org/' + session.get('username') + '.json', {
 
                 xhrFields: {
                    withCredentials: true
@@ -362,7 +362,7 @@ $(function() {
             alert($(".dropdown").data("selected"));
     		resumeM.save({resume:resume, theme: $(".dropdown").data("selected")}, {
     			success: function () {
-					$('#publish-modal .modal-body').html('<p>Beautiful! Access your published resume at<br /><a style="color: #007eff" href="http://registry.jsonresume.org/'+Session.get('username')+'" target="_blank">http://registry.jsonresume.org/'+Session.get('username')+'</a></p>');
+					$('#publish-modal .modal-body').html('<p>Beautiful! Access your published resume at<br /><a style="color: #007eff" href="https://registry.jsonresume.org/'+Session.get('username')+'" target="_blank">https://registry.jsonresume.org/'+Session.get('username')+'</a></p>');
 
     				console.log('whoa', arguments);
     			}
@@ -392,7 +392,7 @@ $(function() {
         }, function() {
             console.log('a');
             jq('#login-modal').modal('hide');
-            $.ajax('http://registry.jsonresume.org/' + Session.get('username') + '.json', {
+            $.ajax('https://registry.jsonresume.org/' + Session.get('username') + '.json', {
                 success: function(res) {
                     var resumeObj = res;
                     resetBuilder(resumeObj);
