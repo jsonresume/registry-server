@@ -1,5 +1,5 @@
 // download.js
-// http://danml.com/js/download.js
+// https://danml.com/js/download.js
 
 function download(strData, strFileName, strMimeType) {
 	var D = document,

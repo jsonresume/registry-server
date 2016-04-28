@@ -77,7 +77,7 @@ app.get('/stats', controller.showStats);
 app.get('/pdf', function(req, res) {
     console.log(req.body.resume, req.body.theme);
     request
-        .post('http://themes.jsonresume.org/theme/' + req.body.theme)
+        .post('https://themes.jsonresume.org/theme/' + req.body.theme)
         .send({
             resume: req.body.resume
         })

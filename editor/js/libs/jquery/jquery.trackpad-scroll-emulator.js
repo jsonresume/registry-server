@@ -250,7 +250,7 @@
      * Calculate scrollbar width
      *
      * Original function by Jonathan Sharp:
-     * http://jdsharp.us/jQuery/minute/calculate-scrollbar-width.php
+     * https://jdsharp.us/jQuery/minute/calculate-scrollbar-width.php
      * Updated to work in Chrome v25.
      */
     function scrollbarWidth() {

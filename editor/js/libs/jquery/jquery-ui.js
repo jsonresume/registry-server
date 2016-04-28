@@ -1,5 +1,5 @@
 /*! jQuery UI - v1.11.1 - 2014-09-02
-* http://jqueryui.com
+* https://jqueryui.com
 * Includes: core.js, widget.js, mouse.js, draggable.js, sortable.js
 * Copyright 2014 jQuery Foundation and other contributors; Licensed MIT */
 
@@ -16,13 +16,13 @@
 }(function( $ ) {
 /*!
  * jQuery UI Core 1.11.1
- * http://jqueryui.com
+ * https://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
- * http://jquery.org/license
+ * https://jquery.org/license
  *
- * http://api.jqueryui.com/category/ui-core/
+ * https://api.jqueryui.com/category/ui-core/
  */
 
 
@@ -198,7 +198,7 @@ if ( !$.fn.addBack ) {
 	};
 }
 
-// support: jQuery 1.6.1, 1.6.2 (http://bugs.jquery.com/ticket/9413)
+// support: jQuery 1.6.1, 1.6.2 (https://bugs.jquery.com/ticket/9413)
 if ( $( "<a>" ).data( "a-b", "a" ).removeData( "a-b" ).data( "a-b" ) ) {
 	$.fn.removeData = (function( removeData ) {
 		return function( key ) {
@@ -310,13 +310,13 @@ $.ui.plugin = {
 
 /*!
  * jQuery UI Widget 1.11.1
- * http://jqueryui.com
+ * https://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
- * http://jquery.org/license
+ * https://jquery.org/license
  *
- * http://api.jqueryui.com/jQuery.widget/
+ * https://api.jqueryui.com/jQuery.widget/
  */
 
 
@@ -335,7 +335,7 @@ $.cleanData = (function( orig ) {
 					$( elem ).triggerHandler( "remove" );
 				}
 
-			// http://bugs.jquery.com/ticket/8235
+			// https://bugs.jquery.com/ticket/8235
 			} catch( e ) {}
 		}
 		orig( elems );
@@ -597,7 +597,7 @@ $.Widget.prototype = {
 			.unbind( this.eventNamespace )
 			.removeData( this.widgetFullName )
 			// support: jquery <1.6.3
-			// http://bugs.jquery.com/ticket/9413
+			// https://bugs.jquery.com/ticket/9413
 			.removeData( $.camelCase( this.widgetFullName ) );
 		this.widget()
 			.unbind( this.eventNamespace )
@@ -850,13 +850,13 @@ var widget = $.widget;
 
 /*!
  * jQuery UI Mouse 1.11.1
- * http://jqueryui.com
+ * https://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
- * http://jquery.org/license
+ * https://jquery.org/license
  *
- * http://api.jqueryui.com/mouse/
+ * https://api.jqueryui.com/mouse/
  */
 
 
@@ -1024,13 +1024,13 @@ var mouse = $.widget("ui.mouse", {
 
 /*!
  * jQuery UI Draggable 1.11.1
- * http://jqueryui.com
+ * https://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
- * http://jquery.org/license
+ * https://jquery.org/license
  *
- * http://api.jqueryui.com/draggable/
+ * https://api.jqueryui.com/draggable/
  */
 
 
@@ -2030,13 +2030,13 @@ var draggable = $.ui.draggable;
 
 /*!
  * jQuery UI Sortable 1.11.1
- * http://jqueryui.com
+ * https://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
- * http://jquery.org/license
+ * https://jquery.org/license
  *
- * http://api.jqueryui.com/sortable/
+ * https://api.jqueryui.com/sortable/
  */
 
 

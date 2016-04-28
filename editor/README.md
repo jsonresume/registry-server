@@ -1,12 +1,12 @@
 # Resume Editor
 
-The live editor available at http://registry.jsonresume.org/
+The live editor available at https://registry.jsonresume.org/
 
 ## Development
 
 ### Using Grunt
 
-Install [Grunt](http://gruntjs.com/):
+Install [Grunt](https://gruntjs.com/):
 
 ```
 sudo npm -g install grunt-cli
@@ -22,4 +22,4 @@ grunt uglify
 
 ## License
 
-Available under [the MIT license](http://mths.be/mit).
+Available under [the MIT license](https://mths.be/mit).

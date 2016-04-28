@@ -1,5 +1,5 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "https://json-schema.org/draft-04/schema#",
 	"title": "Resume Schema",
 	"type": "object",
 	"additionalProperties": false,
@@ -79,7 +79,7 @@
 							},
 							"url": {
 								"type": "string",
-								"description": "e.g. http://twitter.com/neutralthoughts"
+								"description": "e.g. https://twitter.com/neutralthoughts"
 							}
 						}
 					}
@@ -103,7 +103,7 @@
 			  	},
 			  	"website": {
 			  		"type": "string",
-			  		"description": "e.g. http://facebook.com",
+			  		"description": "e.g. https://facebook.com",
 			  		"format": "uri"
 			  	},
 			  	"startDate": {
@@ -150,7 +150,7 @@
 			  	},
 			  	"website": {
 			  		"type": "string",
-			  		"description": "e.g. http://facebook.com",
+			  		"description": "e.g. https://facebook.com",
 			  		"format": "uri"
 			  	},
 			  	"startDate": {
@@ -277,7 +277,7 @@
 				  	},
 				  	"website": {
 				  		"type": "string",
-				  		"description": "e.g. http://www.computer.org/csdl/mags/co/1996/10/rx069-abs.html"
+				  		"description": "e.g. https://www.computer.org/csdl/mags/co/1996/10/rx069-abs.html"
 				  	},
 				  	"summary": {
 				  		"type": "string",

@@ -47,7 +47,7 @@ module.exports = function upsertResume(req, res, next) {
                         }
 
                         res.send({
-                            url: 'http://registry.jsonresume.org/' + user.username
+                            url: 'https://registry.jsonresume.org/' + user.username
                         });
                     });
                 } else if (valueExists === null) {
@@ -76,7 +76,7 @@ module.exports = function upsertResume(req, res, next) {
             }
 
             res.send({
-                url: 'http://registry.jsonresume.org/' + guestUsername
+                url: 'https://registry.jsonresume.org/' + guestUsername
             });
         });
     }

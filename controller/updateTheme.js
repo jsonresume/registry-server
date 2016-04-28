@@ -29,7 +29,7 @@ module.exports = function updateTheme(req, res, next) {
                     'jsonresume.theme': theme
                 }, function(err, resume) {
                     res.send({
-                        url: 'http://registry.jsonresume.org/' + user.username
+                        url: 'https://registry.jsonresume.org/' + user.username
                     });
                 });
             } else if (valueExists === null) {
@@ -46,7 +46,7 @@ module.exports = function updateTheme(req, res, next) {
                     'jsonresume.theme': theme
                 }, function(err, resume) {
                     res.send({
-                        url: 'http://registry.jsonresume.org/' + user.username
+                        url: 'https://registry.jsonresume.org/' + user.username
                     });
                 });
 

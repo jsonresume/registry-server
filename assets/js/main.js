@@ -264,8 +264,8 @@ $(function() {
             /*
             $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
                 if (options.url.indexOf('session') !== -1 || options.url.indexOf('user') !== -1) {
-                    options.url = 'http://registry.jsonresume.org/' + options.url;
-                    //options.url = 'http://localhost:5000' + options.url;
+                    options.url = 'https://registry.jsonresume.org/' + options.url;
+                    //options.url = 'https://localhost:5000' + options.url;
                     options.xhrFields = {
                         withCredentials: true
                     };
@@ -332,8 +332,8 @@ $(function() {
 
             reset();
         }
-        //$.ajax('http://localhost:5000/thomasdavis.json', {
-        /*$.ajax('http://registry.jsonresume.org/'+session.get('username')+'.json', {
+        //$.ajax('https://localhost:5000/thomasdavis.json', {
+        /*$.ajax('https://registry.jsonresume.org/'+session.get('username')+'.json', {
       		success: function (res) {
       			var resumeObj = res;
       			console.log(resumeObj);
@@ -431,7 +431,7 @@ $(function() {
 		    		var resumeM = new ResumeModel();
 		    		resumeM.save({resume:resume, theme: $(".dropdown").data("selected")}, {
 		    			success: function () {
-        					$('.register-form .modal-body').html('<p>Beautiful! Access your published resume at<br /><a style="color: #007eff" href="http://registry.jsonresume.org/'+Session.get('username')+'" target="_blank">http://registry.jsonresume.org/'+Session.get('username')+'</a></p>');
+        					$('.register-form .modal-body').html('<p>Beautiful! Access your published resume at<br /><a style="color: #007eff" href="https://registry.jsonresume.org/'+Session.get('username')+'" target="_blank">https://registry.jsonresume.org/'+Session.get('username')+'</a></p>');
 
 		    				console.log('whoa', arguments);
 		    			}

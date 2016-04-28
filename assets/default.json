@@ -17,7 +17,7 @@
       "state": "California"
     },
     "websites": {
-      "blog": "http://richardhendricks.com"
+      "blog": "https://richardhendricks.com"
     },
     "profiles": {
       "github": "richardhendricks",
@@ -28,7 +28,7 @@
     "startDate": "2013-12-01",
     "position": "CEO/President",
     "company": "Pied Piper",
-    "website": "http://piedpiper.com",
+    "website": "https://piedpiper.com",
     "summary": "Pied Piper is a multi-platform technology based on a proprietary universal compression algorithm that has consistently fielded high Weisman Scores™ that are not merely competitive, but approach the theoretical limit of lossless compression.",
     "highlights": [
       "Build an algorithm for artist to detect if their music was violating copy right infringement laws",
@@ -53,7 +53,7 @@
     "name": "Video compression for 3d media",
     "publisher": "Hooli",
     "releaseDate": "2014-10-01",
-    "website": "http://en.wikipedia.org/wiki/Silicon_Valley_(TV_series)"
+    "website": "https://en.wikipedia.org/wiki/Silicon_Valley_(TV_series)"
   }],
   "skills": [{
     "name": "Web Development",

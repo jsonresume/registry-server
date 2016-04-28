@@ -30,7 +30,7 @@ describe('Resumes: ', function() {
   //
   //       should.not.exist(err);
   //       res.body.should.have.property('url');
-  //       res.body.url.should.startWith('http://registry.jsonresume.org/');
+  //       res.body.url.should.startWith('https://registry.jsonresume.org/');
   //       // url should end with the randomly generated guestUsername
   //       // TODO test that test resume was actually created.
   //
@@ -48,7 +48,7 @@ describe('Resumes: ', function() {
   //     })
   //     .expect(200, function(err, res) {
   //       should.not.exist(err);
-  //       res.body.should.have.property('url', 'http://registry.jsonresume.org/' + user.username);
+  //       res.body.should.have.property('url', 'https://registry.jsonresume.org/' + user.username);
   //
   //       done();
   //     });
@@ -64,7 +64,7 @@ describe('Resumes: ', function() {
       })
       .expect(200, function(err, res) {
         should.not.exist(err);
-        res.body.should.have.property('url', 'http://registry.jsonresume.org/' + user.username);
+        res.body.should.have.property('url', 'https://registry.jsonresume.org/' + user.username);
         // TODO find resume and check theme field
 
         done();

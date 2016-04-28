@@ -1,5 +1,5 @@
 process.env.MONGOHQ_URL = 'mongodb://localhost:27017/jsonresume-tests';
-process.env.POSTMARK_API_KEY = 'POSTMARK_API_TEST'; // http://blog.postmarkapp.com/post/913165552/handling-email-in-your-test-environment
+process.env.POSTMARK_API_KEY = 'POSTMARK_API_TEST'; // https://blog.postmarkapp.com/post/913165552/handling-email-in-your-test-environment
 var Q = require('q');
 var bcrypt = require('bcrypt-nodejs');
 var should = require('should');
@@ -54,7 +54,7 @@ describe('renderResume: GET /:username ', function() {
   });
 
   it('should return 200 OK for a valid user with a resume', function() {
-    var themeReq = nock('http://themes.jsonresume.org')
+    var themeReq = nock('https://themes.jsonresume.org')
       .post('/theme/' + server.DEFAULT_THEME)
       .reply(200, 'An example resume');
     return api.post('/resume')
@@ -77,7 +77,7 @@ describe('renderResume: GET /:username ', function() {
   });
 
   it('should return 500 Internal Server Error if the theme manager service returns an error', function() {
-    var themeReq = nock('http://themes.jsonresume.org')
+    var themeReq = nock('https://themes.jsonresume.org')
       .post('/theme/' + server.DEFAULT_THEME)
       .replyWithError({
         message: 'server is down'
