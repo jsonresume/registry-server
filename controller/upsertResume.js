@@ -41,7 +41,7 @@ module.exports = function upsertResume(req, res, next) {
                         'jsonresume.username': user.username
                     };
 
-                    Resume.update(conditions, resume, { upsert: true }, function(err, resume) {
+                    Resume.update(conditions, resume, { upsert: true, overwrite: true }, function(err, resume) {
                         if (err) {
                             return next(err);
                         }
