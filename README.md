@@ -13,7 +13,7 @@ Requirements: MongoDB, Redis
 1. `npm install`
 1. `git submodule update --init --recursive --depth 1`
 1. `mongo 127.0.0.1:27017/jsonresume --eval "db.resumes.insert({})"`
-1. `MONGOHQ_URL=mongodb://127.0.0.1:27017/jsonresume node server.js`
+1. `POSTMARK_API_KEY=1234567889 MONGOHQ_URL=mongodb://127.0.0.1:27017/jsonresume node server.js`
 
 *Alternatively:*
 
@@ -22,7 +22,7 @@ Requirements: Vagrant, Virtualbox
 1. Clone the repository
 1. `vagrant up`
 1. `vagrant ssh`
-1. `node server.js`
+1. `POSTMARK_API_KEY=1234567889 MONGOHQ_URL=mongodb://127.0.0.1:27017/jsonresume node server.js`
 
 ## Testing
 
