@@ -17,7 +17,7 @@ Requirements: MongoDB, Redis
 
 *Alternatively:*
 
-Requirements: Vagrant, Virtualbox
+Requirements: Vagrant, VirtualBox(or other providers)
 
 1. Clone the repository
 1. `vagrant up`
