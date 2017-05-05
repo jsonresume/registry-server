@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 export PROJECT_DIR=/vagrant
 export PROVISION_DIR=$PROJECT_DIR/provision

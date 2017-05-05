@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 function echo_heading {
   local string=$1
