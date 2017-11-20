@@ -35,3 +35,4 @@ For additional documentation please see the [Wiki page](https://github.com/jsonr
 ## License
 
 Available under [the MIT license](https://mths.be/mit).
+
