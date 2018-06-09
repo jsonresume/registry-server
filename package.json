@@ -2,7 +2,7 @@
   "name": "registry-server",
   "version": "0.0.0",
   "engines": {
-    "node": "^4"
+    "node": "^8"
   },
   "description": "",
   "main": "server.js",
