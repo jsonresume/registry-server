@@ -1,8 +1,7 @@
 # JSON Resume Registry Server
 
-[![Join the chat at https://gitter.im/jsonresume/public](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jsonresume/public?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/jsonresume/registry-server.svg?branch=master)](https://travis-ci.org/jsonresume/registry-server) [![Dependency Status](https://david-dm.org/jsonresume/registry-server.svg)](https://david-dm.org/jsonresume/registry-server) [![devDependency Status](https://david-dm.org/jsonresume/registry-server/dev-status.svg)](https://david-dm.org/jsonresume/registry-server#info=devDependencies)
-﻿[![Issue Stats](https://www.issuestats.com/github/jsonresume/registry-server/badge/pr?style=flat)](https://www.issuestats.com/github/jsonresume/registry-server) [![Issue Stats](https://www.issuestats.com/github/jsonresume/registry-server/badge/issue?style=flat)](https://www.issuestats.com/github/jsonresume/registry-server)
-
+[![Join the chat at https://gitter.im/jsonresume/public](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jsonresume/public?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/jsonresume/registry-server.svg?branch=master)](https://travis-ci.org/jsonresume/registry-server) [![Dependency Status](https://david-dm.org/jsonresume/registry-server.svg)](https://david-dm.org/jsonresume/registry-server) [![devDependency Status](https://david-dm.org/jsonresume/registry-server/dev-status.svg)](https://david-dm.org/jsonresume/registry-server#info=devDependencies)﻿
+[![Issue Stats](http://www.issuestats.com/github/jsonresume/registry-server/badge/pr?style=flat)](https://www.issuestats.com/github/jsonresume/registry-server) [![Issue Stats](http://www.issuestats.com/github/jsonresume/registry-server/badge/issue?style=flat)](https://www.issuestats.com/github/jsonresume/registry-server)
 
 
 ## Installation
