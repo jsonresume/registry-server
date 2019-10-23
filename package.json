@@ -30,7 +30,7 @@
     "http-status-codes": "^1.0.5",
     "lodash": "^4.17.10",
     "mongodb": "~2.2.26",
-    "mongoose": "^4.13",
+    "mongoose": "^5.7",
     "mustache": "^2.3.0",
     "newrelic": "^1.26.2",
     "pdfcrowd": "^1.1.1",
